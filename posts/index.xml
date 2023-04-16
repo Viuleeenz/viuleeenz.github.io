@@ -124,7 +124,7 @@ that these function are actually called within the UnPackMe address space. In my
 <p>These steps are left as homework for the few people that reached this point :)</p>
 <h2 id="conclusion">Conclusion</h2>
 <p>To conclude, in this brief post we saw how to manually examine a binary that has been packed, looking for clues, formulate hypothesis and then working to confirm or reject them.</p>
-<p>In my experience, reversing isn&rsquo;t going in the middle of the code without an idea, it’s important to follow a method that should be as general as possible like the <code>scientific method</code>. In order to get better, I strongly recommend to practice with other sample trying to apply the same approach we saw here.</p>
+<p>In my experience, reversing isn&rsquo;t going in the middle of the code without an idea, it’s important to follow a method that should be as general as possible. In order to get better, I strongly recommend to practice with other sample trying to apply the same approach we saw here.</p>
 <p>In case of doubts, unclear part, or just feedback about this post, feel free to reach me on my mail account.</p>
 ]]></content>
         </item>
