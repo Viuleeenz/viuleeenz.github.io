@@ -14,7 +14,7 @@
       <pubDate>Tue, 14 Mar 2023 00:00:00 +0000</pubDate>
       
       <guid>https://Viuleeenz.github.io/posts/2023/03/dynamic-binary-instrumentation-for-malware-analysis/</guid>
-      <description>Introduction </description>
+      <description>Introduction Because of the massive Ursnif campaigns that hit Italy during the last weeks, I was looking for a lightweight method to quickly extract the last infection stage of all collected samples, in order to start further analysis effectively. Due to this, I wrote a little frida script that performs basic Dynamic Binary Instrumentation (DBI) to monitor useful function calls and extracts the Ursnif payload. In this article I am going to briefly discuss this script and the steps needed to start analyzing the resulting binary.</description>
     </item>
     
     <item>
@@ -50,7 +50,8 @@
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://Viuleeenz.github.io/whitepapers/</guid>
-      <description>On this page, I will post whitepapers, references of each work or blogpost where I was personally involved. The goal of this page is to share additional information that I wasn’t capable of directly posting on the main page for any reason (e.g., conferences slide, working activities, etc… ).</description>
+      <description>On this page, I will post whitepapers, references of each work or blogpost where I was personally involved. The goal of this page is to share additional information that I wasn’t capable of directly posting on the main page for any reason (e.g., conferences slide, working activities, etc… ).
+Nexus: a new Android botnet? At the beginning of January 2023, a new Android banking botnet named Nexus that was promoted by a user on multiple underground hacking forums.</description>
     </item>
     
   </channel>
