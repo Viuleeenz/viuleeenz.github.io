@@ -7,7 +7,17 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
-    <lastBuildDate>Tue, 14 Mar 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://Viuleeenz.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 08 May 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://Viuleeenz.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Extracting DDosia targets from process memory</title>
+      <link>https://Viuleeenz.github.io/posts/2023/05/extracting-ddosia-targets-from-process-memory/</link>
+      <pubDate>Mon, 08 May 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://Viuleeenz.github.io/posts/2023/05/extracting-ddosia-targets-from-process-memory/</guid>
+      <description>Introduction This post is part of an analysis that I have carried out during my spare time, motivated by a friend that asked me to have a look at the DDosia project related to the NoName057(16) group. The reason behind this request was caused by DDosia client changes for performing the DDos attacks. Because of that, all procedures used so far for monitoring NoName057(16) activities did not work anymore.
+Before starting to reverse DDosia Windows sample, I preferred to gather as much information as possible about NoName057(16) TTPs and a few references to their samples.</description>
+    </item>
+    
     <item>
       <title>Dynamic Binary Instrumentation for Malware Analysis</title>
       <link>https://Viuleeenz.github.io/posts/2023/03/dynamic-binary-instrumentation-for-malware-analysis/</link>
@@ -51,7 +61,7 @@
       
       <guid>https://Viuleeenz.github.io/whitepapers/</guid>
       <description>On this page, I will post whitepapers, references of each work or blogpost where I was personally involved. The goal of this page is to share additional information that I wasn’t capable of directly posting on the main page for any reason (e.g., conferences slide, working activities, etc… ).
-Nexus: a new Android botnet? At the beginning of January 2023, a new Android banking botnet named Nexus that was promoted by a user on multiple underground hacking forums.</description>
+Operation drIBAN: insight from modern banking frauds behind Ramnit In 2019, me and my colleagues from the Incident Response Team (TIR) at Cleafy, observed and analyzed a persistent fraud operation that started around that time.</description>
     </item>
     
   </channel>

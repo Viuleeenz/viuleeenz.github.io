@@ -164,7 +164,7 @@ Before starting to reverse DDosia Windows sample, I preferred to gather as much 
 <p><a href="https://decoded.avast.io/martinchlumecky/ddosia-project-how-noname05716-is-trying-to-improve-the-efficiency-of-ddos-attacks/">Avast</a> wrote a very detailed article about that project and described thoroughly all changes observed in the last few months. Because of that, before proceeding with this post, If you feel you are missing something, I strongly  recommend that you read their article.</p>
 <h2 id="client-setup">Client Setup</h2>
 <p>According to the information retrieved from the Telegram channel of DDosia Project, there are a couple of requirements before executing the client. The very first action is to create your id through a dedicated bot that will be used later on for authentication purposes. After that, it&rsquo;s necessary to put the client_id.txt file (generated from DDosia bot) and the executable file in the same folder. If everything has been done properly, it should be possible to observe that authentication process will be done correctly and the client is going to download targets from its server:</p>
-<p><img src="https://Viuleeenz.github.io/img/ddosia/client_a.png" alt="Figure 1: Client authenticated correctly"></p>
+<p><img src="https://Viuleeenz.github.io/img/ddosia/c_a.png" alt="Figure 1: Client authenticated correctly"></p>
 <p>Figure 1: Client authenticated correctly</p>
 <h2 id="dynamic-analysis-and-process-memory-inspection">Dynamic analysis and process memory inspection</h2>
 <p>Here we are with the fun part. Because of the issues of analyzing GO binaries statically, I preferred to use a dynamic approach supported by Cape sandbox. In fact, executing the client with Cape it was possible to gather behavioral information to speed up our analysis (<a href="https://capesandbox.com/analysis/385183/">ref</a>). Since the executable is going to be used for DDoS attacks, it&rsquo;s easy to expect that most of the functions are related to network routines. One of the most interesting WindowsAPI refers to <a href="https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-wsastartup">WSAStartup</a>. This is interesting for us, because according to Microsoft documentation, it must be the first function to be used in order to retrieve socket implementation for further network operations:</p>
@@ -177,7 +177,7 @@ Before starting to reverse DDosia Windows sample, I preferred to gather as much 
 <p>As already mentioned on Avast blogspot, the target list is encrypted and retrieved after the authentication process. However, performing DDoS attacks requires a decryption routine to make targets in cleartext and forward them to a proper procedure. With this insight, it’s possible to open up a debugger and set a breakpoint of WSAStartup and start exploring the process flow from that point.</p>
 <p><img src="https://Viuleeenz.github.io/img/ddosia/network_communication.png" alt="Figure 3 - Exploring DDosia executable control flow"></p>
 <p>Figure 3 - Exploring DDosia executable control flow</p>
-<p>Exploring the process execution, it’s possible to observe that WSAStartup API is called two times before the executables retrieve the target list. The first one has been used from the main thread to perform the authentication process on the server side, instead the second call will be done right after retrieving the target file and it will be used from another thread to start the attack phase. Since that information we are looking for has been already downloaded and hopefully decrypted (at the time of the second call) we could explore the process memory trying to identify our target list.</p>
+<p>Exploring the process execution, it’s possible to observe that <strong>WSAStartup API is called two times before the executables retrieve the target list.</strong> The first one has been used from the main thread to perform the authentication process on the server side, instead the second call will be done right after retrieving the target file and it will be used from another thread to start the attack phase. Since that information we are looking for has been already downloaded and hopefully decrypted (at the time of the second call) we could explore the process memory trying to identify our target list.</p>
 <p><img src="https://Viuleeenz.github.io/img/ddosia/cleartext_targets.png" alt="Figure 4 - Target stored in cleartext within process memory">
 Figure 4 - Target stored in cleartext within process memory</p>
 <p>As we expected, information is actually decrypted right before being used from threads that are in charge to flood the targets. From the cleartext sample, it’s also possible to reconstruct the original json file structure that follow this format:</p>
@@ -185,8 +185,14 @@ Figure 4 - Target stored in cleartext within process memory</p>
 </span></span></code></pre></div><p>At this point I have shown all procedures to quickly follow the execution flow until the decryption routine is called. From now on, it&rsquo;s just a matter of looking for those data within process memory and extracting them for your own purpose. It’s worth noting that that information won’t be stored decrypted forever, in fact, as the executable keeps running, the json file is actually mangled in a way that is not easy to resemble it properly.</p>
 <h2 id="a-little-bit-of-automation">A little bit of automation</h2>
 <p>Even if the analysis has been completed and targets are correctly retrieved, I thought that giving a little tool to extract that information would be useful. Instead of doing complex stuff, I wrote two simple scripts called targets.js and recover.py. The purpose of these two files is to allow analysts from different backgrounds to extract those targets, even performing a simple memory dump. Probably there are easier and smarter techniques out there, but it was also a good chance to put in practice DBI, which I have already covered in a previous <a href="https://viuleeenz.github.io/posts/2023/03/dynamic-binary-instrumentation-for-malware-analysis/">post</a>.</p>
-<p><code>target.js</code>: Frida script that aims to get a memory dump after the WSAStartup has been called for the second time (when payloads are in cleartext in memory).</p>
-<p><code>recover.py</code>: it’s a simple python script that retrieves structured information from the files dumped. It’s worth noting that I limited my script to look for structured information, retrieving IP and Hostname (additional improvements are left to user’s needs).</p>
+<ul>
+<li>
+<p><a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/DynamicBinaryInstrumentation/DDosia_Targets/targets.js">target.js</a>: Frida script that aims to get a memory dump after the WSAStartup has been called for the second time (when payloads are in cleartext in memory).</p>
+</li>
+<li>
+<p><a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/DynamicBinaryInstrumentation/DDosia_Targets/recover.py">recover.py</a>: it’s a simple python script that retrieves structured information from the files dumped. It’s worth noting that I limited my script to look for structured information, retrieving IP and Hostname (additional improvements are left to user’s needs).</p>
+</li>
+</ul>
 <h2 id="script-testing">Script Testing</h2>
 <p>In order to run the mentioned scripts there are two requirements to fulfill:</p>
 <ul>
@@ -199,14 +205,14 @@ Figure 4 - Target stored in cleartext within process memory</p>
 <p>Figure 5 - Dumping process Memory with Frida</p>
 <p>Now you can navigate in dumps folder and run the python script using the following command line that is going to forward all dumped file from the current directory to the script that is going to print the result in your console:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>python.exe recover.py (Get-Item .\*dump)
-</span></span></code></pre></div><p><img src="https://Viuleeenz.github.io/img/ddosia/target_extraction.png" alt="Figure 6 - Extracting DDosia targets from dump files"></p>
+</span></span></code></pre></div><p><img src="https://Viuleeenz.github.io/img/ddosia/target_extraction.png" alt="Figure 6 - Extracting DDosia targets from dumped files"></p>
 <p>Figure 6 - Extracting DDosia targets from dump files</p>
 <h2 id="final-notes">Final Notes</h2>
 <p>Before concluding, It’s worth mentioning that updates on these scripts and new techniques to dealing with further improvements of DDosia project are not going to be shown, because it represents a topic that I’m not following personally and I’m sure that more authoritative voices will keep track of this threat and its evolution.</p>
-<p>Happy Reversing.</p>
 <h3 id="references">References:</h3>
-<p>FileName  Sha256  Date
-d_windows_amd64.exe   726c2c2b35cb1adbe59039193030f23e552a28226ecf0b175ec5eba9dbcd336e  19/04/2023</p>
+<ul>
+<li>Binary analyzed: <a href="https://www.virustotal.com/gui/file/726c2c2b35cb1adbe59039193030f23e552a28226ecf0b175ec5eba9dbcd336e">d_windows_amd64.exe</a> | 726c2c2b35cb1adbe59039193030f23e552a28226ecf0b175ec5eba9dbcd336e (sha256) | 19/04/2023</li>
+</ul>
 
       </div>
     </article>
