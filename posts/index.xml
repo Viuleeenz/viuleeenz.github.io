@@ -52,9 +52,6 @@
 <p>Running the script against this sample with Frida as follow:</p>
 <p><code>frida.exe &lt;mal_executable&gt; -l &lt;your_script.js&gt;</code></p>
 <p>It will produce a file called <strong>0x2cf0000_mz.bin</strong> (it may vary from the memory address allocation on your machine).</p>
-<p>Running the script against this sample with Frida as follow:</p>
-<p><code>frida.exe &lt;mal_executable&gt; -l &lt;your_script.js&gt;</code></p>
-<p>It will produce a file called <strong>0x2cf0000_mz.bin</strong> (it may vary from the memory address allocation on your machine).</p>
 <p><img src="/img/dbi/extractionWithFrida.png" alt="Figure 5 - Ursnif payload extraction with Frida"></p>
 <p>Figure 5 - Ursnif payload extraction with Frida</p>
 <p>If we open this file with PE-Bear, what should alert us, is the import table that contains unresolved information. This happens, because our code has been extracted directly from memory and before proceeding with our analysis it is necessary to map the raw sections addresses with their virtual counterparts (for brevity I have prepared a script that is going to perform these steps automatically). After having settled the addresses properly, it’s possible to proceed with configuration extraction through a custom script (that is out of the scope for this post).</p>
