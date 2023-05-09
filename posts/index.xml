@@ -31,10 +31,10 @@ Before starting to reverse DDosia Windows sample, I preferred to gather as much 
 <p>The WSAStartup function must be the first Windows Sockets function called by an application or DLL. It allows an application or DLL to specify the version of Windows Sockets required and retrieve details of the specific Windows Sockets implementation. The application or DLL can only issue further Windows Sockets functions after successfully calling WSAStartup.</p>
 </blockquote>
 <p>Moreover, starting to monitor network requests with Wireshark, give us additional information about client-server interactions and targets retrieving procedure:</p>
-<p><img src="/img/ddosia/control_flow.png" alt="Figure 2 - Request for target list"></p>
+<p><img src="/img/ddosia/network_communication.png" alt="Figure 2 - Request for target list"></p>
 <p>Figure 2 - Request for target list</p>
 <p>As already mentioned on Avast blogspot, the target list is encrypted and retrieved after the authentication process. However, performing DDoS attacks requires a decryption routine to make targets in cleartext and forward them to a proper procedure. With this insight, it’s possible to open up a debugger and set a breakpoint of WSAStartup and start exploring the process flow from that point.</p>
-<p><img src="/img/ddosia/network_communication.png" alt="Figure 3 - Exploring DDosia executable control flow"></p>
+<p><img src="/img/ddosia/control_flow.png" alt="Figure 3 - Exploring DDosia executable control flow"></p>
 <p>Figure 3 - Exploring DDosia executable control flow</p>
 <p>Exploring the process execution, it’s possible to observe that <strong>WSAStartup API is called two times before the executables retrieve the target list.</strong> The first one has been used from the main thread to perform the authentication process on the server side, instead the second call will be done right after retrieving the target file and it will be used from another thread to start the attack phase. Since that information we are looking for has been already downloaded and hopefully decrypted (at the time of the second call) we could explore the process memory trying to identify our target list.</p>
 <p><img src="/img/ddosia/cleartext_targets.png" alt="Figure 4 - Target stored in cleartext within process memory">
