@@ -36,7 +36,7 @@ Before starting to reverse DDosia Windows sample, I preferred to gather as much 
 <p>As already mentioned on Avast blogspot, the target list is encrypted and retrieved after the authentication process. However, performing DDoS attacks requires a decryption routine to make targets in cleartext and forward them to a proper procedure. With this insight, it’s possible to open up a debugger and set a breakpoint of WSAStartup and start exploring the process flow from that point.</p>
 <p><img src="/img/ddosia/control_flow.png" alt="Figure 3 - Exploring DDosia executable control flow"></p>
 <p>Figure 3 - Exploring DDosia executable control flow</p>
-<p>Exploring the process execution, it’s possible to observe that <strong>WSAStartup API is called two times before the executables retrieve the target list.</strong> The first one has been used from the main thread to perform the authentication process on the server side, instead the second call will be done right after retrieving the target file and it will be used from another thread to start the attack phase. Since that information we are looking for has been already downloaded and hopefully decrypted (at the time of the second call) we could explore the process memory trying to identify our target list.</p>
+<p>Exploring the process execution, it’s possible to observe that <strong>WSAStartup API is called two times before starting the attack.</strong> The first one has been used from the main thread to perform the authentication process on the server side, instead the second call will be done right after retrieving the target file and it will be used from another thread to start the attack phase. Since that information we are looking for has been already downloaded and hopefully decrypted (at the time of the second call) we could explore the process memory trying to identify our target list.</p>
 <p><img src="/img/ddosia/cleartext_targets.png" alt="Figure 4 - Target stored in cleartext within process memory">
 Figure 4 - Target stored in cleartext within process memory</p>
 <p>As we expected, information is actually decrypted right before being used from threads that are in charge to flood the targets. From the cleartext sample, it’s also possible to reconstruct the original json file structure that follow this format:</p>
@@ -59,7 +59,8 @@ Figure 4 - Target stored in cleartext within process memory</p>
 <li>Create a folder named “dumps” in the same place where you run the target.js file.</li>
 </ul>
 <p>If all requirements are satisfied it’s just a matter of running those scripts and getting the results. The first step is to run frida.exe, using the targets.js file that contains all the information to dump the process memory:</p>
-<p>If everything has been done correctly (please keep in mind the requirements), you should be able to see a message “[END] Memory dumped correctly” in your console.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>frida.exe &lt;ddosia_client.exe&gt;  -l targets.js
+</span></span></code></pre></div><p>If everything has been done correctly (please keep in mind the requirements), you should be able to see a message “[END] Memory dumped correctly” in your console.</p>
 <p><img src="/img/ddosia/frida_dump.png" alt="Figure 5 - Dumping process Memory with Frida"></p>
 <p>Figure 5 - Dumping process Memory with Frida</p>
 <p>Now you can navigate in dumps folder and run the python script using the following command line that is going to forward all dumped file from the current directory to the script that is going to print the result in your console:</p>
