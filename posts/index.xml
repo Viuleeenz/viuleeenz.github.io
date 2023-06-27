@@ -111,7 +111,7 @@ Figure 4 - finding function code and its usage</p>
 <p><img src="https://lh6.googleusercontent.com/CZC2L6z-Ie0G8mb6v0Nutciep3hXx7AerWk-c6vr52u1QyEIicO-E76156SnByknVj8_JtB-m2lZCxuSB_NBst6miGqVh8vcz3zNg81m4raC4QCVV1can-KqGLdLRNp5YH1IzPm9MzhEANTWX-J4XFY" alt="Figure 5 - Variable deobfuscated successfully">
 Figure 5 - Variable deobfuscated successfully</p>
 <h2 id="conclusion">Conclusion</h2>
-<p>This post has been written to illustrate an effective and quite useful technique to locate interesting functions within a binary and to write a custom IDA-python script that is capable of finding all function occurrences. This approach it’s actually very helpful also to avoid configuration dependencies, giving to our script the ability to be shared without <strong>tweaking specific parameters</strong> that could rely on IDA instances.</p>
+<p>This post has been written to illustrate an effective and quite useful technique to locate interesting functions within a binary and to write a custom IDA-python script that is capable of finding all function occurrences. This approach it’s actually very helpful also to avoid configuration dependencies, giving to our script the ability to be shared <strong>without tweaking specific parameters</strong> that could rely on IDA instances.</p>
 <h3 id="references">References</h3>
 <ul>
 <li>Ida-python script: <a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/IDA-python/function_search/fSearch.py">fSearch.py</a></li>
