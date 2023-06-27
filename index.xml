@@ -7,7 +7,17 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
-    <lastBuildDate>Mon, 08 May 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://Viuleeenz.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 27 Jun 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://Viuleeenz.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Ida-python - Locate function independently from its offset</title>
+      <link>https://Viuleeenz.github.io/posts/2023/06/ida-python-locate-function-independently-from-its-offset/</link>
+      <pubDate>Tue, 27 Jun 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://Viuleeenz.github.io/posts/2023/06/ida-python-locate-function-independently-from-its-offset/</guid>
+      <description>Introduction Analyzing samples statically could be not an easy going taks, especially when you deal with heavily obfuscated or encrypted data. Because of that, it’s useful to find out the decryption/deobfuscation routine and write a little script that makes sense of strings or function names before starting to analyze the whole sample.
+The idea behind this technique was inspired by the infinite amount of tweaking I have made to run multiple Ida-python scripts that were heavily machine-setting dependents.</description>
+    </item>
+    
     <item>
       <title>Extracting DDosia targets from process memory</title>
       <link>https://Viuleeenz.github.io/posts/2023/05/extracting-ddosia-targets-from-process-memory/</link>
