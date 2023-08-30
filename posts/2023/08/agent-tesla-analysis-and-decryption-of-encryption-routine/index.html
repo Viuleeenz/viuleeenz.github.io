@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="author" content="map[name:Alessandro Strino]">
+<meta name="description" content="Agent Tesla Decryption General Information and preface Agent Tesla, according to the data provided by CERT-EU, is one the most prominent threats that are hitting European cyberspace. Because of that, I found that it could be quite interesting understanding its behavior. However, as I usually prefer, instead of focusing on the infection chain or information about TA methodologies, sharing knowledge that were already provided by more authoritative sources, I preferred to focus mostly on malware analysis and in this specific case to the latest encryption algorithm adopted." />
+<meta name="keywords" content="malware, binary, digital forensics, exploit development, reverse engineering" />
+<meta name="robots" content="noodp" />
+<meta name="theme-color" content="" />
+<link rel="canonical" href="https://Viuleeenz.github.io/posts/2023/08/agent-tesla-analysis-and-decryption-of-encryption-routine/" />
+
+
+    <title>
+        
+            Agent Tesla -  Analysis and Decryption of encryption routine :: Security Undisguised 
+        
+    </title>
+
+
+
+
+
+<link rel="stylesheet" href="https://Viuleeenz.github.io/main.b78c3be9451dc4ca61ca377f3dc2cf2e6345a44c2bae46216a322ef366daa399.css" integrity="sha256-t4w76UUdxMphyjd/PcLPLmNFpEwrrkYhajIu82bao5k=">
+
+
+    
+        <link rel="stylesheet" type="text/css" href="https://Viuleeenz.github.io/style.css">
+    
+
+
+    <link rel="apple-touch-icon" sizes="180x180" href="https://Viuleeenz.github.io/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://Viuleeenz.github.io/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://Viuleeenz.github.io/favicon-16x16.png">
+    <link rel="manifest" href="https://Viuleeenz.github.io/site.webmanifest">
+    <link rel="mask-icon" href="https://Viuleeenz.github.io/safari-pinned-tab.svg" color="">
+    <link rel="shortcut icon" href="https://Viuleeenz.github.io/favicon.ico">
+    <meta name="msapplication-TileColor" content="">
+
+
+<meta itemprop="name" content="Agent Tesla -  Analysis and Decryption of encryption routine">
+<meta itemprop="description" content="Agent Tesla Decryption General Information and preface Agent Tesla, according to the data provided by CERT-EU, is one the most prominent threats that are hitting European cyberspace. Because of that, I found that it could be quite interesting understanding its behavior. However, as I usually prefer, instead of focusing on the infection chain or information about TA methodologies, sharing knowledge that were already provided by more authoritative sources, I preferred to focus mostly on malware analysis and in this specific case to the latest encryption algorithm adopted."><meta itemprop="datePublished" content="2023-08-28T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2023-08-28T00:00:00+00:00" />
+<meta itemprop="wordCount" content="1267"><meta itemprop="image" content="https://Viuleeenz.github.io/"/>
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://Viuleeenz.github.io/"/>
+
+<meta name="twitter:title" content="Agent Tesla -  Analysis and Decryption of encryption routine"/>
+<meta name="twitter:description" content="Agent Tesla Decryption General Information and preface Agent Tesla, according to the data provided by CERT-EU, is one the most prominent threats that are hitting European cyberspace. Because of that, I found that it could be quite interesting understanding its behavior. However, as I usually prefer, instead of focusing on the infection chain or information about TA methodologies, sharing knowledge that were already provided by more authoritative sources, I preferred to focus mostly on malware analysis and in this specific case to the latest encryption algorithm adopted."/>
+
+
+
+    <meta property="og:title" content="Agent Tesla -  Analysis and Decryption of encryption routine" />
+<meta property="og:description" content="Agent Tesla Decryption General Information and preface Agent Tesla, according to the data provided by CERT-EU, is one the most prominent threats that are hitting European cyberspace. Because of that, I found that it could be quite interesting understanding its behavior. However, as I usually prefer, instead of focusing on the infection chain or information about TA methodologies, sharing knowledge that were already provided by more authoritative sources, I preferred to focus mostly on malware analysis and in this specific case to the latest encryption algorithm adopted." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://Viuleeenz.github.io/posts/2023/08/agent-tesla-analysis-and-decryption-of-encryption-routine/" /><meta property="og:image" content="https://Viuleeenz.github.io/"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2023-08-28T00:00:00+00:00" />
+<meta property="article:modified_time" content="2023-08-28T00:00:00+00:00" />
+
+
+
+
+
+
+
+    <meta property="article:published_time" content="2023-08-28 00:00:00 &#43;0000 UTC" />
+
+
+
+
+
+
+
+
+
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XNKLBC4D9D"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-XNKLBC4D9D', { 'anonymize_ip': false });
+}
+</script>
+
+
+
+    </head>
+
+    
+        <body>
+    
+    
+        <div class="container">
+            <header class="header">
+    <span class="header__inner">
+        <a href="https://Viuleeenz.github.io/" style="text-decoration: none;">
+    <div class="logo">
+        
+            <span class="logo__mark">&gt;</span>
+            <span class="logo__text ">
+                $ cd /home/Viuleeenz</span>
+            <span class="logo__cursor" style=
+                  "
+                   
+                   ">
+            </span>
+        
+    </div>
+</a>
+
+        <span class="header__right">
+            
+                <nav class="menu">
+    <ul class="menu__inner"><li><a href="https://Viuleeenz.github.io/about/">About</a></li><li><a href="https://Viuleeenz.github.io/posts/">Posts</a></li><li><a href="https://Viuleeenz.github.io/whitepapers/">Whitepapers</a></li>
+    </ul>
+</nav>
+
+                <span class="menu-trigger">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                    </svg>
+                </span>
+            
+                <span class="theme-toggle not-selectable"><svg class="theme-toggler" width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+   <path d="M22 41C32.4934 41 41 32.4934 41 22C41 11.5066 32.4934 3 22
+   3C11.5066 3 3 11.5066 3 22C3 32.4934 11.5066 41 22 41ZM7 22C7
+   13.7157 13.7157 7 22 7V37C13.7157 37 7 30.2843 7 22Z"/>
+ </svg></span>
+        </span>
+    </span>
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XNKLBC4D9D"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-XNKLBC4D9D', { 'anonymize_ip': false });
+}
+</script>
+
+</header>
+
+
+            <div class="content">
+                
+  <main class="post">
+
+    <div class="post-info">
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        6 minutes
+
+        
+      </p>
+    </div>
+
+    <article>
+      <h1 class="post-title">
+        <a href="https://Viuleeenz.github.io/posts/2023/08/agent-tesla-analysis-and-decryption-of-encryption-routine/">Agent Tesla -  Analysis and Decryption of encryption routine</a>
+      </h1>
+
+      
+
+      
+
+      
+
+      <div class="post-content">
+        <h1 id="agent-tesla-decryption">Agent Tesla Decryption</h1>
+<h1 id="general-information-and-preface">General Information and preface</h1>
+<p>Agent Tesla, according to the <a href="https://cert.europa.eu/static/threat-intelligence/TLP-CLEAR-CB-23-08.pdf">data</a> provided by CERT-EU, is one the most prominent threats that are hitting European cyberspace. Because of that, I found that it could be quite interesting understanding its behavior. However, as I usually prefer, instead of focusing on the infection chain or information about TA methodologies, sharing knowledge that were already provided by more authoritative sources, I preferred to focus mostly on malware analysis and in this specific case to the latest encryption algorithm adopted. Then, upon the knowledge acquired, I would like to write a decryptor script that extracts payload configuration.</p>
+<h1 id="encryption-variants">Encryption variants</h1>
+<p>Agent Tesla first appeared in 2014, however, its evolution over time could be tracked by multiple TTPs. For the purpose of this article, I’m versioning it through the encryption algorithm adopted. At the time of writing there have been 4 different versions with unique characteristics:</p>
+<p>Encryption v1: ****Through this encryption implementation, strings are stored (encrypted) in base64. The decryption function uses a password and a salt ( both hardcoded) as input for the SHA1 algorithm, in order to generate the decryption key. Then, ciphertext and key are eventually used with AES in CBC mode.</p>
+<p>Encryption v2: The main difference from the previous method, is that each encrypted string is paired with a dedicated key and an IV. The algorithm used is still AES in CBC mode.</p>
+<p>Encryption v3: In this version, TA completely changed their approach, shifting to a pure <em>xor decryption</em>. The decryption function is defined within the <em>.cctor()</em> constructor. The structure of encrypted strings is quite simple. Each string is contained in a byte array paired with a key. The size of the ciphertext allows the decryption routine to iterate over the byte array distinguishing all parameters.</p>
+<p>Encryption v4: The latest version of Agent Tesla is based on a <em>xor string</em> algorithm that stores information within a macro-structure that contains raw data organized as follow:</p>
+<p><a href="https://lh4.googleusercontent.com/rgMJHsQLR6JB0OjAGzCeIZGYJAEiuThnX5uPyZPB9ukmC7vPMclavaVnoQgB9G3tRnv8IOZ2Lvjbcav4pjEUS1uxqeF8fktYlITE4YsNZ9yLtgZJsmsQjCzjKvLfKA0oKT6hzNNZNWE3COKWp0Smm9k">https://lh4.googleusercontent.com/rgMJHsQLR6JB0OjAGzCeIZGYJAEiuThnX5uPyZPB9ukmC7vPMclavaVnoQgB9G3tRnv8IOZ2Lvjbcav4pjEUS1uxqeF8fktYlITE4YsNZ9yLtgZJsmsQjCzjKvLfKA0oKT6hzNNZNWE3COKWp0Smm9k</a></p>
+<p>Figure 1 - Encrypted data structure</p>
+<p>We have a macro-struct that contains the encrypted data. It’s actually possible to visualize it as an array where each element follows a specific structure where the first 4 bytes are dedicated to define the encryption data length, then other 4 bytes are used to describe the encryption key and the remaining bytes are reserved for the actual data.</p>
+<p>As always, the decryption routine iterates over the encrypted data, using key bytes.</p>
+<h1 id="analyzing-encv4-and-its-obfuscation-behavior">Analyzing EncV4 and its obfuscation behavior</h1>
+<p>As I wrote in the first paragraph Agent Tesla analysis will be carried out on the latest encryption mechanism. Because of that, let’s start analyzing the main components of this algorithm:</p>
+<p>private byte[] RXOR(byte[] data, out int key)</p>
+<p>{</p>
+<p>key = RandomNumberGenerator.GetInt32(int.MaxValue);</p>
+<p>// RXOR Cipher: reverse array order and decrypt byte by byte using single XOR</p>
+<p>int n = data.Length - 1;</p>
+<p>for (int i = 0; i &lt; n; i++, n&ndash;)</p>
+<p>{</p>
+<p>data[i] ^= data[n];</p>
+<p>data[n] ^= (byte) (data[i] ^ key);</p>
+<p>data[i] ^= data[n];</p>
+<p>}</p>
+<p>if (data.Length % 2 != 0)</p>
+<p>data[data.Length &raquo; 1] ^= (byte) key; // x &raquo; 1 == x / 2</p>
+<p>return data;</p>
+<p>}</p>
+<p>The key is generated randomly through RandomNumberGenerator.GetInt32(int.MaxValue);function. The <em>int.MaxValue</em> constraint is due to the key size limitation of 4 bytes within the encrypted data structure. The algorithm it&rsquo;s pretty straightforward, performing <em>xor</em> between plaintext and key bytes. However, what really matters here is the <strong>obfuscator</strong> that happens at runtime.</p>
+<p>The obfuscation routine is part of an open source <a href="https://github.com/dr4k0nia/XorStringsNET">project</a>. Basically, this obfuscation works creating multiple placeholders that are going to be replaced at runtime.  Analyzing the sample statically, this technique messes up with code decompilers such as DnSpy.</p>
+<p>However, the author wrote a detailed <a href="https://dr4k0nia.github.io/posts/Encrypting-Strings-In-NET/">blogpost</a> explaining obfuscator features and its modus operandi:</p>
+<p>After processing all methods we need to do some patches in the injected runtime. First, we need to set up the placeholder struct with the correct attribute values. The struct needs a <strong>ClassLayout</strong> with <strong>packing size 1</strong> and the <strong>length of the encrypted data as its size</strong>.</p>
+<p>We also need to create a new <strong>field which will be an initialized version of our struct</strong>. By adding a DataSegment in its <strong>FieldRva</strong>, we can use the field to store any raw data we want, in this case, our encrypted string data.</p>
+<p>Following the indication provided by the author, we should have a more clear idea of what these components are and how to hunt for them in the code. Now it’s possible to start looking at the code gathering as much information as possible (e.g., locating these placeholders) and finding out a pattern to  write an effective configuration decryptor.</p>
+<h1 id="static-analysis">Static Analysis</h1>
+<p>If we open up DnSpy, we could be overwhelmed by the mess that is going to be presented in front of us. However, trying to follow the code flow, we could start exploring.</p>
+<p><a href="https://lh5.googleusercontent.com/zuONKbBX5bsAJ-9VLBUlNoqYkhrk3PdCdn3WHkNawFSZG6MvRT636ILfvDcipjFTT0GlhrCzBdbnxiDNMWsQpDpViMBIgFZFJZ1fhqZZJZdi_bi3lRoGkMNJ2pv16lful5B_TWsxw7m6nMatFOupgRw">https://lh5.googleusercontent.com/zuONKbBX5bsAJ-9VLBUlNoqYkhrk3PdCdn3WHkNawFSZG6MvRT636ILfvDcipjFTT0GlhrCzBdbnxiDNMWsQpDpViMBIgFZFJZ1fhqZZJZdi_bi3lRoGkMNJ2pv16lful5B_TWsxw7m6nMatFOupgRw</a></p>
+<p>Figure 2 <strong>Entry point</strong></p>
+<p>Starting from the Entry Point, it’s possible to locate something promising. Exploring variable and function calls and following references to the object <strong>GWZl2RFJ6nA</strong>, it&rsquo;s possible to bump into quite interesting piece of code.</p>
+<p><a href="https://lh4.googleusercontent.com/U3w0tnCvmRyhyBt97-Pk36cwOrTPTGa6KoRQIWPwArHkdyJ8nwQZWrchT7r4dQiU7BbazIGGDoDYDl1wPIknrnyjdzR1ZZo4jC-mLGlcbqllKjfDRnBR8UdJOAU7UlPiHWo4Uzd48Hj-AY0tSpXuG48">https://lh4.googleusercontent.com/U3w0tnCvmRyhyBt97-Pk36cwOrTPTGa6KoRQIWPwArHkdyJ8nwQZWrchT7r4dQiU7BbazIGGDoDYDl1wPIknrnyjdzR1ZZo4jC-mLGlcbqllKjfDRnBR8UdJOAU7UlPiHWo4Uzd48Hj-AY0tSpXuG48</a></p>
+<p>Figure 3 - Obfuscated decryption routine</p>
+<p>First of all, we see the function <strong>cpblk</strong> that it’s necessary to perform the injection at runtime, moreover, scrolling the code it&rsquo;s possible to get insight about pointer operations paired with xor. In fact, observing the line 104 in Figure 3, it is very similar to the encryption routine that we saw in the previous paragraph.  Nevertheless, on the top of that, as a final proof that we are looking in the right place, scrolling at the end of the code we see a class that fulfills all requirements requested by the obfuscator.</p>
+<ul>
+<li>ClassLayout</li>
+<li>Pack size = 1</li>
+<li>Size = encrypted data length</li>
+</ul>
+<h1 id="heading"></h1>
+<p><a href="https://lh4.googleusercontent.com/SscVl6FW0XbBVt3px_oGIjxBChRw68fi7Zrez6Mumu_WF7sdJBsNRMVqrIqaXeIo-mPaMQf0V8VnILZKPbprhbATjKxIjhWxLwULyM9FngDrwEdjA2C09QVdog2oUeMjqfngeFViG5m6TJrDQqb37wA">https://lh4.googleusercontent.com/SscVl6FW0XbBVt3px_oGIjxBChRw68fi7Zrez6Mumu_WF7sdJBsNRMVqrIqaXeIo-mPaMQf0V8VnILZKPbprhbATjKxIjhWxLwULyM9FngDrwEdjA2C09QVdog2oUeMjqfngeFViG5m6TJrDQqb37wA</a></p>
+<p>Figure 4 - Class placeholder for runtime decryption</p>
+<p>Moreover, following the instruction provided by the author, we should be able to locate the encrypted string in raw bytes within the binary. If we have a closer look to struct <strong>zqRrwrwgu</strong> examining the raw value, we are redirected to a very suspicious sequence of bytes.</p>
+<p><a href="https://lh3.googleusercontent.com/SGwLKd7RiZ-or8mXHPy7frC_MDAQgyn3RcHZ9sK_vs3jU_yReO3wmC_4le_AFu-l8jxsvGEF2Li5sgbNIa5ObmTDEjkJysNMQUrbwfhkGkESbwRg_gApWFALZmnSVnIyFpe412KCqGRwGy2ryp3H63o">https://lh3.googleusercontent.com/SGwLKd7RiZ-or8mXHPy7frC_MDAQgyn3RcHZ9sK_vs3jU_yReO3wmC_4le_AFu-l8jxsvGEF2Li5sgbNIa5ObmTDEjkJysNMQUrbwfhkGkESbwRg_gApWFALZmnSVnIyFpe412KCqGRwGy2ryp3H63o</a></p>
+<p>Figure 5 - Encrypted string</p>
+<p>Analyzing those bytes, it&rsquo;s immediate to find out that we are dealing with an encrypted payload that is ready to be decrypted.</p>
+<h1 id="decrypting-strings">Decrypting Strings</h1>
+<p>The idea behind this script is simple:</p>
+<ul>
+<li>Find out a class that is big enough to contain the encrypted data ( usually the biggest class in the code). Then we could retrieve raw bytes related to its size from the binary file and forward them towards our decryption routine</li>
+</ul>
+<p>Before proceeding, it&rsquo;s worth mentioning that I’m quite a newbie in .NET interaction with python and generally, I’m still learning .NET layout. Because of that, if someone else is going  to produce more efficient code. Please do it! But for now, let’s do a quick look to this this script:</p>
+<p><a href="https://lh6.googleusercontent.com/YgvfXQ1w_ggTUJ8u7Gd0oP5hPymmMYsmLFFVX0FmNoNx9oYpJ6ALMGdINsjWlQ3b25nzLXobQmcMt0-TmyWwVClZ28nHmJbO4Jmw92ck25uN-2A5XwGmtwx1EoTFYSugv8RD9JN9hn8liM6dALueaTY">https://lh6.googleusercontent.com/YgvfXQ1w_ggTUJ8u7Gd0oP5hPymmMYsmLFFVX0FmNoNx9oYpJ6ALMGdINsjWlQ3b25nzLXobQmcMt0-TmyWwVClZ28nHmJbO4Jmw92ck25uN-2A5XwGmtwx1EoTFYSugv8RD9JN9hn8liM6dALueaTY</a></p>
+<p>Figure 6 - Agent Tesla decryptor</p>
+<ul>
+<li><strong>Line 40 - 44:</strong> Gathered references to ClassLayout and FieldRVA Tables.</li>
+<li><strong>Line 46 - 47:</strong> Following the initial idea that encrypted data should be stored in a quite large class, I started to enumerate class, selecting the biggest (likely the one that contains the encrypted strings)</li>
+<li><strong>Line 51:</strong> retrieve the last element of the FieldRVA table that contains our data (I don’t know if it is an unexpected behavior caused by the obfuscation process applied, but the raw data containing the encryption string resulted to be always the last element of the FieldRVA table).</li>
+</ul>
+<p>Running our script on one of the latest Agent Tesla sample, we got the following result:</p>
+<p><a href="https://lh3.googleusercontent.com/MtQZbbAOaz2HR4EEGvuVnAH2VoTzbz3P31VeZe0WPg_qMGpPuDOOQH7vn5jxriHiljyrfpK_3T_lejGWJ3Scwq1vNJDICyjvmkhZzI8g423d7e20_R8XSulLtXB9Db_-Si7wu5H6dPT95HPotd-BY7o">https://lh3.googleusercontent.com/MtQZbbAOaz2HR4EEGvuVnAH2VoTzbz3P31VeZe0WPg_qMGpPuDOOQH7vn5jxriHiljyrfpK_3T_lejGWJ3Scwq1vNJDICyjvmkhZzI8g423d7e20_R8XSulLtXB9Db_-Si7wu5H6dPT95HPotd-BY7o</a></p>
+<p>Figure 7 - Decryption result</p>
+<h1 id="heading-1"></h1>
+<h1 id="references">References</h1>
+<p>Agent Tesla Decryptor: <a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/ConfigurationExtractors/AgentTesla/agent_tesla_decryptor_v4.py">https://github.com/Viuleeenz/Reversing_Notes/blob/main/ConfigurationExtractors/AgentTesla/agent_tesla_decryptor_v4.py</a></p>
+<p>Samples:</p>
+<ul>
+<li>ae26382f191225447550e9a691453fc3ea2e02127222787c662efc8db63c59e3 (Sha256)</li>
+<li>acedd97c8350bacc485e87ae56c851d08b497c202deb46df28c3e7218cb4469a (Sha256)</li>
+</ul>
+
+      </div>
+    </article>
+
+    <hr />
+
+    <div class="post-info">
+      
+      
+
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        1267 Words
+      </p>
+
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        
+          2023-08-28 02:00
+        
+
+         
+          
+        
+      </p>
+    </div>
+
+    
+
+    
+
+    
+
+  </main>
+
+            </div>
+
+            
+                <footer class="footer">
+    
+    <div class="footer__inner">
+        <div class="footer__content">
+            <span>&copy; 2023</span>
+            
+            <span><a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></span>
+            
+            
+        </div>
+    </div>
+    
+    
+</footer>
+
+            
+        </div>
+
+        
+
+
+
+<script type="text/javascript" src="https://Viuleeenz.github.io/bundle.min.205d491810c28f95aa953fae884e1c27abe13fdf93ec63b882d0036b248d4a6282eb2d134e4e7225c6ad6e86db87b08488a361ca4a7383d01fcff43f3d57b9c3.js" integrity="sha512-IF1JGBDCj5WqlT&#43;uiE4cJ6vhP9&#43;T7GO4gtADaySNSmKC6y0TTk5yJcatbobbh7CEiKNhykpzg9Afz/Q/PVe5ww=="></script>
+
+
+
+    </body>
+</html>
