@@ -7,13 +7,13 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
-    <lastBuildDate>Mon, 28 Aug 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://Viuleeenz.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 29 Aug 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://Viuleeenz.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Agent Tesla - Analysis of ecnryption routine to create an effective decryptor</title>
-      <link>https://Viuleeenz.github.io/posts/2023/08/agent-tesla-analysis-of-ecnryption-routine-to-create-an-effective-decryptor/</link>
-      <pubDate>Mon, 28 Aug 2023 00:00:00 +0000</pubDate>
+      <title>Agent Tesla - Building an effective decryptor</title>
+      <link>https://Viuleeenz.github.io/posts/2023/08/agent-tesla-building-an-effective-decryptor/</link>
+      <pubDate>Tue, 29 Aug 2023 00:00:00 +0000</pubDate>
       
-      <guid>https://Viuleeenz.github.io/posts/2023/08/agent-tesla-analysis-of-ecnryption-routine-to-create-an-effective-decryptor/</guid>
+      <guid>https://Viuleeenz.github.io/posts/2023/08/agent-tesla-building-an-effective-decryptor/</guid>
       <description>General Information and preface Agent Tesla, according to the data provided by CERT-EU, is one the most prominent threats that are hitting European cyberspace. Because of that, I found that it could be quite interesting understanding its behavior. However, as I usually prefer, instead of focusing on the infection chain or information about TA methodologies, sharing knowledge that were already provided by more authoritative sources, I preferred to focus mostly on malware analysis and in this specific case to the latest encryption algorithm adopted.</description>
     </item>
     

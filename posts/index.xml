@@ -6,15 +6,15 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>en-us</language>
         <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
-        <lastBuildDate>Mon, 28 Aug 2023 00:00:00 +0000</lastBuildDate>
+        <lastBuildDate>Tue, 29 Aug 2023 00:00:00 +0000</lastBuildDate>
         <atom:link href="https://Viuleeenz.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
         
         <item>
-            <title>Agent Tesla - Analysis of ecnryption routine to create an effective decryptor</title>
-            <link>https://Viuleeenz.github.io/posts/2023/08/agent-tesla-analysis-of-ecnryption-routine-to-create-an-effective-decryptor/</link>
-            <pubDate>Mon, 28 Aug 2023 00:00:00 +0000</pubDate>
+            <title>Agent Tesla - Building an effective decryptor</title>
+            <link>https://Viuleeenz.github.io/posts/2023/08/agent-tesla-building-an-effective-decryptor/</link>
+            <pubDate>Tue, 29 Aug 2023 00:00:00 +0000</pubDate>
             
-            <guid>https://Viuleeenz.github.io/posts/2023/08/agent-tesla-analysis-of-ecnryption-routine-to-create-an-effective-decryptor/</guid>
+            <guid>https://Viuleeenz.github.io/posts/2023/08/agent-tesla-building-an-effective-decryptor/</guid>
             <description>General Information and preface Agent Tesla, according to the data provided by CERT-EU, is one the most prominent threats that are hitting European cyberspace. Because of that, I found that it could be quite interesting understanding its behavior. However, as I usually prefer, instead of focusing on the infection chain or information about TA methodologies, sharing knowledge that were already provided by more authoritative sources, I preferred to focus mostly on malware analysis and in this specific case to the latest encryption algorithm adopted.</description>
             <content type="html"><![CDATA[<h1 id="general-information-and-preface">General Information and preface</h1>
 <p>Agent Tesla, according to the <a href="https://cert.europa.eu/static/threat-intelligence/TLP-CLEAR-CB-23-08.pdf">data</a> provided by CERT-EU, is one the most prominent threats that are hitting European cyberspace. Because of that, I found that it could be quite interesting understanding its behavior. However, as I usually prefer, instead of focusing on the infection chain or information about TA methodologies, sharing knowledge that were already provided by more authoritative sources, I preferred to focus mostly on malware analysis and in this specific case to the latest encryption algorithm adopted. Then, upon the knowledge acquired, I would like to write a decryptor script that extracts payload configuration.</p>
@@ -48,10 +48,10 @@
 </span></span></code></pre></div><p>The key is generated randomly through <strong>RandomNumberGenerator.GetInt32(int.MaxValue)</strong> function. The <em>int.MaxValue</em> constraint is related to the key size limitation of 4 bytes within the encrypted data structure. The algorithm it&rsquo;s pretty straightforward, performing <em>xor</em> between plaintext and key bytes. However, what really matters here is the <strong>obfuscator</strong> that happens at runtime.</p>
 <p>The <strong>obfuscation routine</strong> is part of an open source <a href="https://github.com/dr4k0nia/XorStringsNET">project</a>. Basically, this obfuscation works creating multiple placeholders that are going to be replaced at runtime. Analyzing the sample statically, this technique messes up with code decompilers such as DnSpy. However, the author wrote a detailed <a href="https://dr4k0nia.github.io/posts/Encrypting-Strings-In-NET/">blogpost</a> explaining obfuscator features and its modus operandi:</p>
 <blockquote>
-<p>After processing all methods we need to do some patches in the injected runtime. First, we need to set up the placeholder struct with the correct attribute values. The struct needs a <strong>ClassLayout</strong> with <strong>packing size 1</strong> and the <strong>length of the encrypted data as its size</strong>.</p>
+<p>&ldquo;After processing all methods we need to do some patches in the injected runtime. First, we need to set up the placeholder struct with the correct attribute values. The struct needs a <strong>ClassLayout</strong> with <strong>packing size 1</strong> and the <strong>length of the encrypted data as its size</strong>.&rdquo;</p>
 </blockquote>
 <blockquote>
-<p>We also need to create a new <strong>field which will be an initialized version of our struct</strong>. By adding a DataSegment in its <strong>FieldRva</strong>, we can use the field to store any raw data we want, in this case, our encrypted string data.</p>
+<p>&ldquo;We also need to create a new <strong>field which will be an initialized version of our struct</strong>. By adding a DataSegment in its <strong>FieldRva</strong>, we can use the field to store any raw data we want, in this case, our encrypted string data.&rdquo;</p>
 </blockquote>
 <p>Following the indication provided by the author, we should have a more clear idea of what these components are and how to hunt for them in the code. Now it’s possible to start looking at the code gathering as much information as possible (e.g., locating these placeholders) and finding out a pattern to write an effective configuration decryptor.</p>
 <h1 id="binary-inspection">Binary inspection</h1>
@@ -90,11 +90,20 @@
 <p><img src="https://lh3.googleusercontent.com/MtQZbbAOaz2HR4EEGvuVnAH2VoTzbz3P31VeZe0WPg_qMGpPuDOOQH7vn5jxriHiljyrfpK_3T_lejGWJ3Scwq1vNJDICyjvmkhZzI8g423d7e20_R8XSulLtXB9Db_-Si7wu5H6dPT95HPotd-BY7o" alt="Figure 7 - Decryptor result"></p>
 <p>Figure 7 - Decryptor result</p>
 <h1 id="references">References</h1>
-<p>Agent Tesla Decryptor: <a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/ConfigurationExtractors/AgentTesla/agent_tesla_decryptor_v4.py">agent_tesla_decryptor_v4.py</a></p>
+<p>Agent Tesla Decryptor:</p>
+<ul>
+<li><a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/ConfigurationExtractors/AgentTesla/agent_tesla_decryptor_v4.py">agent_tesla_decryptor_v4.py</a></li>
+</ul>
+<p>DotNet references:</p>
+<ul>
+<li>General .NET implementation <a href="https://www.ntcore.com/files/dotnetformat.htm">info</a></li>
+<li>Python <a href="https://github.com/pan-unit42/dotnetfile">parser</a> for .NET</li>
+</ul>
 <p>Samples:</p>
 <ul>
-<li>ae26382f191225447550e9a691453fc3ea2e02127222787c662efc8db63c59e3 (Sha256)</li>
-<li>acedd97c8350bacc485e87ae56c851d08b497c202deb46df28c3e7218cb4469a (Sha256)</li>
+<li>ae26382f191225447550e9a691453fc3ea2e02127222787c662efc8db63c59e3 (SHA256) <a href="https://bazaar.abuse.ch/sample/ae26382f191225447550e9a691453fc3ea2e02127222787c662efc8db63c59e3/">MalwareBazar</a></li>
+<li>acedd97c8350bacc485e87ae56c851d08b497c202deb46df28c3e7218cb4469a (SHA256) <a href="https://bazaar.abuse.ch/sample/acedd97c8350bacc485e87ae56c851d08b497c202deb46df28c3e7218cb4469a/">MalwareBazar</a></li>
+<li>f5751d89bc6f15c3ade6513d3cf44f92a25e8cd25d2f5ad239b8c44f8f732cb8 (SHA256)<a href="f5751d89bc6f15c3ade6513d3cf44f92a25e8cd25d2f5ad239b8c44f8f732cb8">MalwareBazar</a></li>
 </ul>
 ]]></content>
         </item>
