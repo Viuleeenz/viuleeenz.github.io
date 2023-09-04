@@ -103,7 +103,7 @@
 <ul>
 <li>ae26382f191225447550e9a691453fc3ea2e02127222787c662efc8db63c59e3 (SHA256) <a href="https://bazaar.abuse.ch/sample/ae26382f191225447550e9a691453fc3ea2e02127222787c662efc8db63c59e3/">MalwareBazar</a></li>
 <li>acedd97c8350bacc485e87ae56c851d08b497c202deb46df28c3e7218cb4469a (SHA256) <a href="https://bazaar.abuse.ch/sample/acedd97c8350bacc485e87ae56c851d08b497c202deb46df28c3e7218cb4469a/">MalwareBazar</a></li>
-<li>f5751d89bc6f15c3ade6513d3cf44f92a25e8cd25d2f5ad239b8c44f8f732cb8 (SHA256)<a href="f5751d89bc6f15c3ade6513d3cf44f92a25e8cd25d2f5ad239b8c44f8f732cb8">MalwareBazar</a></li>
+<li>f5751d89bc6f15c3ade6513d3cf44f92a25e8cd25d2f5ad239b8c44f8f732cb8 (SHA256)<a href="https://bazaar.abuse.ch/sample/f5751d89bc6f15c3ade6513d3cf44f92a25e8cd25d2f5ad239b8c44f8f732cb8">MalwareBazar</a></li>
 </ul>
 ]]></content>
         </item>
@@ -257,10 +257,10 @@ Figure 4 - Target stored in cleartext within process memory</p>
 <p>Even if the analysis has been completed and targets are correctly retrieved, I thought that giving a little tool to extract that information would be useful. Instead of doing complex stuff, I wrote two simple scripts called targets.js and recover.py. The purpose of these two files is to allow analysts from different backgrounds to extract those targets, even performing a simple memory dump. Probably there are easier and smarter techniques out there, but it was also a good chance to put in practice DBI, which I have already covered in a previous <a href="https://viuleeenz.github.io/posts/2023/03/dynamic-binary-instrumentation-for-malware-analysis/">post</a>.</p>
 <ul>
 <li>
-<p><a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/DynamicBinaryInstrumentation/DDosia_Targets/targets.js">target.js</a>: Frida script that aims to get a memory dump after the WSAStartup has been called for the second time (when payloads are in cleartext in memory).</p>
+<p><a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/ConfigurationExtractors/DDosia_Targets/targets.js">target.js</a>: Frida script that aims to get a memory dump after the WSAStartup has been called for the second time (when payloads are in cleartext in memory).</p>
 </li>
 <li>
-<p><a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/DynamicBinaryInstrumentation/DDosia_Targets/recover.py">recover.py</a>: it’s a simple python script that retrieves structured information from the files dumped. It’s worth noting that I limited my script to look for structured information, retrieving IP and Hostname (additional improvements are left to user’s needs).</p>
+<p><a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/ConfigurationExtractors/DDosia_Targets/recover.py">recover.py</a>: it’s a simple python script that retrieves structured information from the files dumped. It’s worth noting that I limited my script to look for structured information, retrieving IP and Hostname (additional improvements are left to user’s needs).</p>
 </li>
 </ul>
 <h2 id="script-testing">Script Testing</h2>

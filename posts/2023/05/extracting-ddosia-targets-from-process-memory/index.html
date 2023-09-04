@@ -210,10 +210,10 @@ Figure 4 - Target stored in cleartext within process memory</p>
 <p>Even if the analysis has been completed and targets are correctly retrieved, I thought that giving a little tool to extract that information would be useful. Instead of doing complex stuff, I wrote two simple scripts called targets.js and recover.py. The purpose of these two files is to allow analysts from different backgrounds to extract those targets, even performing a simple memory dump. Probably there are easier and smarter techniques out there, but it was also a good chance to put in practice DBI, which I have already covered in a previous <a href="https://viuleeenz.github.io/posts/2023/03/dynamic-binary-instrumentation-for-malware-analysis/">post</a>.</p>
 <ul>
 <li>
-<p><a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/DynamicBinaryInstrumentation/DDosia_Targets/targets.js">target.js</a>: Frida script that aims to get a memory dump after the WSAStartup has been called for the second time (when payloads are in cleartext in memory).</p>
+<p><a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/ConfigurationExtractors/DDosia_Targets/targets.js">target.js</a>: Frida script that aims to get a memory dump after the WSAStartup has been called for the second time (when payloads are in cleartext in memory).</p>
 </li>
 <li>
-<p><a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/DynamicBinaryInstrumentation/DDosia_Targets/recover.py">recover.py</a>: it’s a simple python script that retrieves structured information from the files dumped. It’s worth noting that I limited my script to look for structured information, retrieving IP and Hostname (additional improvements are left to user’s needs).</p>
+<p><a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/ConfigurationExtractors/DDosia_Targets/recover.py">recover.py</a>: it’s a simple python script that retrieves structured information from the files dumped. It’s worth noting that I limited my script to look for structured information, retrieving IP and Hostname (additional improvements are left to user’s needs).</p>
 </li>
 </ul>
 <h2 id="script-testing">Script Testing</h2>
