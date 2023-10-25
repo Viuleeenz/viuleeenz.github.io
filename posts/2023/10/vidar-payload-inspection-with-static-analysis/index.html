@@ -191,19 +191,13 @@ if (!doNotTrack) {
 <p>Figure 1 - Vidar main function with garbage code</p>
 <h3 id="anti-analysis-implementation">Anti-Analysis implementation</h3>
 <p>In this sample, there are three main functions that are in charge of performing anti-analysis checks.</p>
-<ul>
-<li>The first one is implemented through the function <strong>VirtualAllocExNuma</strong> that checks if the sample is running on a system with one or more physical CPU:</li>
-</ul>
+<p>The first one is implemented through the function <strong>VirtualAllocExNuma</strong> that checks if the sample is running on a system with one or more physical CPU:</p>
 <p><img src="https://lh7-us.googleusercontent.com/-HDWHV34_5kdT04VICJmciGOaRD7ZDMrmP-DmNfc_oftxhumwvommeGnMfWFupVgEo7osoENveFybbs9YHKkQVzyHtXJtkxrnK2jjfceQ6hNTzdi6Bf2peaSK1YlGUFcr2Ma5_fn2KXXGwuAmVSEvCI" alt="Figure 2 - Call to VirtualAllocExNuma for physical CPU controls."></p>
 <p>Figure 2 - Call to VirtualAllocExNuma for physical CPU controls.</p>
-<ul>
-<li>Another techniques to prevent payload execution is related to <strong>the number of processors available on the machine that are required to be at least 2</strong>:</li>
-</ul>
+<p>Another techniques to prevent payload execution is related to <strong>the number of processors available on the machine that are required to be at least 2</strong>:</p>
 <p><img src="https://lh7-us.googleusercontent.com/o9yejv6GNkWp4yTsJWF_PSOyxKHco5lfkCMLLGbIkkyVhKHHkWiJtv4JCppNsQZs0BBSBvuvFsInQg-4nrqrBH6_dzl65lzyV1cSeSWGzy2I0nRmkr6EK9CYRq3L_-g2V9RQQaOztA8bXIBfJN-WMZk" alt="Figure 3 - Call to GetSystemInfo for Processors’s checks"></p>
 <p>Figure 3 - Call to GetSystemInfo for Processors’s checks</p>
-<ul>
-<li>The last checks that have been identified are related to the Username and Computer Name that is currently used. In particular there are two matches that verify if the username corresponds to <strong>John Doe</strong> and then the <strong>ComputerName</strong> is equal to <strong>HAL9TH</strong>.</li>
-</ul>
+<p>The last checks that have been identified are related to the Username and Computer Name that is currently used. In particular there are two matches that verify if the username corresponds to <strong>John Doe</strong> and then the <strong>ComputerName</strong> is equal to <strong>HAL9TH</strong>.</p>
 <blockquote>
 <p>It turns out that Microsoft Defender&rsquo;s Sandbox computername is HAL9TH, so, you can check for the computer name in your malware before detonation, if the name matches HAL9TH, it means you&rsquo;re inside defender&rsquo;s sandbox, so you can make your program exit.</p>
 </blockquote>
@@ -241,7 +235,9 @@ if (!doNotTrack) {
 <p>Figure 10 - Monitored chrome extensions</p>
 <h2 id="network-communication">Network Communication</h2>
 <p>According to the examined functions related to the network communication, it is possible to recreate the POST request structure that could be monitored and used as an indicator of compromise of this actor:</p>
-<p>Content Disposition: form-data; name=&lt;Vidar_parameter&gt;</p>
+<ul>
+<li><strong>Content Disposition: form-data; name=&lt;Vidar_parameter&gt;</strong></li>
+</ul>
 <p>It’s worth mentioning that parameters observed are:</p>
 <ul>
 <li><strong>ID</strong> for BOT identification;</li>
