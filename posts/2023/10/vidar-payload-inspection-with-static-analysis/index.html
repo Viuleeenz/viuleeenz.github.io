@@ -9,12 +9,12 @@
 <meta name="keywords" content="malware, binary, digital forensics, exploit development, reverse engineering" />
 <meta name="robots" content="noodp" />
 <meta name="theme-color" content="" />
-<link rel="canonical" href="https://Viuleeenz.github.io/posts/2023/10/static-analysis-on-a-vidar-sample/" />
+<link rel="canonical" href="https://Viuleeenz.github.io/posts/2023/10/vidar-payload-inspection-with-static-analysis/" />
 
 
     <title>
         
-            Static analysis on a Vidar sample :: Security Undisguised 
+            Vidar - payload inspection with static analysis :: Security Undisguised 
         
     </title>
 
@@ -39,23 +39,23 @@
     <meta name="msapplication-TileColor" content="">
 
 
-<meta itemprop="name" content="Static analysis on a Vidar sample">
+<meta itemprop="name" content="Vidar - payload inspection with static analysis">
 <meta itemprop="description" content="Behind this post Through this blogpost I’m going to talk about one of the latest Vidar samples that I had a chance to analyze. The payload is actually part of a campaign delivered in July 2023 using PEC mails and this analysis comes from a post related to Cert-Agid in the same period. Even if the payload seems to be out of time, it&rsquo;s still a valid example for further analysis of more recents ones."><meta itemprop="datePublished" content="2023-10-25T00:00:00+00:00" />
 <meta itemprop="dateModified" content="2023-10-25T00:00:00+00:00" />
-<meta itemprop="wordCount" content="1134"><meta itemprop="image" content="https://Viuleeenz.github.io/"/>
+<meta itemprop="wordCount" content="1137"><meta itemprop="image" content="https://Viuleeenz.github.io/"/>
 <meta itemprop="keywords" content="" />
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="https://Viuleeenz.github.io/"/>
 
-<meta name="twitter:title" content="Static analysis on a Vidar sample"/>
+<meta name="twitter:title" content="Vidar - payload inspection with static analysis"/>
 <meta name="twitter:description" content="Behind this post Through this blogpost I’m going to talk about one of the latest Vidar samples that I had a chance to analyze. The payload is actually part of a campaign delivered in July 2023 using PEC mails and this analysis comes from a post related to Cert-Agid in the same period. Even if the payload seems to be out of time, it&rsquo;s still a valid example for further analysis of more recents ones."/>
 
 
 
-    <meta property="og:title" content="Static analysis on a Vidar sample" />
+    <meta property="og:title" content="Vidar - payload inspection with static analysis" />
 <meta property="og:description" content="Behind this post Through this blogpost I’m going to talk about one of the latest Vidar samples that I had a chance to analyze. The payload is actually part of a campaign delivered in July 2023 using PEC mails and this analysis comes from a post related to Cert-Agid in the same period. Even if the payload seems to be out of time, it&rsquo;s still a valid example for further analysis of more recents ones." />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://Viuleeenz.github.io/posts/2023/10/static-analysis-on-a-vidar-sample/" /><meta property="og:image" content="https://Viuleeenz.github.io/"/><meta property="article:section" content="posts" />
+<meta property="og:url" content="https://Viuleeenz.github.io/posts/2023/10/vidar-payload-inspection-with-static-analysis/" /><meta property="og:image" content="https://Viuleeenz.github.io/"/><meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2023-10-25T00:00:00+00:00" />
 <meta property="article:modified_time" content="2023-10-25T00:00:00+00:00" />
 
@@ -167,7 +167,7 @@ if (!doNotTrack) {
 
     <article>
       <h1 class="post-title">
-        <a href="https://Viuleeenz.github.io/posts/2023/10/static-analysis-on-a-vidar-sample/">Static analysis on a Vidar sample</a>
+        <a href="https://Viuleeenz.github.io/posts/2023/10/vidar-payload-inspection-with-static-analysis/">Vidar - payload inspection with static analysis</a>
       </h1>
 
       
@@ -254,7 +254,12 @@ if (!doNotTrack) {
 <h2 id="references">References</h2>
 <p>Sample:</p>
 <ul>
-<li>556f8b06b92ddbc4008dea5298eab3934c61647a1cd7333a9087c37cc5a75456 (SHA256)<a href="https://bazaar.abuse.ch/sample/556f8b06b92ddbc4008dea5298eab3934c61647a1cd7333a9087c37cc5a75456/">MalwareBazaar</a></li>
+<li>
+<p>556f8b06b92ddbc4008dea5298eab3934c61647a1cd7333a9087c37cc5a75456 (SHA256)<a href="https://bazaar.abuse.ch/sample/556f8b06b92ddbc4008dea5298eab3934c61647a1cd7333a9087c37cc5a75456/">MalwareBazaar</a></p>
+</li>
+<li>
+<p>Ida-python scrypt: <a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/ConfigurationExtractors/Vidar/ida_vidar_string_decrypt.py">ida_vidar_string_decrypt.py</a></p>
+</li>
 </ul>
 <p>Microsoft Defender&rsquo;s Sandbox:</p>
 <ul>
@@ -586,7 +591,7 @@ if (!doNotTrack) {
           <line x1="16" y1="17" x2="8" y2="17"></line>
           <polyline points="10 9 9 9 8 9"></polyline>
         </svg>
-        1134 Words
+        1137 Words
       </p>
 
       <p>

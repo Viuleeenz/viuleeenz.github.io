@@ -10,11 +10,11 @@
         <atom:link href="https://Viuleeenz.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
         
         <item>
-            <title>Static analysis on a Vidar sample</title>
-            <link>https://Viuleeenz.github.io/posts/2023/10/static-analysis-on-a-vidar-sample/</link>
+            <title>Vidar - payload inspection with static analysis</title>
+            <link>https://Viuleeenz.github.io/posts/2023/10/vidar-payload-inspection-with-static-analysis/</link>
             <pubDate>Wed, 25 Oct 2023 00:00:00 +0000</pubDate>
             
-            <guid>https://Viuleeenz.github.io/posts/2023/10/static-analysis-on-a-vidar-sample/</guid>
+            <guid>https://Viuleeenz.github.io/posts/2023/10/vidar-payload-inspection-with-static-analysis/</guid>
             <description>Behind this post Through this blogpost I’m going to talk about one of the latest Vidar samples that I had a chance to analyze. The payload is actually part of a campaign delivered in July 2023 using PEC mails and this analysis comes from a post related to Cert-Agid in the same period. Even if the payload seems to be out of time, it&amp;rsquo;s still a valid example for further analysis of more recents ones.</description>
             <content type="html"><![CDATA[<h2 id="behind-this-post">Behind this post</h2>
 <p>Through this blogpost I’m going to talk about one of the latest Vidar samples that I had a chance to analyze. The payload is actually part of a campaign delivered in July 2023 using PEC mails and this analysis comes from a post related to <a href="https://cert-agid.gov.it/tag/vidar/">Cert-Agid</a> in the same period. Even if the payload seems to be out of time, it&rsquo;s still a valid example for further analysis of more recents ones.</p>
@@ -93,7 +93,12 @@
 <h2 id="references">References</h2>
 <p>Sample:</p>
 <ul>
-<li>556f8b06b92ddbc4008dea5298eab3934c61647a1cd7333a9087c37cc5a75456 (SHA256)<a href="https://bazaar.abuse.ch/sample/556f8b06b92ddbc4008dea5298eab3934c61647a1cd7333a9087c37cc5a75456/">MalwareBazaar</a></li>
+<li>
+<p>556f8b06b92ddbc4008dea5298eab3934c61647a1cd7333a9087c37cc5a75456 (SHA256)<a href="https://bazaar.abuse.ch/sample/556f8b06b92ddbc4008dea5298eab3934c61647a1cd7333a9087c37cc5a75456/">MalwareBazaar</a></p>
+</li>
+<li>
+<p>Ida-python scrypt: <a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/ConfigurationExtractors/Vidar/ida_vidar_string_decrypt.py">ida_vidar_string_decrypt.py</a></p>
+</li>
 </ul>
 <p>Microsoft Defender&rsquo;s Sandbox:</p>
 <ul>
