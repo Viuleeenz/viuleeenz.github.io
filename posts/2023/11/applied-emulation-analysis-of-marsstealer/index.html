@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="author" content="map[name:Alessandro Strino]">
+<meta name="description" content="Introduction Emulation is a technique that could be very handy and effective when we have to deal with malware triage, configuration extractor and deobfuscate part of the code without rewriting complex algorithms. Even if it seems magic (and it&amp;rsquo;s not unfortunately) it&amp;rsquo;s still not possible to apply emulation on random code. However, if applied correctly this method could really speed up our malware analysis and triage. Through this blogpost I would like to give an overview about emulation usage and apply it in a real case scenario." />
+<meta name="keywords" content="malware, binary, digital forensics, exploit development, reverse engineering" />
+<meta name="robots" content="noodp" />
+<meta name="theme-color" content="" />
+<link rel="canonical" href="https://Viuleeenz.github.io/posts/2023/11/applied-emulation-analysis-of-marsstealer/" />
+
+
+    <title>
+        
+            Applied Emulation - Analysis of MarsStealer :: Security Undisguised 
+        
+    </title>
+
+
+
+
+
+<link rel="stylesheet" href="https://Viuleeenz.github.io/main.b78c3be9451dc4ca61ca377f3dc2cf2e6345a44c2bae46216a322ef366daa399.css" integrity="sha256-t4w76UUdxMphyjd/PcLPLmNFpEwrrkYhajIu82bao5k=">
+
+
+    
+        <link rel="stylesheet" type="text/css" href="https://Viuleeenz.github.io/style.css">
+    
+
+
+    <link rel="apple-touch-icon" sizes="180x180" href="https://Viuleeenz.github.io/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://Viuleeenz.github.io/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://Viuleeenz.github.io/favicon-16x16.png">
+    <link rel="manifest" href="https://Viuleeenz.github.io/site.webmanifest">
+    <link rel="mask-icon" href="https://Viuleeenz.github.io/safari-pinned-tab.svg" color="">
+    <link rel="shortcut icon" href="https://Viuleeenz.github.io/favicon.ico">
+    <meta name="msapplication-TileColor" content="">
+
+
+<meta itemprop="name" content="Applied Emulation - Analysis of MarsStealer">
+<meta itemprop="description" content="Introduction Emulation is a technique that could be very handy and effective when we have to deal with malware triage, configuration extractor and deobfuscate part of the code without rewriting complex algorithms. Even if it seems magic (and it&rsquo;s not unfortunately) it&rsquo;s still not possible to apply emulation on random code. However, if applied correctly this method could really speed up our malware analysis and triage. Through this blogpost I would like to give an overview about emulation usage and apply it in a real case scenario."><meta itemprop="datePublished" content="2023-11-15T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2023-11-15T00:00:00+00:00" />
+<meta itemprop="wordCount" content="1093"><meta itemprop="image" content="https://Viuleeenz.github.io/"/>
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://Viuleeenz.github.io/"/>
+
+<meta name="twitter:title" content="Applied Emulation - Analysis of MarsStealer"/>
+<meta name="twitter:description" content="Introduction Emulation is a technique that could be very handy and effective when we have to deal with malware triage, configuration extractor and deobfuscate part of the code without rewriting complex algorithms. Even if it seems magic (and it&rsquo;s not unfortunately) it&rsquo;s still not possible to apply emulation on random code. However, if applied correctly this method could really speed up our malware analysis and triage. Through this blogpost I would like to give an overview about emulation usage and apply it in a real case scenario."/>
+
+
+
+    <meta property="og:title" content="Applied Emulation - Analysis of MarsStealer" />
+<meta property="og:description" content="Introduction Emulation is a technique that could be very handy and effective when we have to deal with malware triage, configuration extractor and deobfuscate part of the code without rewriting complex algorithms. Even if it seems magic (and it&rsquo;s not unfortunately) it&rsquo;s still not possible to apply emulation on random code. However, if applied correctly this method could really speed up our malware analysis and triage. Through this blogpost I would like to give an overview about emulation usage and apply it in a real case scenario." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://Viuleeenz.github.io/posts/2023/11/applied-emulation-analysis-of-marsstealer/" /><meta property="og:image" content="https://Viuleeenz.github.io/"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2023-11-15T00:00:00+00:00" />
+<meta property="article:modified_time" content="2023-11-15T00:00:00+00:00" />
+
+
+
+
+
+
+
+    <meta property="article:published_time" content="2023-11-15 00:00:00 &#43;0000 UTC" />
+
+
+
+
+
+
+
+
+
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XNKLBC4D9D"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-XNKLBC4D9D', { 'anonymize_ip': false });
+}
+</script>
+
+
+
+    </head>
+
+    
+        <body>
+    
+    
+        <div class="container">
+            <header class="header">
+    <span class="header__inner">
+        <a href="https://Viuleeenz.github.io/" style="text-decoration: none;">
+    <div class="logo">
+        
+            <span class="logo__mark">&gt;</span>
+            <span class="logo__text ">
+                $ cd /home/Viuleeenz</span>
+            <span class="logo__cursor" style=
+                  "
+                   
+                   ">
+            </span>
+        
+    </div>
+</a>
+
+        <span class="header__right">
+            
+                <nav class="menu">
+    <ul class="menu__inner"><li><a href="https://Viuleeenz.github.io/about/">About</a></li><li><a href="https://Viuleeenz.github.io/posts/">Posts</a></li><li><a href="https://Viuleeenz.github.io/whitepapers/">Whitepapers</a></li>
+    </ul>
+</nav>
+
+                <span class="menu-trigger">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                    </svg>
+                </span>
+            
+                <span class="theme-toggle not-selectable"><svg class="theme-toggler" width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+   <path d="M22 41C32.4934 41 41 32.4934 41 22C41 11.5066 32.4934 3 22
+   3C11.5066 3 3 11.5066 3 22C3 32.4934 11.5066 41 22 41ZM7 22C7
+   13.7157 13.7157 7 22 7V37C13.7157 37 7 30.2843 7 22Z"/>
+ </svg></span>
+        </span>
+    </span>
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XNKLBC4D9D"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-XNKLBC4D9D', { 'anonymize_ip': false });
+}
+</script>
+
+</header>
+
+
+            <div class="content">
+                
+  <main class="post">
+
+    <div class="post-info">
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        6 minutes
+
+        
+      </p>
+    </div>
+
+    <article>
+      <h1 class="post-title">
+        <a href="https://Viuleeenz.github.io/posts/2023/11/applied-emulation-analysis-of-marsstealer/">Applied Emulation - Analysis of MarsStealer</a>
+      </h1>
+
+      
+
+      
+
+      
+
+      <div class="post-content">
+        <h2 id="introduction">Introduction</h2>
+<p><strong>Emulation is a technique that could be very handy and effective</strong> when we have to deal with <strong>malware triage</strong>, <strong>configuration extractor</strong> and <strong>deobfuscate part of the code without rewriting complex algorithms</strong>. Even if it seems magic (and it&rsquo;s not unfortunately) it&rsquo;s still not possible to apply emulation on random code. However, if applied correctly this method could really speed up our malware analysis and triage. Through this blogpost I would like to give an overview about emulation usage and apply it in a real case scenario.</p>
+<p>Recently, I followed a twitter warning about Vidar malware in the wild and eager to revalidate an IDA-python script to deobfuscate strings, I immediately jumped into it. However, extracting that sample it was pretty obvious that I was dealing with another stealer, called MarsStealer. Since I did have a lot of information about that sample, I thought that could be a good choice to experiment with emulation. The result was quite promising and because of that <strong>I want to take this occasion to show a few basic emulations that could, hopefully, help someone else to speed up its analysis</strong>.</p>
+<h3 id="payload-extraction">Payload extraction</h3>
+<p>Opening up in IDA the original sample, it was clear that a lot of strings were actually obfuscated and the code was partially packed, because of the references to jumps or calls towards registries and un-initialized DWORD.</p>
+<p><img src="https://Viuleeenz.github.io/img/mars_stealer/_ida_packed_code.png" alt="Figure 1: MarsStealer packed code"></p>
+<p>Figure 1: MarsStealer packed code</p>
+<p>In order to extract the actual payload that will contain a deobfuscation string routine and additional code, it&rsquo;s necessary to go for dynamic analysis and speed up our extraction. As always one of the quickest methods to extract unpacked information is to look for <strong>VirtualAlloc</strong> and <strong>VirtualProtect.</strong></p>
+<p><img src="https://Viuleeenz.github.io/img/mars_stealer/ms_unpacked_payload.png" alt="Figure 2: Unpacked payload retrieved"></p>
+<p>Figure 2: Unpacked payload retrieved</p>
+<h3 id="deobfuscation-routine-analysis">Deobfuscation routine analysis</h3>
+<p>Since that our purpose is to find out code to emulate, we could look for a deobfuscation routine within the payload extracted. Our search won’t last long because, almost <strong>immediately after the VirtualProtect</strong> call the malware jumps directly to the allocated memory, <strong>starting the name resolving routine.</strong></p>
+<p><img src="https://Viuleeenz.github.io/img/mars_stealer/_deobfuscation_wrapper.png" alt="Figure 3: Deobfuscation wrapper"></p>
+<p>Figure 3: Deobfuscation wrapper</p>
+<p>The highlighted function is a wrapper that contains the actual routine. The code is quite easy to spot because of the <strong>tree push instructions</strong>. Opening the payload in IDA, it&rsquo;s possible to go a little bit deeper and explore the deobfuscation routine, reconstructing its signature and from that point, understanding the function flow.</p>
+<p><img src="https://Viuleeenz.github.io/img/mars_stealer/_deobfuscation_routine.png" alt="Figure 4: Deobfuscation routine"></p>
+<p>Figure 4: Deobfuscation routine</p>
+<p>Regardless of the red box related memory errors, it&rsquo;s very easy to understand its core functionality and control flow. However, even if it seems quite easy to reconstruct its logic, I’m going to take this code as a use case to try a completely different approach, using <strong>emulation to resolve all the strings</strong>.</p>
+<h3 id="emulation-requirements">Emulation requirements</h3>
+<p>Before proceeding with emulation, there are few things to settle. The first one is that for emulating this code, we need to emulate the user mode because we are dealing with instructions that are going to make additional <strong>calls to WindowsAPI</strong>. For that reason, we are going to use <a href="https://github.com/mrexodia/dumpulator">dumpulator</a>, implementing if needed some API calls. The second thing to talk about are <strong>the requirements for dumpulator</strong>. To make it effective, it&rsquo;s necessary to take a <strong>minidump</strong> of the process that we are analyzing and understand the parameters for <strong>starting</strong> and <strong>stopping</strong> <strong>emulation</strong>.</p>
+<ul>
+<li>In order to <strong>take a minidump</strong>, its possible to use <strong><strong><strong><strong><strong><strong>x32dbg/x64dbg</strong></strong></strong></strong></strong></strong> that include it as a command (e.g., minidump  mstealer.dump);</li>
+<li>then to take the <strong>starting point</strong>, it’s possible to take references to deobfuscation calls and save those addresses for later.</li>
+</ul>
+<p><img src="https://Viuleeenz.github.io/img/mars_stealer/_references_to_deobfuscation_function.png" alt="Figure 5: References to deobfuscation function"></p>
+<p>Figure 5: References to deobfuscation function</p>
+<p>Now that we have two out of tree requirements, it&rsquo;s necessary to focus on the <strong>emulation ending point</strong>. Of course, this one is the most important requirement and could impact your result in terms of efficiency (emulation is tremendously slow) and code writing (could be required to write more code that fits your needs).</p>
+<p>For the purpose of this analysis/tutorial about emulation I’m going straight to the point using <strong>hints collected from IDA</strong> and doing some dynamic code analysis.</p>
+<h3 id="emulation-ending-point-extraction">Emulation ending point extraction</h3>
+<p>Observing carefully the Figure 4, it&rsquo;s easy to spot that the plaintext string is settled <strong>after the for loop</strong> and <strong>before the VirtualProtect call</strong>. Looking at the assembly with the information acquired, it’s easy to understand that emulation should stop at the instruction <strong>push ecx</strong>. In fact, <strong>ecx register is going to be a pointer for the plaintext string</strong>.</p>
+<p><img src="https://Viuleeenz.github.io/img/mars_stealer/_plaintext_resolution.png" alt="Figure 6: Plaintext resolution"></p>
+<p>Figure 6: Focus on plaintext resolution</p>
+<p>With all this information, the <strong>emulation end variable</strong> could be easily retrieved within the debugger at the address <strong>0x025f4de5</strong>.</p>
+<p><img src="https://Viuleeenz.github.io/img/mars_stealer/_end_address.png" alt="Figure 7: Emulation stop address"></p>
+<p>Figure 7: Emulation stop address</p>
+<h3 id="string-resolving-automation">String Resolving Automation</h3>
+<p>Since that we have collected all the requirements for the emulation, we are ready to setup our code as follow:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e">#Dumpulator libraries</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> dumpulator <span style="color:#f92672">import</span> <span style="color:#f92672">*</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> dumpulator.native <span style="color:#f92672">import</span> <span style="color:#f92672">*</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> dumpulator.handles <span style="color:#f92672">import</span> <span style="color:#f92672">*</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> dumpulator.memory <span style="color:#f92672">import</span> <span style="color:#f92672">*</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">deobfuscate</span>(address):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    start:
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            [x] push ciphertext
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">                push key
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">                push key_length
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    end:
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            [x] push ecx
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            call VirtualProtect
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    end <span style="color:#f92672">=</span> <span style="color:#ae81ff">0x031F4DE5</span>
+</span></span><span style="display:flex;"><span>    dp <span style="color:#f92672">=</span> Dumpulator(<span style="color:#e6db74">&#34;mars_stealer.dump&#34;</span>,quiet<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>    dp<span style="color:#f92672">.</span>start(address,  end<span style="color:#f92672">=</span>end )
+</span></span><span style="display:flex;"><span>    out <span style="color:#f92672">=</span> dp<span style="color:#f92672">.</span>read_str(dp<span style="color:#f92672">.</span>regs<span style="color:#f92672">.</span>ecx)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> out
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>starting_points <span style="color:#f92672">=</span> [<span style="color:#ae81ff">0x031F2E46</span>,<span style="color:#ae81ff">0x031F2E5F</span>,<span style="color:#ae81ff">0x031F2E78</span>,<span style="color:#ae81ff">0x031F2E91</span>,<span style="color:#ae81ff">0x031F2EAA</span>,<span style="color:#ae81ff">0x031F2EC3</span>,<span style="color:#ae81ff">0x031F2EDC</span>,<span style="color:#ae81ff">0x031F2EF5</span>,<span style="color:#ae81ff">0x031F2F0E</span>,<span style="color:#ae81ff">0x031F2F27</span>,<span style="color:#ae81ff">0x031F2F40</span>,<span style="color:#ae81ff">0x031F2F59</span>,<span style="color:#ae81ff">0x031F2F72</span>,<span style="color:#ae81ff">0x031F2F8B</span>,<span style="color:#ae81ff">0x031F2FA4</span>,<span style="color:#ae81ff">0x031F2FBD</span>,<span style="color:#ae81ff">0x031F2FD6</span>,<span style="color:#ae81ff">0x031F2FEF</span>,<span style="color:#ae81ff">0x031F3008</span>,<span style="color:#ae81ff">0x031F3021</span>,<span style="color:#ae81ff">0x031F303A</span>,<span style="color:#ae81ff">0x031F3053</span>,<span style="color:#ae81ff">0x031F306C</span>,<span style="color:#ae81ff">0x031F3085</span>,<span style="color:#ae81ff">0x031F309E</span>,<span style="color:#ae81ff">0x031F30B7</span>,<span style="color:#ae81ff">0x031F30D0</span>,<span style="color:#ae81ff">0x031F30E9</span>,<span style="color:#ae81ff">0x031F3102</span>,<span style="color:#ae81ff">0x031F311B</span>,<span style="color:#ae81ff">0x031F3134</span>,<span style="color:#ae81ff">0x031F314D</span>,<span style="color:#ae81ff">0x031F3166</span>,<span style="color:#ae81ff">0x031F317F</span>,<span style="color:#ae81ff">0x031F3198</span>,<span style="color:#ae81ff">0x031F31B1</span>,<span style="color:#ae81ff">0x031F31CA</span>,<span style="color:#ae81ff">0x031F31E3</span>,<span style="color:#ae81ff">0x031F3206</span>,<span style="color:#ae81ff">0x031F321F</span>,<span style="color:#ae81ff">0x031F3238</span>,<span style="color:#ae81ff">0x031F3251</span>,<span style="color:#ae81ff">0x031F326A</span>,<span style="color:#ae81ff">0x031F3283</span>,<span style="color:#ae81ff">0x031F329C</span>,<span style="color:#ae81ff">0x031F32B5</span>,<span style="color:#ae81ff">0x031F32CE</span>,<span style="color:#ae81ff">0x031F32E7</span>,<span style="color:#ae81ff">0x031F3300</span>,<span style="color:#ae81ff">0x031F3319</span>,<span style="color:#ae81ff">0x031F3332</span>,<span style="color:#ae81ff">0x031F334B</span>,<span style="color:#ae81ff">0x031F3364</span>,<span style="color:#ae81ff">0x031F337D</span>,<span style="color:#ae81ff">0x031F3396</span>,<span style="color:#ae81ff">0x031F33AF</span>,<span style="color:#ae81ff">0x031F33C8</span>,<span style="color:#ae81ff">0x031F33E1</span>,<span style="color:#ae81ff">0x031F33FA</span>,<span style="color:#ae81ff">0x031F3413</span>,<span style="color:#ae81ff">0x031F342C</span>,<span style="color:#ae81ff">0x031F3445</span>,<span style="color:#ae81ff">0x031F345E</span>,<span style="color:#ae81ff">0x031F3477</span>,<span style="color:#ae81ff">0x031F3490</span>,<span style="color:#ae81ff">0x031F34A9</span>,<span style="color:#ae81ff">0x031F34C2</span>,<span style="color:#ae81ff">0x031F34DB</span>,<span style="color:#ae81ff">0x031F34F4</span>,<span style="color:#ae81ff">0x031F350D</span>,<span style="color:#ae81ff">0x031F3526</span>,<span style="color:#ae81ff">0x031F353F</span>,<span style="color:#ae81ff">0x031F3558</span>,<span style="color:#ae81ff">0x031F3571</span>,<span style="color:#ae81ff">0x031F358A</span>,<span style="color:#ae81ff">0x031F35A3</span>,<span style="color:#ae81ff">0x031F35BC</span>,<span style="color:#ae81ff">0x031F35D5</span>,<span style="color:#ae81ff">0x031F35EE</span>,<span style="color:#ae81ff">0x031F3607</span>,<span style="color:#ae81ff">0x031F3620</span>,<span style="color:#ae81ff">0x031F3639</span>,<span style="color:#ae81ff">0x031F3652</span>,<span style="color:#ae81ff">0x031F366B</span>,<span style="color:#ae81ff">0x031F3684</span>,<span style="color:#ae81ff">0x031F369D</span>,<span style="color:#ae81ff">0x031F36B6</span>,<span style="color:#ae81ff">0x031F36CF</span>,<span style="color:#ae81ff">0x031F36E8</span>,<span style="color:#ae81ff">0x031F3701</span>,<span style="color:#ae81ff">0x031F371A</span>,<span style="color:#ae81ff">0x031F3733</span>,<span style="color:#ae81ff">0x031F374C</span>,<span style="color:#ae81ff">0x031F3765</span>,<span style="color:#ae81ff">0x031F377E</span>,<span style="color:#ae81ff">0x031F3797</span>,<span style="color:#ae81ff">0x031F37B0</span>,<span style="color:#ae81ff">0x031F37C9</span>,<span style="color:#ae81ff">0x031F37E2</span>,<span style="color:#ae81ff">0x031F37FB</span>,<span style="color:#ae81ff">0x031F3814</span>,<span style="color:#ae81ff">0x031F382D</span>,<span style="color:#ae81ff">0x031F3846</span>,<span style="color:#ae81ff">0x031F385F</span>,<span style="color:#ae81ff">0x031F3878</span>,<span style="color:#ae81ff">0x031F3891</span>,<span style="color:#ae81ff">0x031F38AA</span>,<span style="color:#ae81ff">0x031F38C3</span>,<span style="color:#ae81ff">0x031F38DC</span>,<span style="color:#ae81ff">0x031F38F5</span>,<span style="color:#ae81ff">0x031F390E</span>,<span style="color:#ae81ff">0x031F3927</span>,<span style="color:#ae81ff">0x031F3940</span>,<span style="color:#ae81ff">0x031F3959</span>,<span style="color:#ae81ff">0x031F3972</span>,<span style="color:#ae81ff">0x031F398B</span>,<span style="color:#ae81ff">0x031F39A4</span>,<span style="color:#ae81ff">0x031F39BD</span>,<span style="color:#ae81ff">0x031F39D6</span>,<span style="color:#ae81ff">0x031F39EF</span>,<span style="color:#ae81ff">0x031F3A08</span>,<span style="color:#ae81ff">0x031F3A21</span>,<span style="color:#ae81ff">0x031F3A3A</span>,<span style="color:#ae81ff">0x031F3A53</span>,<span style="color:#ae81ff">0x031F3A6C</span>,<span style="color:#ae81ff">0x031F3A85</span>,<span style="color:#ae81ff">0x031F3A9E</span>,<span style="color:#ae81ff">0x031F3AB7</span>,<span style="color:#ae81ff">0x031F3AD0</span>,<span style="color:#ae81ff">0x031F3AE9</span>,<span style="color:#ae81ff">0x031F3B02</span>,<span style="color:#ae81ff">0x031F3B1B</span>,<span style="color:#ae81ff">0x031F3B34</span>,<span style="color:#ae81ff">0x031F3B4D</span>,<span style="color:#ae81ff">0x031F3B66</span>,<span style="color:#ae81ff">0x031F3B7F</span>,<span style="color:#ae81ff">0x031F3B98</span>,<span style="color:#ae81ff">0x031F3BB1</span>,<span style="color:#ae81ff">0x031F3BCA</span>,<span style="color:#ae81ff">0x031F3BE3</span>,<span style="color:#ae81ff">0x031F3BFC</span>,<span style="color:#ae81ff">0x031F3C15</span>,<span style="color:#ae81ff">0x031F3C2E</span>,<span style="color:#ae81ff">0x031F3C47</span>,<span style="color:#ae81ff">0x031F3C60</span>,<span style="color:#ae81ff">0x031F3C79</span>,<span style="color:#ae81ff">0x031F3C92</span>,<span style="color:#ae81ff">0x031F3CAB</span>,<span style="color:#ae81ff">0x031F3CC4</span>,<span style="color:#ae81ff">0x031F3CDD</span>,<span style="color:#ae81ff">0x031F3CF6</span>,<span style="color:#ae81ff">0x031F3D0F</span>,<span style="color:#ae81ff">0x031F3D28</span>,<span style="color:#ae81ff">0x031F3D41</span>,<span style="color:#ae81ff">0x031F3D5A</span>,<span style="color:#ae81ff">0x031F3D73</span>,<span style="color:#ae81ff">0x031F3D8C</span>,<span style="color:#ae81ff">0x031F3DA5</span>,<span style="color:#ae81ff">0x031F3DBE</span>,<span style="color:#ae81ff">0x031F3DD7</span>,<span style="color:#ae81ff">0x031F3DF0</span>,<span style="color:#ae81ff">0x031F3E09</span>,<span style="color:#ae81ff">0x031F3E22</span>,<span style="color:#ae81ff">0x031F3E3B</span>,<span style="color:#ae81ff">0x031F3E54</span>,<span style="color:#ae81ff">0x031F3E6D</span>,<span style="color:#ae81ff">0x031F3E86</span>,<span style="color:#ae81ff">0x031F3E9F</span>,<span style="color:#ae81ff">0x031F3EB8</span>,<span style="color:#ae81ff">0x031F3ED1</span>,<span style="color:#ae81ff">0x031F3EEA</span>,<span style="color:#ae81ff">0x031F3F03</span>,<span style="color:#ae81ff">0x031F3F1C</span>,<span style="color:#ae81ff">0x031F3F35</span>,<span style="color:#ae81ff">0x031F3F4E</span>,<span style="color:#ae81ff">0x031F3F67</span>,<span style="color:#ae81ff">0x031F3F80</span>,<span style="color:#ae81ff">0x031F3F99</span>,<span style="color:#ae81ff">0x031F3FB2</span>,<span style="color:#ae81ff">0x031F3FCB</span>,<span style="color:#ae81ff">0x031F3FE4</span>,<span style="color:#ae81ff">0x031F3FFD</span>,<span style="color:#ae81ff">0x031F4016</span>,<span style="color:#ae81ff">0x031F402F</span>,<span style="color:#ae81ff">0x031F4048</span>,<span style="color:#ae81ff">0x031F4061</span>,<span style="color:#ae81ff">0x031F407A</span>,<span style="color:#ae81ff">0x031F4093</span>,<span style="color:#ae81ff">0x031F40AC</span>,<span style="color:#ae81ff">0x031F40C5</span>,<span style="color:#ae81ff">0x031F40DE</span>,<span style="color:#ae81ff">0x031F40F7</span>,<span style="color:#ae81ff">0x031F4110</span>,<span style="color:#ae81ff">0x031F4129</span>,<span style="color:#ae81ff">0x031F4142</span>,<span style="color:#ae81ff">0x031F415B</span>,<span style="color:#ae81ff">0x031F4174</span>,<span style="color:#ae81ff">0x031F418D</span>,<span style="color:#ae81ff">0x031F41A6</span>,<span style="color:#ae81ff">0x031F41BF</span>,<span style="color:#ae81ff">0x031F41D8</span>,<span style="color:#ae81ff">0x031F41F1</span>,<span style="color:#ae81ff">0x031F420A</span>,<span style="color:#ae81ff">0x031F4223</span>,<span style="color:#ae81ff">0x031F423C</span>,<span style="color:#ae81ff">0x031F4255</span>,<span style="color:#ae81ff">0x031F426E</span>,<span style="color:#ae81ff">0x031F4287</span>,<span style="color:#ae81ff">0x031F42A0</span>,<span style="color:#ae81ff">0x031F42B9</span>,<span style="color:#ae81ff">0x031F42D2</span>,<span style="color:#ae81ff">0x031F42EB</span>,<span style="color:#ae81ff">0x031F4304</span>,<span style="color:#ae81ff">0x031F431D</span>,<span style="color:#ae81ff">0x031F4336</span>,<span style="color:#ae81ff">0x031F434F</span>,<span style="color:#ae81ff">0x031F4368</span>,<span style="color:#ae81ff">0x031F4381</span>,<span style="color:#ae81ff">0x031F439A</span>,<span style="color:#ae81ff">0x031F43B3</span>,<span style="color:#ae81ff">0x031F43CC</span>,<span style="color:#ae81ff">0x031F43E5</span>,<span style="color:#ae81ff">0x031F43FE</span>,<span style="color:#ae81ff">0x031F4417</span>,<span style="color:#ae81ff">0x031F4430</span>,<span style="color:#ae81ff">0x031F4449</span>,<span style="color:#ae81ff">0x031F4462</span>,<span style="color:#ae81ff">0x031F447B</span>,<span style="color:#ae81ff">0x031F4494</span>,<span style="color:#ae81ff">0x031F44AD</span>,<span style="color:#ae81ff">0x031F44C6</span>,<span style="color:#ae81ff">0x031F44DF</span>,<span style="color:#ae81ff">0x031F44F8</span>,<span style="color:#ae81ff">0x031F4511</span>,<span style="color:#ae81ff">0x031F452A</span>,<span style="color:#ae81ff">0x031F4543</span>,<span style="color:#ae81ff">0x031F455C</span>,<span style="color:#ae81ff">0x031F4575</span>,<span style="color:#ae81ff">0x031F458E</span>,<span style="color:#ae81ff">0x031F45A7</span>,<span style="color:#ae81ff">0x031F45C0</span>,<span style="color:#ae81ff">0x031F45D9</span>,<span style="color:#ae81ff">0x031F45F2</span>,<span style="color:#ae81ff">0x031F460B</span>,<span style="color:#ae81ff">0x031F4624</span>,<span style="color:#ae81ff">0x031F463D</span>,<span style="color:#ae81ff">0x031F4656</span>,<span style="color:#ae81ff">0x031F466F</span>,<span style="color:#ae81ff">0x031F4688</span>,<span style="color:#ae81ff">0x031F46A1</span>,<span style="color:#ae81ff">0x031F46BA</span>,<span style="color:#ae81ff">0x031F46D3</span>,<span style="color:#ae81ff">0x031F46EC</span>,<span style="color:#ae81ff">0x031F4705</span>,<span style="color:#ae81ff">0x031F471E</span>,<span style="color:#ae81ff">0x031F4737</span>,<span style="color:#ae81ff">0x031F4750</span>,<span style="color:#ae81ff">0x031F4769</span>,<span style="color:#ae81ff">0x031F4782</span>,<span style="color:#ae81ff">0x031F479B</span>,<span style="color:#ae81ff">0x031F47B4</span>,<span style="color:#ae81ff">0x031F47CD</span>,<span style="color:#ae81ff">0x031F47E6</span>,<span style="color:#ae81ff">0x031F47FF</span>,<span style="color:#ae81ff">0x031F4818</span>,<span style="color:#ae81ff">0x031F4831</span>,<span style="color:#ae81ff">0x031F484A</span>,<span style="color:#ae81ff">0x031F4863</span>,<span style="color:#ae81ff">0x031F487C</span>,<span style="color:#ae81ff">0x031F4895</span>,<span style="color:#ae81ff">0x031F48AE</span>,<span style="color:#ae81ff">0x031F48C7</span>,<span style="color:#ae81ff">0x031F48E0</span>,<span style="color:#ae81ff">0x031F48F9</span>,<span style="color:#ae81ff">0x031F4912</span>,<span style="color:#ae81ff">0x031F492B</span>,<span style="color:#ae81ff">0x031F4944</span>,<span style="color:#ae81ff">0x031F495D</span>,<span style="color:#ae81ff">0x031F4976</span>,<span style="color:#ae81ff">0x031F498F</span>,<span style="color:#ae81ff">0x031F49A8</span>,<span style="color:#ae81ff">0x031F49C1</span>,<span style="color:#ae81ff">0x031F49DA</span>,<span style="color:#ae81ff">0x031F49F3</span>,<span style="color:#ae81ff">0x031F4A0C</span>,<span style="color:#ae81ff">0x031F4A25</span>,<span style="color:#ae81ff">0x031F4A3E</span>,<span style="color:#ae81ff">0x031F4A57</span>,<span style="color:#ae81ff">0x031F4A70</span>,<span style="color:#ae81ff">0x031F4A89</span>,<span style="color:#ae81ff">0x031F4AA2</span>,<span style="color:#ae81ff">0x031F4ABB</span>,<span style="color:#ae81ff">0x031F4AD4</span>,<span style="color:#ae81ff">0x031F4AED</span>,<span style="color:#ae81ff">0x031F4B06</span>,<span style="color:#ae81ff">0x031F4B1F</span>,<span style="color:#ae81ff">0x031F4B38</span>,<span style="color:#ae81ff">0x031F4B51</span>,<span style="color:#ae81ff">0x031F4B6A</span>,<span style="color:#ae81ff">0x031F4B83</span>,<span style="color:#ae81ff">0x031F4B9C</span>,<span style="color:#ae81ff">0x031F4BB5</span>,<span style="color:#ae81ff">0x031F4BCE</span>,<span style="color:#ae81ff">0x031F4BE7</span>,<span style="color:#ae81ff">0x031F4C00</span>,<span style="color:#ae81ff">0x031F4C19</span>,<span style="color:#ae81ff">0x031F4C32</span>,<span style="color:#ae81ff">0x031F4C4B</span>,<span style="color:#ae81ff">0x031F4C64</span>,<span style="color:#ae81ff">0x031F4C7D</span>,<span style="color:#ae81ff">0x031F4C96</span>,<span style="color:#ae81ff">0x031F4CAF</span>,<span style="color:#ae81ff">0x031F4CC8</span>,<span style="color:#ae81ff">0x031F4CE1</span>,<span style="color:#ae81ff">0x031F4CFA</span>]
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> s <span style="color:#f92672">in</span> starting_points:
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># push offset is 4byte. </span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 3 push instuction before call</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 0xC bytes backward to take all function parameters</span>
+</span></span><span style="display:flex;"><span>    s <span style="color:#f92672">=</span> s <span style="color:#f92672">-</span> <span style="color:#ae81ff">0xC</span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;Address </span><span style="color:#e6db74">{</span>hex(s)<span style="color:#e6db74">}</span><span style="color:#e6db74"> : </span><span style="color:#e6db74">{</span>deobfuscate(s)<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>)
+</span></span></code></pre></div><p>Launching this script we are able to extract a lot of information on Mars Stealer, starting our triage without even reversing the whole malware. In fact, from the resolved string we have something related to common stealer targets such as: credit cards, browser, crypto wallet, etc..</p>
+<p><img src="https://Viuleeenz.github.io/img/mars_stealer/_deobfuscated_strings.png" alt="Figure 8: Retrieved strings"></p>
+<p>Figure 8: Retrieved strings</p>
+<p>Additionally we also have a chance to get a few insights about anti-analysis or reversing-aware functions such as: <strong>IsDebuggerPresent</strong> or <strong>CreateToolhelp32Snapshot</strong>. Additionally we have also some indications about anti-sandbox techniques with <strong>HAL9TH</strong>, that should be the Microsoft sandbox computer name. All deobfuscated strings could be found here</p>
+<h3 id="conclusion-and-next-chapter">Conclusion and next chapter</h3>
+<p>Emulation represents the state of the art for analyzing malware functions or triaging sample without losing yourself in complex and heavily obfuscated routine. It was pretty fun to analyze Mars Stealer through this technique. I’m thinking of creating additional and probably more structured content (maybe a Whitepaper) about malware emulation.</p>
+<p>The script above could be used as a reference for further analysis, it&rsquo;s quite simple (and not perfect) but very effective and I used that as a “<em>soft</em>” introduction to this topic and also to give an idea of emulation capabilities.</p>
+<p>Hope you enjoyed reading this post as much as I had reversing this malware and writing this post!</p>
+<h3 id="references">References</h3>
+<p>Sample analyzed:</p>
+<ul>
+<li><a href="https://bazaar.abuse.ch/sample/81dbad520f8f4d8163e02d7b01866918e8392bb549df2cb73f1b8148f6fd5b51/">MalwareBazaar Sample</a></li>
+</ul>
+<p>Minidump:</p>
+<ul>
+<li><a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/ConfigurationExtractors/MarsStealer/mars_stealer_minidump.7z">mars_stealer_minidump.7z</a></li>
+</ul>
+<p>String resolver:</p>
+<ul>
+<li><a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/ConfigurationExtractors/MarsStealer/MarsStealer_stringResolver.py">MarsStealer_stringResolver.py</a></li>
+</ul>
+<p>Extracted strings:</p>
+<ul>
+<li><a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/ConfigurationExtractors/MarsStealer/strings.txt">strings.txt</a></li>
+</ul>
+<p>Dumpulator:</p>
+<ul>
+<li><a href="https://github.com/mrexodia/dumpulator">Reference</a></li>
+</ul>
+
+      </div>
+    </article>
+
+    <hr />
+
+    <div class="post-info">
+      
+      
+
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        1093 Words
+      </p>
+
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        
+          2023-11-15 01:00
+        
+
+         
+          
+        
+      </p>
+    </div>
+
+    
+
+    
+
+    
+
+  </main>
+
+            </div>
+
+            
+                <footer class="footer">
+    
+    <div class="footer__inner">
+        <div class="footer__content">
+            <span>&copy; 2023</span>
+            
+            <span><a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></span>
+            
+            
+        </div>
+    </div>
+    
+    
+</footer>
+
+            
+        </div>
+
+        
+
+
+
+<script type="text/javascript" src="https://Viuleeenz.github.io/bundle.min.205d491810c28f95aa953fae884e1c27abe13fdf93ec63b882d0036b248d4a6282eb2d134e4e7225c6ad6e86db87b08488a361ca4a7383d01fcff43f3d57b9c3.js" integrity="sha512-IF1JGBDCj5WqlT&#43;uiE4cJ6vhP9&#43;T7GO4gtADaySNSmKC6y0TTk5yJcatbobbh7CEiKNhykpzg9Afz/Q/PVe5ww=="></script>
+
+
+
+    </body>
+</html>

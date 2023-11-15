@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
-    <lastBuildDate>Wed, 25 Oct 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://Viuleeenz.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 15 Nov 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://Viuleeenz.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Applied Emulation - Analysis of MarsStealer</title>
+      <link>https://Viuleeenz.github.io/posts/2023/11/applied-emulation-analysis-of-marsstealer/</link>
+      <pubDate>Wed, 15 Nov 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://Viuleeenz.github.io/posts/2023/11/applied-emulation-analysis-of-marsstealer/</guid>
+      <description>Introduction Emulation is a technique that could be very handy and effective when we have to deal with malware triage, configuration extractor and deobfuscate part of the code without rewriting complex algorithms. Even if it seems magic (and it&amp;rsquo;s not unfortunately) it&amp;rsquo;s still not possible to apply emulation on random code. However, if applied correctly this method could really speed up our malware analysis and triage. Through this blogpost I would like to give an overview about emulation usage and apply it in a real case scenario.</description>
+    </item>
+    
     <item>
       <title>Vidar - payload inspection with static analysis</title>
       <link>https://Viuleeenz.github.io/posts/2023/10/vidar-payload-inspection-with-static-analysis/</link>
