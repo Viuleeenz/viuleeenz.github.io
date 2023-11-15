@@ -42,7 +42,7 @@
 <meta itemprop="name" content="Applied Emulation - Analysis of MarsStealer">
 <meta itemprop="description" content="Introduction Emulation is a technique that could be very handy and effective when we have to deal with malware triage, configuration extractor and deobfuscate part of the code without rewriting complex algorithms. Even if it seems magic (and it&rsquo;s not unfortunately) it&rsquo;s still not possible to apply emulation on random code. However, if applied correctly this method could really speed up our malware analysis and triage. Through this blogpost I would like to give an overview about emulation usage and apply it in a real case scenario."><meta itemprop="datePublished" content="2023-11-15T00:00:00+00:00" />
 <meta itemprop="dateModified" content="2023-11-15T00:00:00+00:00" />
-<meta itemprop="wordCount" content="1093"><meta itemprop="image" content="https://Viuleeenz.github.io/"/>
+<meta itemprop="wordCount" content="1096"><meta itemprop="image" content="https://Viuleeenz.github.io/"/>
 <meta itemprop="keywords" content="" />
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="https://Viuleeenz.github.io/"/>
@@ -248,7 +248,7 @@ if (!doNotTrack) {
 </span></span></code></pre></div><p>Launching this script we are able to extract a lot of information on Mars Stealer, starting our triage without even reversing the whole malware. In fact, from the resolved string we have something related to common stealer targets such as: credit cards, browser, crypto wallet, etc..</p>
 <p><img src="https://Viuleeenz.github.io/img/mars_stealer/ms_deobfuscated_strings.png" alt="Figure 8: Retrieved strings"></p>
 <p>Figure 8: Retrieved strings</p>
-<p>Additionally we also have a chance to get a few insights about anti-analysis or reversing-aware functions such as: <strong>IsDebuggerPresent</strong> or <strong>CreateToolhelp32Snapshot</strong>. Additionally we have also some indications about anti-sandbox techniques with <strong>HAL9TH</strong>, that should be the Microsoft sandbox computer name. All deobfuscated strings could be found here</p>
+<p>Additionally we also have a chance to get a few insights about anti-analysis or reversing-aware functions such as: <strong>IsDebuggerPresent</strong> or <strong>CreateToolhelp32Snapshot</strong>. Additionally we have also some indications about anti-sandbox techniques with <strong>HAL9TH</strong>, that should be the Microsoft sandbox computer name. All deobfuscated strings could be found within the <strong>Reference section</strong>.</p>
 <h3 id="conclusion-and-next-chapter">Conclusion and next chapter</h3>
 <p>Emulation represents the state of the art for analyzing malware functions or triaging sample without losing yourself in complex and heavily obfuscated routine. It was pretty fun to analyze Mars Stealer through this technique. I’m thinking of creating additional and probably more structured content (maybe a Whitepaper) about malware emulation.</p>
 <p>The script above could be used as a reference for further analysis, it&rsquo;s quite simple (and not perfect) but very effective and I used that as a “<em>soft</em>” introduction to this topic and also to give an idea of emulation capabilities.</p>
@@ -292,7 +292,7 @@ if (!doNotTrack) {
           <line x1="16" y1="17" x2="8" y2="17"></line>
           <polyline points="10 9 9 9 8 9"></polyline>
         </svg>
-        1093 Words
+        1096 Words
       </p>
 
       <p>
