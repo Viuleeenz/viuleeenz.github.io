@@ -209,7 +209,7 @@ if (!doNotTrack) {
 <p>Observing carefully the Figure 4, it&rsquo;s easy to spot that the plaintext string is settled <strong>after the for loop</strong> and <strong>before the VirtualProtect call</strong>. Looking at the assembly with the information acquired, it’s easy to understand that emulation should stop at the instruction <strong>push ecx</strong>. In fact, <strong>ecx register is going to be a pointer for the plaintext string</strong>.</p>
 <p><img src="https://Viuleeenz.github.io/img/mars_stealer/ms_plaintext_resolution.png" alt="Figure 6: Plaintext resolution"></p>
 <p>Figure 6: Focus on plaintext resolution</p>
-<p>With all this information, the <strong>emulation end variable</strong> could be easily retrieved within the debugger at the address <strong>0x025f4de5</strong>.</p>
+<p>With all this information, the <strong>emulation end variable</strong> could be easily retrieved within the debugger at the address <strong>0x031f4De5</strong>.</p>
 <p><img src="https://Viuleeenz.github.io/img/mars_stealer/ms_end_address.png" alt="Figure 7: Emulation stop address"></p>
 <p>Figure 7: Emulation stop address</p>
 <h3 id="string-resolving-automation">String Resolving Automation</h3>
@@ -252,7 +252,7 @@ if (!doNotTrack) {
 <h3 id="conclusion-and-next-chapter">Conclusion and next chapter</h3>
 <p>Emulation represents the state of the art for analyzing malware functions or triaging sample without losing yourself in complex and heavily obfuscated routine. It was pretty fun to analyze Mars Stealer through this technique. I’m thinking of creating additional and probably more structured content (maybe a Whitepaper) about malware emulation.</p>
 <p>The script above could be used as a reference for further analysis, it&rsquo;s quite simple (and not perfect) but very effective and I used that as a “<em>soft</em>” introduction to this topic and also to give an idea of emulation capabilities.</p>
-<p>Hope you enjoyed reading this post as much as I had reversing this malware and writing this post!</p>
+<p>Hope you enjoyed reading this post as much as I had reversing this malware and writing this article!</p>
 <h3 id="references">References</h3>
 <p>Sample analyzed:</p>
 <ul>
