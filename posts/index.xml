@@ -30,7 +30,7 @@
 <p>Since that our purpose is to find out code to emulate, we could look for a deobfuscation routine within the payload extracted. Our search won’t last long because, almost <strong>immediately after the VirtualProtect</strong> call the malware jumps directly to the allocated memory, <strong>starting the name resolving routine.</strong></p>
 <p><img src="/img/mars_stealer/ms_deobfuscation_wrapper.png" alt="Figure 3: Deobfuscation wrapper"></p>
 <p>Figure 3: Deobfuscation wrapper</p>
-<p>The highlighted function is a wrapper that contains the actual routine. The code is quite easy to spot because of the <strong>tree push instructions</strong>. Opening the payload in IDA, it&rsquo;s possible to go a little bit deeper and explore the deobfuscation routine, reconstructing its signature and from that point, understanding the function flow.</p>
+<p>The highlighted function is a wrapper that contains the actual routine. The code is quite easy to spot because of the <strong>three push instructions</strong>. Opening the payload in IDA, it&rsquo;s possible to go a little bit deeper and explore the deobfuscation routine, reconstructing its signature and from that point, understanding the function flow.</p>
 <p><img src="/img/mars_stealer/ms_deobfuscation_routine.png" alt="Figure 4: Deobfuscation routine"></p>
 <p>Figure 4: Deobfuscation routine</p>
 <p>Regardless of the red box related memory errors, it&rsquo;s very easy to understand its core functionality and control flow. However, even if it seems quite easy to reconstruct its logic, I’m going to take this code as a use case to try a completely different approach, using <strong>emulation to resolve all the strings</strong>.</p>
@@ -42,7 +42,7 @@
 </ul>
 <p><img src="/img/mars_stealer/ms_references_to_deobfuscation_function.png" alt="Figure 5: References to deobfuscation function"></p>
 <p>Figure 5: References to deobfuscation function</p>
-<p>Now that we have two out of tree requirements, it&rsquo;s necessary to focus on the <strong>emulation ending point</strong>. Of course, this one is the most important requirement and could impact your result in terms of efficiency (emulation is tremendously slow) and code writing (could be required to write more code that fits your needs).</p>
+<p>Now that we have two out of three requirements, it&rsquo;s necessary to focus on the <strong>emulation ending point</strong>. Of course, this one is the most important requirement and could impact your result in terms of efficiency (emulation is tremendously slow) and code writing (could be required to write more code that fits your needs).</p>
 <p>For the purpose of this analysis/tutorial about emulation I’m going straight to the point using <strong>hints collected from IDA</strong> and doing some dynamic code analysis.</p>
 <h3 id="emulation-ending-point-extraction">Emulation ending point extraction</h3>
 <p>Observing carefully the Figure 4, it&rsquo;s easy to spot that the plaintext string is settled <strong>after the for loop</strong> and <strong>before the VirtualProtect call</strong>. Looking at the assembly with the information acquired, it’s easy to understand that emulation should stop at the instruction <strong>push ecx</strong>. In fact, <strong>ecx register is going to be a pointer for the plaintext string</strong>.</p>
