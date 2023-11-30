@@ -788,10 +788,38 @@ Figure 4 - Target stored in cleartext within process memory</p>
 <p>Figure 6 - Extracting DDosia targets from dump files</p>
 <h2 id="final-notes">Final Notes</h2>
 <p>Before concluding, It’s worth mentioning that updates on these scripts and new techniques to dealing with further improvements of DDosia project are not going to be shown, because it represents a topic that I’m not following personally and I’m sure that more authoritative voices will keep track of this threat and its evolution.</p>
-<h3 id="references">References:</h3>
+<hr>
+<h3 id="2023-11---update-">[2023-11 - UPDATE ]</h3>
+<p>As mentioned in the section above I’m not able to provide updates on real-time DDosia Project changes, but since it represents a quite good challenge to sharpen my reversing skills on GO binaries (and I received unexpected feedback about this work), I decided to look in their new Windows client version.</p>
+<p>Since I would like to keep this update note as brief as possible, I’ll go straight to the point. What really changes and makes the previous frida script ineffective are slightly binary improvements (mostly related to the syscalls used). Because of that I tried to switch monitored syscall to <a href="https://learn.microsoft.com/en-us/windows/console/writeconsole"><strong>WriteConsoleW</strong></a>, hooking on the message that confirmed the numbers of targets retrieved. I found out that I really needed to change 1 line of the previous script to keep it updated. (Great example of code reuse xD).</p>
+<h3 id="note"><strong>Note:</strong></h3>
+<p>Most of this blogpost it&rsquo;s still a valid reference for setting up the environment and understanding the control flow to retrieve the actual targets, moreover, as far as I know, there were no great changes on the authentication layer. Previous configured environments needs to replace the old binary to the newer provided on DDosia channel.</p>
 <ul>
-<li>Binary analyzed: <a href="https://www.virustotal.com/gui/file/726c2c2b35cb1adbe59039193030f23e552a28226ecf0b175ec5eba9dbcd336e">d_windows_amd64.exe</a> | 726c2c2b35cb1adbe59039193030f23e552a28226ecf0b175ec5eba9dbcd336e (sha256) | 19/04/2023</li>
+<li>New frida script: <a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/ConfigurationExtractors/DDosia_Targets/console.js">console.js</a></li>
 </ul>
+<hr>
+<h3 id="references">References:</h3>
+<table>
+<thead>
+<tr>
+<th>FileName</th>
+<th>Sha256</th>
+<th>Date</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="(https://www.virustotal.com/gui/file/726c2c2b35cb1adbe59039193030f23e552a28226ecf0b175ec5eba9dbcd336e)">d_windows_amd64.exe</a></td>
+<td>726c2c2b35cb1adbe59039193030f23e552a28226ecf0b175ec5eba9dbcd336e</td>
+<td>2023/04/19</td>
+</tr>
+<tr>
+<td>(new sample) <a href="https://www.virustotal.com/gui/file/1b53443ebaabafd6f511d4cf7cb85ddf9fa32540c5dd5621f04a3c5eefa663a9">d_win_x64.exe</a></td>
+<td>1b53443ebaabafd6f511d4cf7cb85ddf9fa32540c5dd5621f04a3c5eefa663a9</td>
+<td>2023/11/09</td>
+</tr>
+</tbody>
+</table>
 ]]></content>
         </item>
         
