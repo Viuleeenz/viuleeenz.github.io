@@ -177,9 +177,9 @@ if (!doNotTrack) {
       
 
       <div class="post-content">
-        <h1 id="general-information-and-preface">General Information and preface</h1>
+        <h3 id="general-information-and-preface">General Information and preface</h3>
 <p>Agent Tesla, according to the <a href="https://cert.europa.eu/static/threat-intelligence/TLP-CLEAR-CB-23-08.pdf">data</a> provided by CERT-EU, is one the most prominent threats that are hitting European cyberspace. Because of that, I found that it could be quite interesting understanding its behavior. However, as I usually prefer, instead of focusing on the infection chain or information about TA methodologies, sharing knowledge that were already provided by more authoritative sources, I preferred to focus mostly on malware analysis and in this specific case to the latest encryption algorithm adopted. Then, upon the knowledge acquired, I would like to write a decryptor script that extracts payload configuration.</p>
-<h1 id="encryption-variants">Encryption variants</h1>
+<h3 id="encryption-variants">Encryption variants</h3>
 <p>Agent Tesla first appeared in 2014, however, its evolution over time could be tracked by multiple TTPs. For the purpose of this article, I’m versioning it through the encryption algorithm adopted. At the time of writing there have been 4 different versions with unique characteristics:</p>
 <p><strong>Encryption v1</strong>: Through this encryption implementation, strings are stored (encrypted) in base64. The decryption function uses a password and a salt ( both hardcoded) as input for the SHA1 algorithm, in order to generate the decryption key. Then, ciphertext and key are eventually used with AES in CBC mode.</p>
 <p><strong>Encryption v2</strong>: The main difference from the previous method, is that each encrypted string is paired with a dedicated key and an IV. The algorithm used is still AES in CBC mode.</p>
@@ -189,7 +189,7 @@ if (!doNotTrack) {
 <p>Figure 1 - Encrypted data structure</p>
 <p>In this version we have a macro-struct that contains the encrypted data. It’s actually possible to visualize it as an array where each element follows a specific structure where the first 4 bytes are dedicated to define the encryption data length, then other 4 bytes are used to describe the encryption key and the remaining bytes are reserved for the actual data.</p>
 <p>As always, the decryption routine iterates over the encrypted data, using key bytes.</p>
-<h1 id="analysis-of-encryption-v4-and-obfuscation-routine">Analysis of encryption v4 and obfuscation routine</h1>
+<h3 id="analysis-of-encryption-v4-and-obfuscation-routine">Analysis of encryption v4 and obfuscation routine</h3>
 <p>As I wrote in the first paragraph Agent Tesla analysis will be carried out on the latest encryption mechanism. Because of that, let’s start analyzing the main components of this algorithm:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C#" data-lang="C#"><span style="display:flex;"><span><span style="color:#66d9ef">private</span> <span style="color:#66d9ef">byte</span>[] RXOR(<span style="color:#66d9ef">byte</span>[] data, <span style="color:#66d9ef">out</span> <span style="color:#66d9ef">int</span> key)
 </span></span><span style="display:flex;"><span>{
@@ -215,7 +215,7 @@ if (!doNotTrack) {
 <p>&ldquo;We also need to create a new <strong>field which will be an initialized version of our struct</strong>. By adding a DataSegment in its <strong>FieldRva</strong>, we can use the field to store any raw data we want, in this case, our encrypted string data.&rdquo;</p>
 </blockquote>
 <p>Following the indication provided by the author, we should have a more clear idea of what these components are and how to hunt for them in the code. Now it’s possible to start looking at the code gathering as much information as possible (e.g., locating these placeholders) and finding out a pattern to write an effective configuration decryptor.</p>
-<h1 id="binary-inspection">Binary inspection</h1>
+<h3 id="binary-inspection">Binary inspection</h3>
 <p>If we open up DnSpy, we could be overwhelmed by the mess that is going to be presented in front of us. However, trying to follow the code flow, we could start exploring.</p>
 <p><img src="https://lh5.googleusercontent.com/zuONKbBX5bsAJ-9VLBUlNoqYkhrk3PdCdn3WHkNawFSZG6MvRT636ILfvDcipjFTT0GlhrCzBdbnxiDNMWsQpDpViMBIgFZFJZ1fhqZZJZdi_bi3lRoGkMNJ2pv16lful5B_TWsxw7m6nMatFOupgRw" alt="Figure 2: Entry point"></p>
 <p>Figure 2 - Entry point</p>
@@ -234,7 +234,7 @@ if (!doNotTrack) {
 <p><img src="https://lh3.googleusercontent.com/SGwLKd7RiZ-or8mXHPy7frC_MDAQgyn3RcHZ9sK_vs3jU_yReO3wmC_4le_AFu-l8jxsvGEF2Li5sgbNIa5ObmTDEjkJysNMQUrbwfhkGkESbwRg_gApWFALZmnSVnIyFpe412KCqGRwGy2ryp3H63o" alt="figure 5 - Encrypted String"></p>
 <p>Figure 5 - Encrypted string</p>
 <p>Analyzing those bytes, it&rsquo;s immediate to find out that we are dealing with an encrypted payload that is ready to be decrypted.</p>
-<h1 id="decrypting-strings">Decrypting Strings</h1>
+<h3 id="decrypting-strings">Decrypting Strings</h3>
 <p><strong>The idea behind this script is simple</strong>:</p>
 <ul>
 <li>Find out a class that is big enough to contain the encrypted data ( usually the biggest class in the code). Then we could retrieve raw bytes related to its size from the binary file and forward them towards our decryption routine</li>
@@ -250,7 +250,7 @@ if (!doNotTrack) {
 <p>Running our script on one of the latest Agent Tesla sample, we got the following result:</p>
 <p><img src="https://lh3.googleusercontent.com/MtQZbbAOaz2HR4EEGvuVnAH2VoTzbz3P31VeZe0WPg_qMGpPuDOOQH7vn5jxriHiljyrfpK_3T_lejGWJ3Scwq1vNJDICyjvmkhZzI8g423d7e20_R8XSulLtXB9Db_-Si7wu5H6dPT95HPotd-BY7o" alt="Figure 7 - Decryptor result"></p>
 <p>Figure 7 - Decryptor result</p>
-<h1 id="references">References</h1>
+<h3 id="references">References</h3>
 <p>Agent Tesla Decryptor:</p>
 <ul>
 <li><a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/ConfigurationExtractors/AgentTesla/agent_tesla_decryptor_v4.py">agent_tesla_decryptor_v4.py</a></li>
