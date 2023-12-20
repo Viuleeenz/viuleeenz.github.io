@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
-    <lastBuildDate>Wed, 15 Nov 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://Viuleeenz.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 20 Dec 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://Viuleeenz.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Applied Emulation - Decrypting Ursnif strings with Unicorn</title>
+      <link>https://Viuleeenz.github.io/posts/2023/12/applied-emulation-decrypting-ursnif-strings-with-unicorn/</link>
+      <pubDate>Wed, 20 Dec 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://Viuleeenz.github.io/posts/2023/12/applied-emulation-decrypting-ursnif-strings-with-unicorn/</guid>
+      <description>Introduction Here we go with another chapter of the Applied Emulation series. In the previous blogpost we have talked about emulation and more specifically, the usage of Dumpulator to perform a quick triage. However, in this blogpost we are going to use a completely different approach, taking advantage of static analysis to understand and emulate a string decryption algorithm through Unicorn. As always, I would like to give a practical example on a real case scenario.</description>
+    </item>
+    
     <item>
       <title>Applied Emulation - Analysis of MarsStealer</title>
       <link>https://Viuleeenz.github.io/posts/2023/11/applied-emulation-analysis-of-marsstealer/</link>

@@ -2,6 +2,9 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>https://Viuleeenz.github.io/posts/2023/12/applied-emulation-decrypting-ursnif-strings-with-unicorn/</loc>
+    <lastmod>2023-12-20T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://Viuleeenz.github.io/posts/2023/11/applied-emulation-analysis-of-marsstealer/</loc>
     <lastmod>2023-11-15T00:00:00+00:00</lastmod>
   </url><url>
@@ -24,10 +27,10 @@
     <lastmod>2021-09-02T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://Viuleeenz.github.io/posts/</loc>
-    <lastmod>2023-11-15T00:00:00+00:00</lastmod>
+    <lastmod>2023-12-20T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://Viuleeenz.github.io/</loc>
-    <lastmod>2023-11-15T00:00:00+00:00</lastmod>
+    <lastmod>2023-12-20T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://Viuleeenz.github.io/series/</loc>
     <lastmod>2021-09-02T00:00:00+00:00</lastmod>
