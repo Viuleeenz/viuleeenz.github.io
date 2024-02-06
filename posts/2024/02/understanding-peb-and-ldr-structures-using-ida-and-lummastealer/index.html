@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="author" content="map[name:Alessandro Strino]">
+<meta name="description" content="In this post I’m going to explain how Process Environment Block (PEB) is parsed by malware devs and how that structure is abused. Instead of going too deep into a lot of details, I would like to follow an easier approach pairing the theory with a practical real example using IDA and LummaStealer, without overwhelming the reader with a lot of technical details trying to simplify the data structure involved in the process." />
+<meta name="keywords" content="malware, binary, digital forensics, exploit development, reverse engineering" />
+<meta name="robots" content="noodp" />
+<meta name="theme-color" content="" />
+<link rel="canonical" href="https://Viuleeenz.github.io/posts/2024/02/understanding-peb-and-ldr-structures-using-ida-and-lummastealer/" />
+
+
+    <title>
+        
+            Understanding PEB and LDR Structures using IDA and LummaStealer :: Security Undisguised 
+        
+    </title>
+
+
+
+
+
+<link rel="stylesheet" href="https://Viuleeenz.github.io/main.b78c3be9451dc4ca61ca377f3dc2cf2e6345a44c2bae46216a322ef366daa399.css" integrity="sha256-t4w76UUdxMphyjd/PcLPLmNFpEwrrkYhajIu82bao5k=">
+
+
+    
+        <link rel="stylesheet" type="text/css" href="https://Viuleeenz.github.io/style.css">
+    
+
+
+    <link rel="apple-touch-icon" sizes="180x180" href="https://Viuleeenz.github.io/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://Viuleeenz.github.io/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://Viuleeenz.github.io/favicon-16x16.png">
+    <link rel="manifest" href="https://Viuleeenz.github.io/site.webmanifest">
+    <link rel="mask-icon" href="https://Viuleeenz.github.io/safari-pinned-tab.svg" color="">
+    <link rel="shortcut icon" href="https://Viuleeenz.github.io/favicon.ico">
+    <meta name="msapplication-TileColor" content="">
+
+
+<meta itemprop="name" content="Understanding PEB and LDR Structures using IDA and LummaStealer">
+<meta itemprop="description" content="In this post I’m going to explain how Process Environment Block (PEB) is parsed by malware devs and how that structure is abused. Instead of going too deep into a lot of details, I would like to follow an easier approach pairing the theory with a practical real example using IDA and LummaStealer, without overwhelming the reader with a lot of technical details trying to simplify the data structure involved in the process."><meta itemprop="datePublished" content="2024-02-04T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2024-02-04T00:00:00+00:00" />
+<meta itemprop="wordCount" content="1550"><meta itemprop="image" content="https://Viuleeenz.github.io/"/>
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://Viuleeenz.github.io/"/>
+
+<meta name="twitter:title" content="Understanding PEB and LDR Structures using IDA and LummaStealer"/>
+<meta name="twitter:description" content="In this post I’m going to explain how Process Environment Block (PEB) is parsed by malware devs and how that structure is abused. Instead of going too deep into a lot of details, I would like to follow an easier approach pairing the theory with a practical real example using IDA and LummaStealer, without overwhelming the reader with a lot of technical details trying to simplify the data structure involved in the process."/>
+
+
+
+    <meta property="og:title" content="Understanding PEB and LDR Structures using IDA and LummaStealer" />
+<meta property="og:description" content="In this post I’m going to explain how Process Environment Block (PEB) is parsed by malware devs and how that structure is abused. Instead of going too deep into a lot of details, I would like to follow an easier approach pairing the theory with a practical real example using IDA and LummaStealer, without overwhelming the reader with a lot of technical details trying to simplify the data structure involved in the process." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://Viuleeenz.github.io/posts/2024/02/understanding-peb-and-ldr-structures-using-ida-and-lummastealer/" /><meta property="og:image" content="https://Viuleeenz.github.io/"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2024-02-04T00:00:00+00:00" />
+<meta property="article:modified_time" content="2024-02-04T00:00:00+00:00" />
+
+
+
+
+
+
+
+    <meta property="article:published_time" content="2024-02-04 00:00:00 &#43;0000 UTC" />
+
+
+
+
+
+
+
+
+
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XNKLBC4D9D"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-XNKLBC4D9D', { 'anonymize_ip': false });
+}
+</script>
+
+
+
+    </head>
+
+    
+        <body>
+    
+    
+        <div class="container">
+            <header class="header">
+    <span class="header__inner">
+        <a href="https://Viuleeenz.github.io/" style="text-decoration: none;">
+    <div class="logo">
+        
+            <span class="logo__mark">&gt;</span>
+            <span class="logo__text ">
+                $ cd /home/Viuleeenz</span>
+            <span class="logo__cursor" style=
+                  "
+                   
+                   ">
+            </span>
+        
+    </div>
+</a>
+
+        <span class="header__right">
+            
+                <nav class="menu">
+    <ul class="menu__inner"><li><a href="https://Viuleeenz.github.io/about/">About</a></li><li><a href="https://Viuleeenz.github.io/posts/">Posts</a></li><li><a href="https://Viuleeenz.github.io/whitepapers/">Whitepapers</a></li>
+    </ul>
+</nav>
+
+                <span class="menu-trigger">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                    </svg>
+                </span>
+            
+                <span class="theme-toggle not-selectable"><svg class="theme-toggler" width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+   <path d="M22 41C32.4934 41 41 32.4934 41 22C41 11.5066 32.4934 3 22
+   3C11.5066 3 3 11.5066 3 22C3 32.4934 11.5066 41 22 41ZM7 22C7
+   13.7157 13.7157 7 22 7V37C13.7157 37 7 30.2843 7 22Z"/>
+ </svg></span>
+        </span>
+    </span>
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XNKLBC4D9D"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-XNKLBC4D9D', { 'anonymize_ip': false });
+}
+</script>
+
+</header>
+
+
+            <div class="content">
+                
+  <main class="post">
+
+    <div class="post-info">
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        8 minutes
+
+        
+      </p>
+    </div>
+
+    <article>
+      <h1 class="post-title">
+        <a href="https://Viuleeenz.github.io/posts/2024/02/understanding-peb-and-ldr-structures-using-ida-and-lummastealer/">Understanding PEB and LDR Structures using IDA and LummaStealer</a>
+      </h1>
+
+      
+
+      
+
+      
+
+      <div class="post-content">
+        <p>In this post I’m going to explain how Process Environment Block (PEB) is parsed by malware devs and how that structure is abused. Instead of going too deep into a lot of details, I would like to follow an easier approach pairing the theory with a practical real example using IDA and LummaStealer, without overwhelming the reader with a lot of technical details trying to simplify the data structure involved in the process. At the end of the theory part, I’m going to <strong>apply PEB and all related structures in IDA</strong>, inspecting malware parsing capabilities that are going to be applied for resolving hashed APIs.</p>
+<p>Let’s start.</p>
+<h3 id="peb-structure">PEB Structure</h3>
+<p>The PEB is a crucial data structure that contains various <strong>information</strong> about a <strong>running process</strong>. Unlike other Windows structure (e.g., EPROCESS, ETHREAD, etc..), it exists in the user address space and is available for every process at a <strong>fixed</strong> address in memory (PEB can be found at <code>fs:[0x30]</code> in the Thread Environment Block (TEB) for x86 processes as well as at <code>gs:[0x60]</code> for x64 processes). Some of documented fields that it’s worth knowing are:</p>
+<ul>
+<li>BeingDebugged: Whether the process is being debugged;</li>
+<li><strong>Ldr</strong>: A pointer to a <code>PEB_LDR_DATA</code> structure providing information about loaded modules;</li>
+<li>ProcessParameters: A pointer to a <code>RTL_USER_PROCESS_PARAMETERS</code> structure providing information about process startup parameters;</li>
+<li>PostProcessInitRoutine: A pointer to a callback function called after DLL initialization but before the main executable code is invoked</li>
+</ul>
+<h3 id="image-loader-aka-ldr">Image Loader aka Ldr</h3>
+<p>When a process is started on the system, the kernel creates a process object to represent it and performs various kernel-related initialization tasks. However, these tasks do not result in the execution of the application, but in the <strong>preparation of its context and environment</strong>. This work is performed by the <em><strong>image loader</strong></em> (<strong>Ldr</strong>).</p>
+<p>The loader is responsible for several main tasks, including:</p>
+<ul>
+<li>Parsing the import address table (IAT) of the application to look for all DLLs that it requires (and then recursively parsing the IAT of each DLL), followed by parsing the export table of the DLLs to make sure the function is actually present.</li>
+<li>Loading and unloading DLLs at runtime, as well as on demand, and maintaining a list of all
+loaded modules (the module database).</li>
+</ul>
+<p><img src="https://Viuleeenz.github.io/img/peb_parsing/list_structure.png" alt="Figure 1: PEB, LDR_DATA and LDR_MODULE interactions"></p>
+<p>Figure 1: PEB, LDR_DATA and LDR_MODULE interactions</p>
+<p>At first glance, these structures might seem a little bit confusing. However, let&rsquo;s simplify them to make them more understandable. We could think about them as a <strong>list where the structure PEB_LDR_DATA is the head of the list</strong> and <strong>each module information is accessed through a double linked list</strong> (<em>InOrderLoaderModuleList</em> in this case) that points to <strong>LDR_MODULE</strong>.</p>
+<h3 id="how-those-structures-are-abused">How those structures are abused</h3>
+<p>Most of the times when we see <strong>PEB and LDR_MODULE structure parsing</strong> we are dealing with malwares that are potentially using <strong>API Hashing technique.</strong> Shellcode will typically walk through those structures in order to find the base address of loaded dlls and extract all their exported functions, collecting names and <strong>pointers to the functions that are intended to call</strong>, avoiding to leave direct reference of them within the malware file.</p>
+<p>This is a simple trick that tries to evade some basic protections mechanism that could arise when we see clear references to malware-related functions such as: <em>VirtualAlloc, VirtualProtect, CreateProcessInterW, ResumeThread, etc…</em></p>
+<h3 id="api-hashing">API Hashing</h3>
+<p>By employing API hashing, malware creators can ensure that specific Windows APIs remain hidden from casual observation. Through this approach, malware developers try to add an extra layer of complexity by concealing suspicious Windows API calls within the Import Address Table (IAT) of PE.</p>
+<p>API hashing technique is pretty straightforward and it could be divided in three main steps:</p>
+<ol>
+<li><em>Malware developers prepare a set of hashes corresponding to WINAPI functions.</em></li>
+<li><em>When an API needs to be called, it looks for loaded modules through the PEB.Ldr structure.</em></li>
+<li><em>Then, when a module is find, it goes through all the functions performing the hash function until the result matches with the given input.</em></li>
+</ol>
+<p><img src="https://Viuleeenz.github.io/img/peb_parsing/api_hashing_overview.png" alt="Figure 2: API Hashing Overview"></p>
+<p>Figure 2: API Hashing Overview</p>
+<p>Now that we have a more understanding of the basic concepts related to API hashing, PEB and Ldr structures, let’s try to put them in practice using LummaStealer as an example.</p>
+<h3 id="parsing-peb-and-ldr-with-lummastealer">Parsing PEB and LDR with LummaStealer</h3>
+<p>Opening up the sample in IDA and scrolling a little after the main function it is possible to bump into very interesting functions that perform some actions on a couple of parameters that are quite interesting and correlated to explanation so far.</p>
+<p><img src="https://Viuleeenz.github.io/img/peb_parsing/sus_hash.png" alt="Figure 3: Wrapper function for hash resolving routine in LummaStealer"></p>
+<p>Figure 3: Wrapper function for hash resolving routine in LummaStealer</p>
+<p>Before function <em><strong>call sub_4082D3</strong></em> (highlighted) we could see some mov operation of two values:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nasm" data-lang="nasm"><span style="display:flex;"><span> <span style="color:#a6e22e">mov</span> edx, aKernel32Dll_0
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">...</span>
+</span></span><span style="display:flex;"><span> <span style="color:#a6e22e">mov</span> ecx, <span style="color:#ae81ff">0x7328f505</span>
+</span></span></code></pre></div><p>Those parameters are quite interesting because:</p>
+<ul>
+<li>The former represents an interesting dll that contains some useful functions such as <em>LoadLibrary, VirtualAlloc, etc..</em></li>
+<li>The latter appears to be a hash (maybe correlated to the previous string).</li>
+</ul>
+<p>If we would like to make an educated guess, it is possible that this function is going to find a function (within <em>kernel32.dll</em>) whose hash corresponds to the input hash. However, let’s try to understand if and how those parameters are manipulated in the function call, validating also our idea.</p>
+<p><img src="https://Viuleeenz.github.io/img/peb_parsing/code_compare.png" alt="Figure 4: Parsing PEB and LDR_MODULE for API hash routine. "></p>
+<p>Figure 4: Parsing PEB and LDR_MODULE for API hash routine.</p>
+<p>Through Figure 6, you can see the exact same code, before (left side) and after (right side) renaming structures. Examining the code a little bit we should be able to recall the concepts already explained in the previous sections.</p>
+<p>Let’s examine the first block of code. Starting from the top of the code we could spot the instruction <code>mov eax, (large)fs:30h</code>  that is going to collect the <strong>PEB pointer</strong>, storing its value in <strong>eax.</strong> Then, right after this instruction we could see <strong>eax</strong> <strong>used with an offset</strong>(<strong>0xC</strong>). In order to understand what is going on, its possible to collect the PEB structure  and look for the 0xC offset. Doing that, it’s clear that <strong>eax is going to collect the Ldr pointer</strong>. The last instruction of the first block is <code>mov edi, [eax+10h]</code> . This is a crucial instruction that needs a dedicated explanation:</p>
+<p>If you are going to look at <strong>PEB_LDR_DATA</strong> you will see that 0x10 offset (for x64 bit architecture)  points to <strong>InLoadOrderModuleList</strong> (that contains, according to its description, <code>pointers to previous and next LDR_MODULE in initialization order</code>). Through this instruction, malware is going to take a <strong>LDR_MODULE</strong> structure (as explained in Figure 3), settling all the requirements to parse it.</p>
+<p>Without going too deep in the code containing the loop (this could be left as an exercise), it is possible to see that the next three blocks are going to find the <em>kernel32.dll</em> iterating over the <strong>LDR_MODULE</strong> structure parameters.</p>
+<p>At the very end of the code, we could see the last block calling a function using the dll pointers retrieved through the loop, using another hash value. This behavior give us another chance for a couple of insight:</p>
+<ul>
+<li>This code is a candidate to settle all parameters that are going to be used for API hash resolving routine (as illustrated in the API Hashing section), since that its output will be used as a function call.</li>
+<li>The string <em>kernel32.dll</em> gave us some hints about possible candidate functions (e.g., <em>LoadLibraryA, VirtualAlloc, etc..</em>).</li>
+</ul>
+<p>With this last consideration, it&rsquo;s time to conclude this post avoiding adding more layers of complexity, losing our focus on PEB and related structures.</p>
+<h3 id="function-recap">Function recap</h3>
+<p>Before concluding, let’s try to sum up, what we have seen so far, in order to make the analysis even more clear:</p>
+<ol>
+<li>The function <code>4082D3</code> takes <strong>two parameters</strong> that are a hash <strong>value</strong> and a string containing a <strong>dll library</strong>.</li>
+<li>Iterating over the loaded modules, it looks for the module name containing the hardcoded <strong>kernel32.dll</strong>.</li>
+<li>Once the module is found, it invokes another function (<code>40832A</code>), passing a pointer to the base address of the module and a hash value.</li>
+<li>The function returns a pointer to a function that takes as an argument the <strong>dll name passed to</strong> 4082D3. This behavior suggests that some sort of <em>LoadLibrary</em> has been resolved on point 3.</li>
+<li>As a final step, the function <code>40832A</code> is called once again, using the hash value passed as a parameter in the function <code>4082D3</code> and a base address retrieved from the point 4.</li>
+</ol>
+<p>Following all the steps it&rsquo;s easy to spot that the <code>40832A</code> function is the actual API hash resolving routine and the function <code>4082D3</code> has been used to settle all the required variables.</p>
+<h3 id="conclusion">Conclusion</h3>
+<p>Through this blog post I tried to explain a little bit better how the PEB and related structures are parsed and abused by malwares. However, I also tried to show how malware analysis could be carried out examining the code and renaming structures accordingly. This brief introduction will be also used as a starting point for the next article where I would like to take the same sample and emulate the API hashing routine in order to resolve all hashes, making this sample ready to be analyzed.</p>
+<h3 id="note-about-simplification">Note about simplification</h3>
+<p>It’s worth mentioning that to make those steps easier, there has been a simplification. In fact, PEB_LDR_DATA contains three different structures that could be used to navigate modules, but for this blogpost, their use could be ignored. Another structure that is worth mentioning it’s LDR_DATA_TABLE_ENTRY that could be considered a corresponding to the LDR_MODULE structure.</p>
+<h3 id="references">References:</h3>
+<p>Undocumented Windows Internal Structures:</p>
+<ul>
+<li><a href="http://undocumented.ntinternals.net/">The Undocumented Functions</a></li>
+<li><a href="https://www.geoffchappell.com/studies/windows/km/ntoskrnl/inc/api/ntpsapi_x/peb_ldr_data.htm">PEB_LDR_DATA</a></li>
+</ul>
+<p>LummaSteler sample:</p>
+<ul>
+<li><a href="https://bazaar.abuse.ch/sample/277d7f450268aeb4e7fe942f70a9df63aa429d703e9400370f0621a438e918bf/">MalwareBazaar</a></li>
+</ul>
+
+      </div>
+    </article>
+
+    <hr />
+
+    <div class="post-info">
+      
+      
+
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        1550 Words
+      </p>
+
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        
+          2024-02-04 01:00
+        
+
+         
+          
+        
+      </p>
+    </div>
+
+    
+
+    
+
+    
+
+  </main>
+
+            </div>
+
+            
+                <footer class="footer">
+    
+    <div class="footer__inner">
+        <div class="footer__content">
+            <span>&copy; 2024</span>
+            
+            <span><a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></span>
+            
+            
+        </div>
+    </div>
+    
+    
+</footer>
+
+            
+        </div>
+
+        
+
+
+
+<script type="text/javascript" src="https://Viuleeenz.github.io/bundle.min.205d491810c28f95aa953fae884e1c27abe13fdf93ec63b882d0036b248d4a6282eb2d134e4e7225c6ad6e86db87b08488a361ca4a7383d01fcff43f3d57b9c3.js" integrity="sha512-IF1JGBDCj5WqlT&#43;uiE4cJ6vhP9&#43;T7GO4gtADaySNSmKC6y0TTk5yJcatbobbh7CEiKNhykpzg9Afz/Q/PVe5ww=="></script>
+
+
+
+    </body>
+</html>
