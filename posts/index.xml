@@ -258,7 +258,7 @@ Figure 3: Decrypted strings</p>
 </ul>
 <p>Emulator:</p>
 <ul>
-<li><a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/ConfigurationExtractors/Ursnif/ursnif_emulate_decryption.py">ursnif_string_decryptor.py</a></li>
+<li><a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/MalwareAutomation/Ursnif/ursnif_emulate_decryption.py">ursnif_string_decryptor.py</a></li>
 </ul>
 ]]></content>
         </item>
@@ -353,15 +353,15 @@ Figure 3: Decrypted strings</p>
 </ul>
 <p>Minidump:</p>
 <ul>
-<li><a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/ConfigurationExtractors/MarsStealer/mars_stealer_minidump.7z">mars_stealer_minidump.7z</a></li>
+<li><a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/MalwareAutomation/MarsStealer/mars_stealer_minidump.7z">mars_stealer_minidump.7z</a></li>
 </ul>
 <p>String resolver:</p>
 <ul>
-<li><a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/ConfigurationExtractors/MarsStealer/MarsStealer_stringResolver.py">MarsStealer_stringResolver.py</a></li>
+<li><a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/MalwareAutomation/MarsStealer/MarsStealer_stringResolver.py">MarsStealer_stringResolver.py</a></li>
 </ul>
 <p>Extracted strings:</p>
 <ul>
-<li><a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/ConfigurationExtractors/MarsStealer/strings.txt">strings.txt</a></li>
+<li><a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/MalwareAutomation/MarsStealer/strings.txt">strings.txt</a></li>
 </ul>
 <p>Dumpulator:</p>
 <ul>
@@ -454,10 +454,8 @@ Figure 3: Decrypted strings</p>
 </ul>
 <p>Ida-python scrypt:</p>
 <ul>
-<li><a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/ConfigurationExtractors/Vidar/ida_vidar_string_decrypt.py">ida_vidar_string_decrypt.py</a></li>
-</ul>
-<p>Microsoft Defender&rsquo;s Sandbox:</p>
-<ul>
+<li><a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/MalwareAutomation/Vidar/ida_vidar_string_decrypt.py">ida_vidar_string_decrypt.py</a>
+Microsoft Defender&rsquo;s Sandbox:</li>
 <li>BlackHat 2018 <a href="https://i.blackhat.com/us-18/Thu-August-9/us-18-Bulazel-Windows-Offender-Reverse-Engineering-Windows-Defenders-Antivirus-Emulator.pdf">detailed analysis </a></li>
 </ul>
 <h2 id="iocs">IOCs</h2>
@@ -854,7 +852,7 @@ Figure 3: Decrypted strings</p>
 <h3 id="references">References</h3>
 <p>Agent Tesla Decryptor:</p>
 <ul>
-<li><a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/ConfigurationExtractors/AgentTesla/agent_tesla_decryptor_v4.py">agent_tesla_decryptor_v4.py</a></li>
+<li><a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/MalwareAutomation/AgentTesla/agent_tesla_decryptor_v4.py">agent_tesla_decryptor_v4.py</a></li>
 </ul>
 <p>DotNet references:</p>
 <ul>
@@ -1050,7 +1048,7 @@ Figure 4 - Target stored in cleartext within process memory</p>
 <p>The modification required was pretty easy, however, this change could be also more consistent for further updates (limiting to tweak a little bit with counter variable) since it exploits the feedback messages (e.g., target acquired, requests completed, rewards, etc..) that won’t be removed any time soon.</p>
 <p>Moreover, most of this blogpost it&rsquo;s still a valid reference for setting up the environment and understanding the control flow to retrieve the actual targets, additionally, as far as I know, there were no great changes on the authentication layer. Previous configured environments needs to replace the old binary to the newer provided on DDosia channel.</p>
 <ul>
-<li>New frida script: <a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/ConfigurationExtractors/DDosia_Targets/console.js">console.js</a></li>
+<li>New frida script: <a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/MalwareAutomation/DDosia_Targets/console.js">console.js</a></li>
 </ul>
 <hr>
 <h3 id="references">References:</h3>
