@@ -42,7 +42,7 @@
 <meta itemprop="name" content="Understanding API Hashing and build a rainbow table for LummaStealer">
 <meta itemprop="description" content="Understanding PEB and Ldr structures represents a starting point when we are dealing with API hashing. However, before proceeding to analyze a sample it’s always necessary to recover obfuscated, encrypted or hashed data. Because of that, through this blogpost I would like to continue what I have started in the previous post, using emulation to create a rainbow table for LummaStealer and then write a little resolver script that is going to use the information extracted to resolve all hashes."><meta itemprop="datePublished" content="2024-03-24T00:00:00+00:00" />
 <meta itemprop="dateModified" content="2024-03-24T00:00:00+00:00" />
-<meta itemprop="wordCount" content="1835"><meta itemprop="image" content="https://Viuleeenz.github.io/"/>
+<meta itemprop="wordCount" content="1838"><meta itemprop="image" content="https://Viuleeenz.github.io/"/>
 <meta itemprop="keywords" content="" />
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="https://Viuleeenz.github.io/"/>
@@ -185,7 +185,7 @@ if (!doNotTrack) {
 <p>Starting from where we left in the last post, we could explore the function routine that is in charge of <strong>collecting function names from a DLL and then perform a hashing algorithm</strong> to find a match with the input name.</p>
 <p><img src="https://Viuleeenz.github.io/img/api_hashing/api_hashing_overview.png" alt="Figure 1: LummaStealer API Hashing overview"></p>
 <p>Figure 1: LummaStealer API Hashing overview</p>
-<p>At the first glance, this function could be disorienting, however, understanding that <strong>ecx</strong> contains the module <strong>BaseAddress</strong> (explained in the previous article) ****it is possible to set a comment that is going to make the whole function easier to understand. Moreover, it has been also divided in three main parts( first two are going to be detailed in the next sections):</p>
+<p>At the first glance, this function could be disorienting, however, understanding that <strong>ecx</strong> contains the module <strong>BaseAddress</strong> (explained in the previous article) it is possible to set a comment that is going to make the whole function easier to understand. Moreover, it has been also divided in three main parts( first two are going to be detailed in the next sections):</p>
 <ol>
 <li>Collecting exported function within a PE file;</li>
 <li>Hashing routine;</li>
@@ -305,7 +305,7 @@ Figure 4: MurMur2 hashing routine</p>
 <li><a href="https://bazaar.abuse.ch/sample/277d7f450268aeb4e7fe942f70a9df63aa429d703e9400370f0621a438e918bf/">MalwareBazaar</a></li>
 </ul>
 <h2 id="bonus">Bonus</h2>
-<p>In order to understand how API Hashing works it’s very useful to make your hand dirty on low level components. However, once you have some experience, it is also very helpful to have some tools that speed up your analysis. An amazing project is <a href="https://github.com/OALabs/hashdb">HashDB</a> maintained by OALabs. It is a simple and effective plugin for IDA that is going to resolve hashes, if the routine is implemented. If you want to try out this plugin for this LummaStealer sample, my pull request has already been  merged ;)</p>
+<p>In order to understand how API Hashing works it’s very useful to make your hand dirty on low level components. However, once you have some experience, it is also very helpful to have some tools that speed up your analysis. An amazing project is <a href="https://github.com/OALabs/hashdb">HashDB</a> maintained by OALabs. It is a simple and effective plugin for IDA and Binary Ninja that is going to resolve hashes, if the routine is implemented. If you want to try out this plugin for this LummaStealer sample, my pull request has already been  merged ;)</p>
 <h2 id="appendix-1---addressofnames">Appendix 1 - AddressOfNames</h2>
 <p>The algorithm to retrieve the <strong>RVA</strong> associated to a function is quite straightforward:</p>
 <ol>
@@ -344,7 +344,7 @@ Figure 4: MurMur2 hashing routine</p>
           <line x1="16" y1="17" x2="8" y2="17"></line>
           <polyline points="10 9 9 9 8 9"></polyline>
         </svg>
-        1835 Words
+        1838 Words
       </p>
 
       <p>
