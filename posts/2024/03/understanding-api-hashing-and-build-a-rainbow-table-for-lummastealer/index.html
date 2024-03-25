@@ -42,7 +42,7 @@
 <meta itemprop="name" content="Understanding API Hashing and build a rainbow table for LummaStealer">
 <meta itemprop="description" content="Understanding PEB and Ldr structures represents a starting point when we are dealing with API hashing. However, before proceeding to analyze a sample it’s always necessary to recover obfuscated, encrypted or hashed data. Because of that, through this blogpost I would like to continue what I have started in the previous post, using emulation to create a rainbow table for LummaStealer and then write a little resolver script that is going to use the information extracted to resolve all hashes."><meta itemprop="datePublished" content="2024-03-24T00:00:00+00:00" />
 <meta itemprop="dateModified" content="2024-03-24T00:00:00+00:00" />
-<meta itemprop="wordCount" content="1688"><meta itemprop="image" content="https://Viuleeenz.github.io/"/>
+<meta itemprop="wordCount" content="1787"><meta itemprop="image" content="https://Viuleeenz.github.io/"/>
 <meta itemprop="keywords" content="" />
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="https://Viuleeenz.github.io/"/>
@@ -159,7 +159,7 @@ if (!doNotTrack) {
           <circle cx="12" cy="12" r="10"></circle>
           <polyline points="12 6 12 12 16 14"></polyline>
         </svg>
-        8 minutes
+        9 minutes
 
         
       </p>
@@ -230,11 +230,15 @@ if (!doNotTrack) {
 <blockquote>
 <p>💡 <em>See Reference section to find out a more clear image about the whole PE structure</em></p>
 </blockquote>
-<h3 id="hashing-routine">Hashing Routine</h3>
+<h3 id="retrieve-the-function-pointer">Retrieve the function pointer</h3>
+<p>Once the code in charge to collect and compare exported functions has been completed, and a match is found, it&rsquo;s time to retrieve the actual function pointer using the structures mentioned above (<strong>AddressOfNamesOrdinals</strong> and <strong>AddressOfFunctions</strong>). In fact, as you can see from the code related to the third box (that has been renamed accordingly), once the match if found, the structure <strong>AddressOfNameOrdinals</strong> it&rsquo;s used to retrieve the functions number that is going to be used to address the structure <strong>AddressOfFunctions</strong> that contains the actual function pointers.</p>
+<p><img src="https://Viuleeenz.github.io/img/api_hashing/collect_api_pointer.png" alt="Figure 3: Collect the actual function pointer"></p>
+<p>Figure 3: Collect the actual function pointer</p>
+<h3 id="analyze-the-hashing-routine">Analyze the hashing routine</h3>
 <p>Through the information collected so far, this code should be childishly simple.</p>
 <p><strong>ecx</strong> contains the hash name extracted from the export table that is going to forward as input to the hash function (identified, <em>in this case, as <a href="https://github.com/abrandoned/murmur2/blob/master/MurmurHash2.c">murmur2</a></em>). The function itself is quite long but does not take too much time to be understood and reimplemented. However, the purpose of this article is to emulate this code in order to find out the values of all hardcoded hashes.</p>
-<p><img src="https://Viuleeenz.github.io/img/api_hashing/murmur2_hashing_routine.png" alt="Figure 3: MurMur2 hashing routine">
-Figure 3: MurMur2 hashing routine</p>
+<p><img src="https://Viuleeenz.github.io/img/api_hashing/murmur2_hashing_routine.png" alt="Figure 4: MurMur2 hashing routine">
+Figure 4: MurMur2 hashing routine</p>
 <p>As we have <a href="https://viuleeenz.github.io/posts/2023/12/applied-emulation-decrypting-ursnif-strings-with-unicorn/">already done</a>, we could select the function opcodes (without the return instruction) and put them in our code emulator routine. It’s worth mentioning that, <strong>ecx</strong> contains the function name that is going to be used as argument for hashing routine, because of that, it’s important to assign that register properly.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">MurMurHash2</span>(func_name):
 </span></span><span style="display:flex;"><span>    code <span style="color:#f92672">=</span> bytes<span style="color:#f92672">.</span>fromhex(<span style="color:#e6db74">&#39;56 57 8B F9 8B D7 8D 4A 01 8A 02 42 84 C0 75 F9 2B D1 8B F2 83 F6 20 83 FA 04 7C 4D 53 8B DA C1 EB 02 6B C3 FC 03 D0 0F B6 4F 03 0F B6 47 02 C1 E1 08 0B C8 69 F6 95 E9 D1 5B 0F B6 47 01 C1 E1 08 0B C8 0F B6 07 C1 E1 08 83 C7 04 0B C8 69 C9 95 E9 D1 5B 8B C1 C1 E8 18 33 C1 69 C8 95 E9 D1 5B 33 F1 83 EB 01 75 BF 5B 83 EA 01 74 1C 83 EA 01 74 0E 83 EA 01 75 1D 0F B6 47 02 C1 E0 10 33 F0 0F B6 47 01 C1 E0 08 33 F0 0F B6 07 33 C6 69 F0 95 E9 D1 5B 8B C6 C1 E8 0D 33 C6 69 C8 95 E9 D1 5B 5F 5E 8B C1 C1 E8 0F 33 C1&#39;</span>)
@@ -249,8 +253,8 @@ Figure 3: MurMur2 hashing routine</p>
 </span></span><span style="display:flex;"><span>    EAX <span style="color:#f92672">=</span> uc<span style="color:#f92672">.</span>reg_read(UC_X86_REG_EAX)
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> EAX
 </span></span></code></pre></div><p>Let’s take a test. Using the <strong>LoadLibraryW</strong> name, we get back <strong>0xab87776c</strong>. If we explore a little bit our code, we will find almost immediately this value! it is called each time a new hash needs to be resolved.</p>
-<p><img src="https://Viuleeenz.github.io/img/api_hashing/loadLibrary_hash.png" alt="Figure 4: LoadLibraryW Hash"></p>
-<p>Figure 4: LoadLibraryW Hash</p>
+<p><img src="https://Viuleeenz.github.io/img/api_hashing/loadLibrary_hash.png" alt="Figure 5: LoadLibraryW Hash"></p>
+<p>Figure 5: LoadLibraryW Hash</p>
 <p>This behavior is a clear indication that before proceeding to extract exported functions, we need to load the associated library (DLL) in memory. With that information we could be sure that our emulator works fine.</p>
 <h3 id="build-a-rainbow-table">Build a rainbow table</h3>
 <p>Building a rainbow table can be done in a few lines of code:</p>
@@ -277,8 +281,8 @@ Figure 3: MurMur2 hashing routine</p>
 <p>Observing the code, an easy pattern to follow involves a register and an immediate values:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nasm" data-lang="nasm"><span style="display:flex;"><span><span style="color:#a6e22e">mov</span> REG, IMM
 </span></span></code></pre></div><p>Implementing this strategy and filtering results only on <em>kernel32.dll,</em> we are able to extract all referenced hashes:</p>
-<p><img src="https://Viuleeenz.github.io/img/api_hashing/hashes_resolved.png" alt="Figure 5: Some hashes related to Kernel32.dll "></p>
-<p>Figure 5: Some hashes related to Kernel32.dll</p>
+<p><img src="https://Viuleeenz.github.io/img/api_hashing/hashes_resolved.png" alt="Figure 6: Some hashes related to Kernel32.dll "></p>
+<p>Figure 6: Some hashes related to Kernel32.dll</p>
 <h2 id="conclusion">Conclusion</h2>
 <p>As always, going deep in each section requires an entire course and at the moment it’s an impossible challenge. However, through this blog post I tried to scratch the surface giving some essential concepts (that could be applied straightaway) to make reversing time a lot more fun.</p>
 <p>Another important thing to highlight here, is related to combine emulation and scripting techniques. Emulation is great, however, writing a script that contains some emulated routine could be a challenging task if we think about efficiency. Writing a single script for a single sample its not a big deal and it won’t have a great impact in a single analysis, however, doing it a scale is a different kettle of fish.</p>
@@ -314,8 +318,8 @@ Figure 3: MurMur2 hashing routine</p>
 </ol>
 </li>
 </ol>
-<p><img src="https://Viuleeenz.github.io/img/api_hashing/functions_and_names_pointers.png" alt="Figure 6: How to retrieve functions names and pointers"></p>
-<p>Figure 6: How to retrieve functions names and pointers</p>
+<p><img src="https://Viuleeenz.github.io/img/api_hashing/functions_and_names_pointers.png" alt="Figure 7: How to retrieve functions names and pointers"></p>
+<p>Figure 7: How to retrieve functions names and pointers</p>
 <blockquote>
 <p>💡<em>If you want to experiment a little bit more with this concept, I suggest to take the kernel32.dll library and follows this algorithm using <a href="https://github.com/hasherezade/pe-bear">PE-Bear</a></em></p>
 </blockquote>
@@ -337,7 +341,7 @@ Figure 3: MurMur2 hashing routine</p>
           <line x1="16" y1="17" x2="8" y2="17"></line>
           <polyline points="10 9 9 9 8 9"></polyline>
         </svg>
-        1688 Words
+        1787 Words
       </p>
 
       <p>
