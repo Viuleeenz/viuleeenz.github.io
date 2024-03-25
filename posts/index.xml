@@ -70,9 +70,12 @@
 <p>💡 <em>See Reference section to find out a more clear image about the whole PE structure</em></p>
 </blockquote>
 <h3 id="retrieve-the-function-pointer">Retrieve the function pointer</h3>
-<p>Once the code in charge to collect and compare exported functions has been completed, and a match is found, it&rsquo;s time to retrieve the actual function pointer using the structures mentioned above (<strong>AddressOfNamesOrdinals</strong> and <strong>AddressOfFunctions</strong>). In fact, as you can see from the code related to the third box (that has been renamed accordingly), once the match if found, the structure <strong>AddressOfNameOrdinals</strong> it&rsquo;s used to retrieve the functions number that is going to be used to address the structure <strong>AddressOfFunctions</strong> that contains the actual function pointers.</p>
+<p>Once the code in charge to collect and compare exported functions has been completed, and a match is found, it&rsquo;s time to retrieve the actual function pointer using some of the structures mentioned above. In fact, as you can see from the code related to the third box (that has been renamed accordingly), once the match if found, the structure <strong>AddressOfNameOrdinals</strong> it&rsquo;s used to retrieve the functions number that is going to address the structure <strong>AddressOfFunctions</strong> that contains the actual function pointers.</p>
 <p><img src="/img/api_hashing/collect_api_pointer.png" alt="Figure 3: Collect the actual function pointer"></p>
 <p>Figure 3: Collect the actual function pointer</p>
+<blockquote>
+<p>💡<em>I don’t want to bother you with so much details at this point, since we have already analyzed throughly some structures and we still have additional contents to discuss. However, the image above has been thought to be self-contained. That said, to not get lost please remember that <strong>edi</strong> represents the <strong>Ldr_Module.BaseAddress</strong></em></p>
+</blockquote>
 <h3 id="analyze-the-hashing-routine">Analyze the hashing routine</h3>
 <p>Through the information collected so far, this code should be childishly simple.</p>
 <p><strong>ecx</strong> contains the hash name extracted from the export table that is going to forward as input to the hash function (identified, <em>in this case, as <a href="https://github.com/abrandoned/murmur2/blob/master/MurmurHash2.c">murmur2</a></em>). The function itself is quite long but does not take too much time to be understood and reimplemented. However, the purpose of this article is to emulate this code in order to find out the values of all hardcoded hashes.</p>
