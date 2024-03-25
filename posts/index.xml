@@ -34,7 +34,7 @@
 <p>The first box starts with the instruction <strong>mov edi, ecx</strong> where <strong>ecx</strong> is a <em>BaseAddress</em> of a module that is going to be analyzed. This is a fundamental instruction that gives us a chance to infere the subsequent value of <strong>edi</strong> and <strong>ebx</strong>. In fact, if we rename values associated to these registers, it should be clear that this code is going to collect exported functions names through <strong>AddressOfNames</strong> and <strong>AddressOfNameOrdinals</strong> pointers.</p>
 <p><img src="/img/api_hashing/resolving_structures_names.png" alt="Figure 2: Resolving structures names"></p>
 <p>Figure 2: Resolving structures names</p>
-<p>Those structures are very important in order to understand what is happening in the code. For now, you could think about those structures as <em>support structures</em> that could be chained together in order to ****collect the actual function pointer (after a match is found!)  within the <strong>Address of a Function structure</strong>.</p>
+<p>Those structures are very important in order to understand what is happening in the code. For now, you could think about those structures as <em>support structures</em> that could be chained together in order to collect the actual function pointer (after a match is found!)  within the <strong>Address of a Function structure</strong>.</p>
 <blockquote>
 <p>💡 <em>At the end of this article I created a dedicated sections to explain those structures and their connections.</em></p>
 </blockquote>
