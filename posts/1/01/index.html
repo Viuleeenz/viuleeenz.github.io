@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="author" content="Alessandro Strino ">
+<meta name="description" content="What we need to know? C and C&#43;&#43; binaries share several commonalities, however, some additional features and complexities introduced by C&#43;&#43; can make reverse engineering C&#43;&#43; binaries more challenging compared to C binaries. Some of the most important features are:
+Name Mangling: C&#43;&#43; compilers often use name mangling to encode additional information about functions and classes into the symbol names in the binary. This can make it more challenging to understand the code&amp;rsquo;s structure and functionality by simply looking at symbol names." />
+<meta name="keywords" content="malware, binary, digital forensics, exploit development, reverse engineering" />
+<meta name="robots" content="noodp" />
+<meta name="theme-color" content="" />
+<link rel="canonical" href="https://Viuleeenz.github.io/posts/1/01/" />
+
+
+    <title>
+        
+             :: Security Undisguised 
+        
+    </title>
+
+
+
+
+
+<link rel="stylesheet" href="https://Viuleeenz.github.io/main.b78c3be9451dc4ca61ca377f3dc2cf2e6345a44c2bae46216a322ef366daa399.css" integrity="sha256-t4w76UUdxMphyjd/PcLPLmNFpEwrrkYhajIu82bao5k=">
+
+
+    
+        <link rel="stylesheet" type="text/css" href="https://Viuleeenz.github.io/style.css">
+    
+
+
+    <link rel="apple-touch-icon" sizes="180x180" href="https://Viuleeenz.github.io/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://Viuleeenz.github.io/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://Viuleeenz.github.io/favicon-16x16.png">
+    <link rel="manifest" href="https://Viuleeenz.github.io/site.webmanifest">
+    <link rel="mask-icon" href="https://Viuleeenz.github.io/safari-pinned-tab.svg" color="">
+    <link rel="shortcut icon" href="https://Viuleeenz.github.io/favicon.ico">
+    <meta name="msapplication-TileColor" content="">
+
+
+<meta itemprop="name" content="">
+<meta itemprop="description" content="What we need to know? C and C&#43;&#43; binaries share several commonalities, however, some additional features and complexities introduced by C&#43;&#43; can make reverse engineering C&#43;&#43; binaries more challenging compared to C binaries. Some of the most important features are:
+Name Mangling: C&#43;&#43; compilers often use name mangling to encode additional information about functions and classes into the symbol names in the binary. This can make it more challenging to understand the code&rsquo;s structure and functionality by simply looking at symbol names.">
+
+<meta itemprop="wordCount" content="2195"><meta itemprop="image" content="https://Viuleeenz.github.io/"/>
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://Viuleeenz.github.io/"/>
+
+<meta name="twitter:title" content=""/>
+<meta name="twitter:description" content="What we need to know? C and C&#43;&#43; binaries share several commonalities, however, some additional features and complexities introduced by C&#43;&#43; can make reverse engineering C&#43;&#43; binaries more challenging compared to C binaries. Some of the most important features are:
+Name Mangling: C&#43;&#43; compilers often use name mangling to encode additional information about functions and classes into the symbol names in the binary. This can make it more challenging to understand the code&rsquo;s structure and functionality by simply looking at symbol names."/>
+
+
+
+    <meta property="og:title" content="" />
+<meta property="og:description" content="What we need to know? C and C&#43;&#43; binaries share several commonalities, however, some additional features and complexities introduced by C&#43;&#43; can make reverse engineering C&#43;&#43; binaries more challenging compared to C binaries. Some of the most important features are:
+Name Mangling: C&#43;&#43; compilers often use name mangling to encode additional information about functions and classes into the symbol names in the binary. This can make it more challenging to understand the code&rsquo;s structure and functionality by simply looking at symbol names." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://Viuleeenz.github.io/posts/1/01/" /><meta property="og:image" content="https://Viuleeenz.github.io/"/><meta property="article:section" content="posts" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XNKLBC4D9D"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-XNKLBC4D9D', { 'anonymize_ip': false });
+}
+</script>
+
+
+
+    </head>
+
+    
+        <body>
+    
+    
+        <div class="container">
+            <header class="header">
+    <span class="header__inner">
+        <a href="https://Viuleeenz.github.io/" style="text-decoration: none;">
+    <div class="logo">
+        
+            <span class="logo__mark">&gt;</span>
+            <span class="logo__text ">
+                $ cd /home/Viuleeenz</span>
+            <span class="logo__cursor" style=
+                  "
+                   
+                   ">
+            </span>
+        
+    </div>
+</a>
+
+        <span class="header__right">
+            
+                <nav class="menu">
+    <ul class="menu__inner"><li><a href="https://Viuleeenz.github.io/about/">About</a></li><li><a href="https://Viuleeenz.github.io/posts/">Posts</a></li><li><a href="https://Viuleeenz.github.io/whitepapers/">Whitepapers</a></li>
+    </ul>
+</nav>
+
+                <span class="menu-trigger">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                    </svg>
+                </span>
+            
+                <span class="theme-toggle not-selectable"><svg class="theme-toggler" width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+   <path d="M22 41C32.4934 41 41 32.4934 41 22C41 11.5066 32.4934 3 22
+   3C11.5066 3 3 11.5066 3 22C3 32.4934 11.5066 41 22 41ZM7 22C7
+   13.7157 13.7157 7 22 7V37C13.7157 37 7 30.2843 7 22Z"/>
+ </svg></span>
+        </span>
+    </span>
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XNKLBC4D9D"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-XNKLBC4D9D', { 'anonymize_ip': false });
+}
+</script>
+
+</header>
+
+
+            <div class="content">
+                
+  <main class="post">
+
+    <div class="post-info">
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        11 minutes
+
+        
+      </p>
+    </div>
+
+    <article>
+      <h1 class="post-title">
+        <a href="https://Viuleeenz.github.io/posts/1/01/"></a>
+      </h1>
+
+      
+
+      
+
+      
+
+      <div class="post-content">
+        <h2 id="what-we-need-to-know">What we need to know?</h2>
+<p>C and C++ binaries share several commonalities, however, some additional features and complexities introduced by C++ can make reverse engineering C++ binaries more challenging compared to C binaries. Some of the most important features are:</p>
+<p><strong>Name Mangling</strong>: C++ compilers often use name mangling to encode additional information about functions and classes into the symbol names in the binary. This can make it more challenging to understand the code&rsquo;s structure and functionality by simply looking at symbol names.</p>
+<p><strong>Object-Oriented Features</strong>: C++ supports object-oriented programming (OOP) features such as classes, inheritance, polymorphism, and virtual functions. Reverse engineering C++ binaries may involve identifying and understanding these constructs, which may not exist in C binaries.</p>
+<p><strong>Templates</strong>: C++ templates allow for generic programming, where functions and classes can operate on different data types. Reverse engineering C++ templates can be complex due to the generation of multiple versions of the same function or class template with different types.</p>
+<p>Another topic that is <strong>mandatory to understand</strong> when we approach binaries is related to the <strong>calling convention.</strong> Even if it&rsquo;s determined by the operating system and the compiler ABI (Application Binary Interface) rather than the specific programming language being used, its one of the fundamental aspects that too many times is overlooked.</p>
+<blockquote>
+<p>💡*There are many other differences related to <strong>Runtime Type Information (RTTI)</strong>, <em><em>Constructor and Destructor Calls,</em> Exception Handling *** and <strong>Compiler-Specific Features</strong>. Those topics aren’t less important than the others mentioned above, however, explaining a basic triage does not involve those topics and giving an explanation for all of them could just lose the focus. Moreover,</em> If you don’t feel comfortable with <strong>calling conventions</strong>, refer to exceptional material on <a href="https://www.youtube.com/watch?v=9lzW0I9_cpY">OALabs</a>.</p>
+</blockquote>
+<h2 id="why-glorysprout">Why GlorySprout?</h2>
+<p>I know, probably this name for most of you does not mean anything because it does not represent one the most prominent threats on Cyberspace, however, didactically speaking, it has a lot of characteristics that make it a great fit. First of all it’s a recent malware and because of this, it shares most of the capabilities employed by more famous ones such as: <strong>obfuscation</strong>, <strong>api hashing</strong>, <strong>inline decryption</strong> etc.. Those characteristics are quite challenging to deal with, especially if we go against them to build an automation script that is going to replicate our work on multiple samples.</p>
+<p>Another interesting characteristic of this malware is that it represents a fork of another malware called Taurus Stealer as reported by RussianPanda in her article. So, why is it important? Taurus Stealers have been dissected and a detailed report is available here. From a learning stand point it represents a plus, since if you are stuck somewhere in the code, you have a way out trying to match this GlorySprout capabilities with Taurus.</p>
+<p>Let’s start our triage.</p>
+<h2 id="binary-overview">Binary Overview</h2>
+<p>Opening up the binary in IDA and scrolling a little bit from the main functions it should be clear that this binary is going to use some api hashing for retrieving DLLs, inline decryption and C++ structures to store some interesting value. To sum up, this binary is going to start resolving structures and APIs, perform inline decryption to start checking Windows information and installed softwares. However, those actions are not intended to be taken without caution. In fact, each time a string is decrypted, its memory region is then immediately zeroed after use. It means that a “<em>quick and dirty</em>” approach using dynamic analysis to inspect memory sections won’t give you insights about strings and/or targets.</p>
+<p><img src="https://prod-files-secure.s3.us-west-2.amazonaws.com/6920c82b-6959-4d1b-8125-60dbdc124466/b1718406-4889-4659-b04d-7cebeb1cce8e/Screenshot_2024-05-15_at_17.47.59.png" alt="Figure 1: Binary Overview"></p>
+<p>Figure 1: Binary Overview</p>
+<h3 id="identifying-and-creating-structures">Identifying and Creating Structures</h3>
+<p>Identifying and creating structures is one of the most important tasks when we deal with C++ malware. Structures are mostly reused through all code, because of that, having a good understanding of structures is mandatory for an accurate analysis. In fact, applying structures properly will make the whole reversing process way more easier.</p>
+<p>Now you may be wondering, how do we recognise a structure? In order to recognise structures it’s important to observe <strong>how a function is called</strong> and <strong>how input parameters are actually used</strong>.</p>
+<p>In order to explain it properly, let’s take an example from GlorySprout.</p>
+<p><img src="https://prod-files-secure.s3.us-west-2.amazonaws.com/6920c82b-6959-4d1b-8125-60dbdc124466/777b0745-d530-441e-a5ae-1bf906de7468/Screenshot_2024-04-22_at_15.27.06.png" alt="Figure 2: Passing structure parameter"></p>
+<p>Figure 2: Passing structure parameter</p>
+<p>Starting from left to right, we see some functions callings that could help us to understand that we are dealing with a structure. Moreover, its also clear in this case, <strong>how big the structures is</strong>.</p>
+<blockquote>
+<p>💡<em>As said before, <strong>calling convention is important</strong> to understand how parameters are passed to a function. In this case, we are dealing with is a clear example of <strong>thiscall</strong>.</em></p>
+</blockquote>
+<p>Let’s have a look at the function layout. Even if we are seeing that <strong>ecx</strong> is going to be used as a parameter for three functions, it is actually used each time with a different offset (this is a good indication that we are dealing with a structure). Moreover, if we have a look at the first call (<code>sub_401DEB</code>), this function seems to fill the first <strong>0xF4</strong> (244 in decimal) bytes pointed by <strong>ecx</strong> with some values. Once the function ends, there is the instruction <strong>lea ecx, [esi+0F8h]</strong> and another function call. This pattern is used a couple of times and confirms our hypothesis that each function is in charge to fill some offset of the structure.</p>
+<p>From the knowledge we have got so far and looking at the code, we could also infer the structure passed to the third call (<code>sub_406FF1</code>) and the whole size of the structure.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>sub_406FF1_bytes_to_fill = 0xF8 - 0x12C = 0x34 (<span style="color:#ae81ff">52</span> bytes)  
+</span></span><span style="display:flex;"><span>structure_size = 0xF8 + 0x34 = 0x12C (<span style="color:#ae81ff">300</span> bytes) + <span style="color:#ae81ff">4</span> bytes realted to the size of the last value.
+</span></span></code></pre></div><p>However, even if we resolved the size structures and understood where it is used, there is still a point missing. <strong>Where does this structure come from?</strong> To answer this question, it’s important to take a step back. Looking at the function<code>sub_40100A</code> we see the instruction [<strong>mov ecx , offset unk_4463F8</strong>]. If you explore that variable you will see that it is stored at <code>0x004463F8</code> and the  next variable is stored at <code>0x0044652F</code>. If we do a subtraction through these two addresses, we have <strong>312</strong> bytes. There are two important things to highlight here. First of all, we are dealing with  a <strong>global structure</strong> that is going to be used multiple times in different code sections (because of that, naming structure fields will be our first task), however, according to the size calculated, it seems that we are missing a few bytes. This could be a good indication that additional bytes will be used later on in the code to store an additional value. In fact, this insight is confirmed if we analyze the last function (<code>sub_40B838</code>). Opening up the function and skipping the prolog instructions, we could immediately see that the structure is moved in <code>esi</code>, and then a <strong>dword</strong> is moved to <strong>esi+4</strong>. It means that <strong>esi</strong> is adding <strong>4 bytes</strong> to the structure that means that now the structure size is <strong>308 bytes</strong>.</p>
+<p><img src="https://prod-files-secure.s3.us-west-2.amazonaws.com/6920c82b-6959-4d1b-8125-60dbdc124466/fbdb8af0-79e6-4eec-9ced-9d2bdf75769f/Screenshot_2024-04-22_at_19.25.11.png" alt="Figure 3: Understanding structure size"></p>
+<p>Figure 3: Understanding structure size</p>
+<p>Now that we have a better understanding of the structure&rsquo;s size, it&rsquo;s time to understand its values. In order to figure out what hex values represent, we need to go a little bit deeper exploring the function. Going over a <strong>decryption routine</strong>, there is a call towards <code>sub_404CC1</code>. If we follow this call, we should immediately recognize a familiar structure (if not, have a look at <a href="https://viuleeenz.github.io/posts/2024/02/understanding-peb-and-ldr-structures-using-ida-and-lummastealer/">this article</a>). We are dealing with a routine that is going to resolve some APIs through the hex value passed to the function.</p>
+<p><img src="https://prod-files-secure.s3.us-west-2.amazonaws.com/6920c82b-6959-4d1b-8125-60dbdc124466/4e7ce651-7e1f-42f1-83bc-a84e4b5e9c5b/Screenshot_2024-04-23_at_10.51.03.png" alt="Figure 4: PEB and LDR data to collect loaded DLLs"></p>
+<p>Figure 4: PEB and LDR data to collect loaded DLLs</p>
+<p>Well, so far we have all the elements required to solve our puzzle! <strong>The structure we are dealing with is 312 bytes long</strong> and <strong>contains hex values related to APIs</strong>. Doing an educated guess, these values will be used and resolved on the fly, when a specific API function is required (structure file will be shared in the Reference section).</p>
+<blockquote>
+<p>💡<em>As part of the triage process, structures are usually the very first block of the puzzle to solve. In this case, we have seen a global structure that is stored within the data section. Exploring the data section a little bit deeper, you will find that structures from this sample are stored one after another. This could be a very good starting point to resolve structures values and hashes that could highlight the binary capabilities.</em></p>
+</blockquote>
+<h3 id="resolving-api-hash">Resolving API Hash</h3>
+<p>If we recall Figure 3, we see multiple assignment instructions related to <strong>esi</strong> that contain our structure. Then in Figure 4 we discovered that API hashing routine is applied to some hex to get a reference to the corresponding function. The routine itself is quite easy and standard, at least in terms of retrieving the function name from the DLL (a detailed analysis has been done <a href="https://viuleeenz.github.io/posts/2024/03/understanding-api-hashing-and-build-a-rainbow-table-for-lummastealer/">here</a>).</p>
+<p><img src="https://prod-files-secure.s3.us-west-2.amazonaws.com/6920c82b-6959-4d1b-8125-60dbdc124466/78543510-ffb3-478f-b88b-0204947daab5/Screenshot_2024-04-23_at_11.40.56.png" alt="Figure 5: API hashing routine"></p>
+<p>Figure 5: API hashing routine</p>
+<p>The Figure above, represents the routine applied to each function name in order to find a match with the hash passed as input. It should be easy to spot that <strong>esi</strong> contains (on each iteration) a string character that will be manipulated to produce the corresponding hash.</p>
+<blockquote>
+<p>💡<em>The routine itself does not require a lot of explanation and it&rsquo;s pretty easy to reconstruct. In order to avoid any spoilers, if a reader wants to take this exercise, my code will be shared within the Reference section. It’s worth mentioning that this function could be implemented also through emulation, even if code preparation is a bit annoying compared to the function complexity, it could be a good exercise too.</em></p>
+</blockquote>
+<h3 id="inline-decryption">Inline Decryption</h3>
+<p>So far we have done good work reconstructing structure layout and resolving API. That information gave us few insights about malware capabilities and in general, what could be the actions taken by this malware to perform its tasks. Unfortunately, we have just scratched the surface . In fact we are still missing information about malware configuration, such as: targets, C2, anti-debug, etc.. In fact, most of the interesting strings are actually decrypted with an inline routine.</p>
+<blockquote>
+<p>💡<em>For anyone of you that actually tried to analyze this malware, you should already familiar with inline decryption routine, since that it spread all around the code.</em></p>
+</blockquote>
+<p><strong>Inline decryption</strong> is a quite interesting technique that really <strong>slows down malware analysis</strong> because it requires decryption of multiple strings, usually with slight differences, on the fly. Those routines are all over the code and most of the malware actions involve their usage. An example has been already observed in Figure 4 and 5. However, in order to understand what we are talking about, The figure below show some routines related to this technique:  </p>
+<p><img src="https://prod-files-secure.s3.us-west-2.amazonaws.com/6920c82b-6959-4d1b-8125-60dbdc124466/bd05e196-2349-424f-8e94-7ffbca39e132/Screenshot_2024-04-23_at_12.20.45.png" alt="Figure 6: Inline Decryption"></p>
+<p>Figure 6: Inline Decryption</p>
+<p>As you can see, all those routines are quite different, involving each time a different operand and sometimes, the whole string is built on multiple parts of the code. According to the information collected so far, about inline decryption, it should be clear that creating a script for each routine will take forever. Does it end our triage? Likely, we still have our secret weapon called <strong>emulation</strong>.</p>
+<p>The idea to solve this challenge is quite simple and effective, but it requires a little bit of experience: Collect all strings and their decryption routine in order to properly emulate each snippet of code.</p>
+<h3 id="automation">Automation</h3>
+<p>Automating all the <strong>inline</strong> <strong>encryption</strong> and the hashing routine it’s not an easy task. First of all, we need to apply the evergreen approach of “*dividi et impera”. *****In this way, the hashing routine have been partially solved using the template from a previous <a href="https://viuleeenz.github.io/posts/2024/03/understanding-api-hashing-and-build-a-rainbow-table-for-lummastealer/">post</a>. In this way, it’s just a matter of emulating the whole function and we are going to have all the corresponding matches.</p>
+<p><img src="https://prod-files-secure.s3.us-west-2.amazonaws.com/6920c82b-6959-4d1b-8125-60dbdc124466/9d8df97b-0af3-4f34-bd0f-8bd5f1c0bd64/Screenshot_2024-05-17_at_00.34.58.png" alt="Figure 7: advapi32.dll resolved hashes"></p>
+<p>Figure 7: advapi32.dll resolved hashes</p>
+<p>However, what is really interesting in this sample is related to the string decryption. The idea is quite simple but very effective. First of all, in order to emulate this code, we need to identify some structures that we could use as <strong>anchor</strong> that is going to indicate that the decryption routine ended. <strong>Then we need to jump back to the very first instruction that starts creating the stack string</strong>. Well, it is easier said than done, because jumping back in the middle of an instruction and then going forward to the anchor value would lead us to an unpredictable result. However, if we jump back, far enough from the stack string creation, we could traverse the instructions upside down, starting from the anchor value back to the stack string. Doing so won&rsquo;t lead to any issue, since all instructions are actually correct.</p>
+<p><img src="https://prod-files-secure.s3.us-west-2.amazonaws.com/6920c82b-6959-4d1b-8125-60dbdc124466/79224778-feed-44a0-9ddb-519eb006d797/Screenshot_2024-05-17_at_00.30.58.png" alt="Figure 8: Resolved strings"></p>
+<p>Figure 8: Resolved strings</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>Through this post we have started to scratch the surface of C++ binaries, understanding calling conventions and highlighting some features of those binaries (e.g, classes and calling conventions). However, going further would have been confusing, providing too much details on information that wouldn’t have an immediate practical counterpart. Nevertheless, what was quite interesting regardless of the api hashing routine emulation, was the inline decryption routine, introducing the <strong>idea of anchors and solving the issue of jumping back from an instruction</strong>.</p>
+<p>Have fun and keep reversing! :)</p>
+<h3 id="references">References</h3>
+<p><a href="https://russianpanda.com/2024/03/16/The-GlorySprout-Stealer-or-a-Failed-Clone-of-Taurus-Stealer/">RussianPanda Research Blog</a></p>
+<p><a href="https://fumik0.com/2019/12/25/lets-play-again-with-predator-the-thief/">Let’s play (again) with Predator the thief</a></p>
+<p><a href="https://outpost24.com/blog/an-in-depth-analysis-of-the-new-taurus-stealer/">An In-Depth analysis of the new Taurus Stealer</a></p>
+
+      </div>
+    </article>
+
+    <hr />
+
+    <div class="post-info">
+      
+      
+
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        2195 Words
+      </p>
+
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        
+          0001-01-01 00:49
+        
+
+        
+      </p>
+    </div>
+
+    
+
+    
+
+    
+
+  </main>
+
+            </div>
+
+            
+                <footer class="footer">
+    
+    <div class="footer__inner">
+        <div class="footer__content">
+            <span>&copy; 2024</span>
+            
+            <span><a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></span>
+            
+            
+        </div>
+    </div>
+    
+    
+</footer>
+
+            
+        </div>
+
+        
+
+
+
+<script type="text/javascript" src="https://Viuleeenz.github.io/bundle.min.205d491810c28f95aa953fae884e1c27abe13fdf93ec63b882d0036b248d4a6282eb2d134e4e7225c6ad6e86db87b08488a361ca4a7383d01fcff43f3d57b9c3.js" integrity="sha512-IF1JGBDCj5WqlT&#43;uiE4cJ6vhP9&#43;T7GO4gtADaySNSmKC6y0TTk5yJcatbobbh7CEiKNhykpzg9Afz/Q/PVe5ww=="></script>
+
+
+
+    </body>
+</html>

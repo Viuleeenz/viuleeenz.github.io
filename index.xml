@@ -7,7 +7,17 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
-    <lastBuildDate>Sun, 24 Mar 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://Viuleeenz.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 16 May 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://Viuleeenz.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Emulating inline decryption for triaging C&#43;&#43; malware</title>
+      <link>https://Viuleeenz.github.io/posts/2024/05/emulating-inline-decryption-for-triaging-c-malware/</link>
+      <pubDate>Thu, 16 May 2024 00:00:00 +0000</pubDate>
+      
+      <guid>https://Viuleeenz.github.io/posts/2024/05/emulating-inline-decryption-for-triaging-c-malware/</guid>
+      <description>What we need to know? C and C++ binaries share several commonalities, however, some additional features and complexities introduced by C++ can make reverse engineering C++ binaries more challenging compared to C binaries. Some of the most important features are:
+Name Mangling: C++ compilers often use name mangling to encode additional information about functions and classes into the symbol names in the binary. This can make it more challenging to understand the code&amp;rsquo;s structure and functionality by simply looking at symbol names.</description>
+    </item>
+    
     <item>
       <title>Understanding API Hashing and build a rainbow table for LummaStealer</title>
       <link>https://Viuleeenz.github.io/posts/2024/03/understanding-api-hashing-and-build-a-rainbow-table-for-lummastealer/</link>
@@ -89,15 +99,6 @@ Before starting to reverse DDosia Windows sample, I preferred to gather as much 
       
       <guid>https://Viuleeenz.github.io/posts/2023/03/dynamic-binary-instrumentation-for-malware-analysis/</guid>
       <description>Introduction Because of the massive Ursnif campaigns that hit Italy during the last weeks, I was looking for a lightweight method to quickly extract the last infection stage of all collected samples, in order to start further analysis effectively. Due to this, I wrote a little frida script that performs basic Dynamic Binary Instrumentation (DBI) to monitor useful function calls and extracts the Ursnif payload. In this article I am going to briefly discuss this script and the steps needed to start analyzing the resulting binary.</description>
-    </item>
-    
-    <item>
-      <title>Manually unpacking of packed executable</title>
-      <link>https://Viuleeenz.github.io/posts/2021/09/manually-unpacking-of-packed-executable/</link>
-      <pubDate>Thu, 02 Sep 2021 00:00:00 +0000</pubDate>
-      
-      <guid>https://Viuleeenz.github.io/posts/2021/09/manually-unpacking-of-packed-executable/</guid>
-      <description>Introduction In this post, I will show how to manually unpack a simple executable that has been packed with WinUPack. However, the goal of this post is to provide a general approach to start reversing code and, in general, packers. Because of that it will be hard to cover all the techniques and strategies that could be applied, but I will try to give the rights hints and the mindset to approach these challenges.</description>
     </item>
     
   </channel>
