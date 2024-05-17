@@ -94,6 +94,10 @@ Name Mangling: C++ compilers often use name mangling to encode additional inform
 <ul>
 <li><a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/MalwareAutomation/GlorySprout/gsprout_api_resolver.py">gsprout_api_resolver.py</a></li>
 </ul>
+<p>GlorySprout sample:</p>
+<ul>
+<li><a href="https://bazaar.abuse.ch/browse.php?search=sha256%3A8996c252fc41b7ec0ec73ce814e84136be6efef898822146c25af2330f4fd04a">Malwarebazaar</a></li>
+</ul>
 <p>Insight from GlorySprout and Taurus Stelaer:</p>
 <ul>
 <li><a href="https://russianpanda.com/2024/03/16/The-GlorySprout-Stealer-or-a-Failed-Clone-of-Taurus-Stealer/">RussianPanda Research Blog</a></li>
