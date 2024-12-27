@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=59174&amp;path=livereload" data-no-instant defer></script>
         <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -11,7 +11,7 @@ The idea behind this technique was inspired by the infinite amount of tweaking I
 <meta name="keywords" content="malware, binary, digital forensics, exploit development, reverse engineering" />
 <meta name="robots" content="noodp" />
 <meta name="theme-color" content="" />
-<link rel="canonical" href="https://Viuleeenz.github.io/posts/2023/06/ida-python-locate-a-function-independently-from-its-offset/" />
+<link rel="canonical" href="http://localhost:59174/posts/2023/06/ida-python-locate-a-function-independently-from-its-offset/" />
 
 
     <title>
@@ -27,7 +27,7 @@ The idea behind this technique was inspired by the infinite amount of tweaking I
     
         
         
-        <link rel="stylesheet" href="../../../../scss/main.c2f26a20d135ff7bc7091bb95e626c68bc9d8e4c0852d733dbfe9527448dfa92.css" integrity="sha256-wvJqINE1/3vHCRu5XmJsaLydjkwIUtcz2/6VJ0SN&#43;pI=">
+        <link rel="stylesheet" href="../../../../scss/main.4c717a3dff5ec47ecfa7229b960ed715a5ad930b4079fbd0ed59f277863cf26c.css" integrity="sha256-THF6Pf9exH7PpyKblg7XFaWtkwtAefvQ7Vnyd4Y88mw=">
     
 
 
@@ -53,16 +53,16 @@ The idea behind this technique was inspired by the infinite amount of tweaking I
   <meta itemprop="datePublished" content="2023-06-27T00:00:00+00:00">
   <meta itemprop="dateModified" content="2023-06-27T00:00:00+00:00">
   <meta itemprop="wordCount" content="1510">
-  <meta itemprop="image" content="https://Viuleeenz.github.io/">
+  <meta itemprop="image" content="http://localhost:59174/">
 
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="https://Viuleeenz.github.io/">
+  <meta name="twitter:image" content="http://localhost:59174/">
   <meta name="twitter:title" content="IDA-Python - Locate a function independently from its offset">
   <meta name="twitter:description" content="Introduction Analyzing samples statically could be not an easy going taks, especially when you deal with heavily obfuscated or encrypted data. Because of that, it’s useful to find out the decryption/deobfuscation routine and write a little script that makes sense of strings or function names before starting to analyze the whole sample.
 The idea behind this technique was inspired by the infinite amount of tweaking I have made to run multiple Ida-python scripts that were heavily machine-setting dependents. The idea is very simple and it’s based on pattern matching as for YARA rules. The scope here is to create a kind of signature for a function that we would like to locate (e.g., deobfuscation routine) and apply its execution to its parameters in order to simplify our analysis without tweaking specific parameters making it independent from the function offset. I have already got good results experimenting with malware samples (e.g, Qbot) and custom binaries from CTFs as well as other samples that used some sort of obfuscation. Because of that, I decided to create this post to share this approach that could be useful for writing better scripts.">
 
 
-    <meta property="og:url" content="https://Viuleeenz.github.io/posts/2023/06/ida-python-locate-a-function-independently-from-its-offset/">
+    <meta property="og:url" content="http://localhost:59174/posts/2023/06/ida-python-locate-a-function-independently-from-its-offset/">
   <meta property="og:site_name" content="Security Undisguised">
   <meta property="og:title" content="IDA-Python - Locate a function independently from its offset">
   <meta property="og:description" content="Introduction Analyzing samples statically could be not an easy going taks, especially when you deal with heavily obfuscated or encrypted data. Because of that, it’s useful to find out the decryption/deobfuscation routine and write a little script that makes sense of strings or function names before starting to analyze the whole sample.
@@ -72,7 +72,7 @@ The idea behind this technique was inspired by the infinite amount of tweaking I
     <meta property="article:section" content="posts">
     <meta property="article:published_time" content="2023-06-27T00:00:00+00:00">
     <meta property="article:modified_time" content="2023-06-27T00:00:00+00:00">
-    <meta property="og:image" content="https://Viuleeenz.github.io/">
+    <meta property="og:image" content="http://localhost:59174/">
 
 
 
@@ -170,7 +170,7 @@ The idea behind this technique was inspired by the infinite amount of tweaking I
 
     <article>
       <h1 class="post-title">
-        <a href="https://Viuleeenz.github.io/posts/2023/06/ida-python-locate-a-function-independently-from-its-offset/">IDA-Python - Locate a function independently from its offset</a>
+        <a href="http://localhost:59174/posts/2023/06/ida-python-locate-a-function-independently-from-its-offset/">IDA-Python - Locate a function independently from its offset</a>
       </h1>
 
       
