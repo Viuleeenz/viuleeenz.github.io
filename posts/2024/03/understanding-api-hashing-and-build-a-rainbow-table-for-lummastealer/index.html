@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=56729&amp;path=livereload" data-no-instant defer></script>
         <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="author" content="map[name:Alessandro Strino]">
-<meta name="description" content="Understanding PEB and Ldr structures represents a starting point when we are dealing with API hashing. However, before proceeding to analyze a sample it’s always necessary to recover obfuscated, encrypted or hashed data. Because of that, through this blogpost I would like to continue what I have started in the previous post, using emulation to create a rainbow table for LummaStealer and then write a little resolver script that is going to use the information extracted to resolve all hashes." />
+<meta name="description" content="Understanding PEB and Ldr structures represents a starting point when we are dealing with API hashing. However, before proceeding to analyze a sample it’s always necessary to recover obfuscated, encrypted or hashed data. Because of that, through this blogpost I would like to continue what I have started in the previous post, using emulation to create a rainbow table for LummaStealer and then write a little resolver script that is going to use the information extracted to resolve all hashes.
+" />
 <meta name="keywords" content="malware, binary, digital forensics, exploit development, reverse engineering" />
 <meta name="robots" content="noodp" />
 <meta name="theme-color" content="" />
-<link rel="canonical" href="https://Viuleeenz.github.io/posts/2024/03/understanding-api-hashing-and-build-a-rainbow-table-for-lummastealer/" />
+<link rel="canonical" href="http://localhost:56729/posts/2024/03/understanding-api-hashing-and-build-a-rainbow-table-for-lummastealer/" />
 
 
     <title>
@@ -22,43 +23,52 @@
 
 
 
-<link rel="stylesheet" href="https://Viuleeenz.github.io/main.b78c3be9451dc4ca61ca377f3dc2cf2e6345a44c2bae46216a322ef366daa399.css" integrity="sha256-t4w76UUdxMphyjd/PcLPLmNFpEwrrkYhajIu82bao5k=">
+    
+        
+        
+        <link rel="stylesheet" href="/scss/main.4c717a3dff5ec47ecfa7229b960ed715a5ad930b4079fbd0ed59f277863cf26c.css" integrity="sha256-THF6Pf9exH7PpyKblg7XFaWtkwtAefvQ7Vnyd4Y88mw=">
+    
+
 
 
     
-        <link rel="stylesheet" type="text/css" href="https://Viuleeenz.github.io/style.css">
+        <link rel="stylesheet" type="text/css" href="/style.css">
     
 
 
-    <link rel="apple-touch-icon" sizes="180x180" href="https://Viuleeenz.github.io/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="https://Viuleeenz.github.io/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="https://Viuleeenz.github.io/favicon-16x16.png">
-    <link rel="manifest" href="https://Viuleeenz.github.io/site.webmanifest">
-    <link rel="mask-icon" href="https://Viuleeenz.github.io/safari-pinned-tab.svg" color="">
-    <link rel="shortcut icon" href="https://Viuleeenz.github.io/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+    <link rel="shortcut icon" href="/favicon.ico">
     <meta name="msapplication-TileColor" content="">
 
 
-<meta itemprop="name" content="Understanding API Hashing and build a rainbow table for LummaStealer">
-<meta itemprop="description" content="Understanding PEB and Ldr structures represents a starting point when we are dealing with API hashing. However, before proceeding to analyze a sample it’s always necessary to recover obfuscated, encrypted or hashed data. Because of that, through this blogpost I would like to continue what I have started in the previous post, using emulation to create a rainbow table for LummaStealer and then write a little resolver script that is going to use the information extracted to resolve all hashes."><meta itemprop="datePublished" content="2024-03-24T00:00:00+00:00" />
-<meta itemprop="dateModified" content="2024-03-24T00:00:00+00:00" />
-<meta itemprop="wordCount" content="1838"><meta itemprop="image" content="https://Viuleeenz.github.io/"/>
-<meta itemprop="keywords" content="" />
-<meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:image" content="https://Viuleeenz.github.io/"/>
 
-<meta name="twitter:title" content="Understanding API Hashing and build a rainbow table for LummaStealer"/>
-<meta name="twitter:description" content="Understanding PEB and Ldr structures represents a starting point when we are dealing with API hashing. However, before proceeding to analyze a sample it’s always necessary to recover obfuscated, encrypted or hashed data. Because of that, through this blogpost I would like to continue what I have started in the previous post, using emulation to create a rainbow table for LummaStealer and then write a little resolver script that is going to use the information extracted to resolve all hashes."/>
+  <meta itemprop="name" content="Understanding API Hashing and build a rainbow table for LummaStealer">
+  <meta itemprop="description" content="Understanding PEB and Ldr structures represents a starting point when we are dealing with API hashing. However, before proceeding to analyze a sample it’s always necessary to recover obfuscated, encrypted or hashed data. Because of that, through this blogpost I would like to continue what I have started in the previous post, using emulation to create a rainbow table for LummaStealer and then write a little resolver script that is going to use the information extracted to resolve all hashes.">
+  <meta itemprop="datePublished" content="2024-03-24T00:00:00+00:00">
+  <meta itemprop="dateModified" content="2024-03-24T00:00:00+00:00">
+  <meta itemprop="wordCount" content="1838">
+  <meta itemprop="image" content="http://localhost:56729/">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="http://localhost:56729/">
+  <meta name="twitter:title" content="Understanding API Hashing and build a rainbow table for LummaStealer">
+  <meta name="twitter:description" content="Understanding PEB and Ldr structures represents a starting point when we are dealing with API hashing. However, before proceeding to analyze a sample it’s always necessary to recover obfuscated, encrypted or hashed data. Because of that, through this blogpost I would like to continue what I have started in the previous post, using emulation to create a rainbow table for LummaStealer and then write a little resolver script that is going to use the information extracted to resolve all hashes.">
 
 
-
-    <meta property="og:title" content="Understanding API Hashing and build a rainbow table for LummaStealer" />
-<meta property="og:description" content="Understanding PEB and Ldr structures represents a starting point when we are dealing with API hashing. However, before proceeding to analyze a sample it’s always necessary to recover obfuscated, encrypted or hashed data. Because of that, through this blogpost I would like to continue what I have started in the previous post, using emulation to create a rainbow table for LummaStealer and then write a little resolver script that is going to use the information extracted to resolve all hashes." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://Viuleeenz.github.io/posts/2024/03/understanding-api-hashing-and-build-a-rainbow-table-for-lummastealer/" /><meta property="og:image" content="https://Viuleeenz.github.io/"/><meta property="article:section" content="posts" />
-<meta property="article:published_time" content="2024-03-24T00:00:00+00:00" />
-<meta property="article:modified_time" content="2024-03-24T00:00:00+00:00" />
-
+    <meta property="og:url" content="http://localhost:56729/posts/2024/03/understanding-api-hashing-and-build-a-rainbow-table-for-lummastealer/">
+  <meta property="og:site_name" content="Security Undisguised">
+  <meta property="og:title" content="Understanding API Hashing and build a rainbow table for LummaStealer">
+  <meta property="og:description" content="Understanding PEB and Ldr structures represents a starting point when we are dealing with API hashing. However, before proceeding to analyze a sample it’s always necessary to recover obfuscated, encrypted or hashed data. Because of that, through this blogpost I would like to continue what I have started in the previous post, using emulation to create a rainbow table for LummaStealer and then write a little resolver script that is going to use the information extracted to resolve all hashes.">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-03-24T00:00:00+00:00">
+    <meta property="article:modified_time" content="2024-03-24T00:00:00+00:00">
+    <meta property="og:image" content="http://localhost:56729/">
 
 
 
@@ -75,20 +85,6 @@
 
 
 
-    
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-XNKLBC4D9D"></script>
-<script>
-var doNotTrack = false;
-if (!doNotTrack) {
-	window.dataLayer = window.dataLayer || [];
-	function gtag(){dataLayer.push(arguments);}
-	gtag('js', new Date());
-	gtag('config', 'G-XNKLBC4D9D', { 'anonymize_ip': false });
-}
-</script>
-
-
-
     </head>
 
     
@@ -98,7 +94,7 @@ if (!doNotTrack) {
         <div class="container">
             <header class="header">
     <span class="header__inner">
-        <a href="https://Viuleeenz.github.io/" style="text-decoration: none;">
+        <a href="/" style="text-decoration: none;">
     <div class="logo">
         
             <span class="logo__mark">&gt;</span>
@@ -116,7 +112,7 @@ if (!doNotTrack) {
         <span class="header__right">
             
                 <nav class="menu">
-    <ul class="menu__inner"><li><a href="https://Viuleeenz.github.io/about/">About</a></li><li><a href="https://Viuleeenz.github.io/posts/">Posts</a></li><li><a href="https://Viuleeenz.github.io/whitepapers/">Whitepapers</a></li>
+    <ul class="menu__inner"><li><a href="/about/">About</a></li><li><a href="/posts/">Posts</a></li><li><a href="/whitepapers/">Whitepapers</a></li>
     </ul>
 </nav>
 
@@ -135,17 +131,20 @@ if (!doNotTrack) {
         </span>
     </span>
     
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-XNKLBC4D9D"></script>
-<script>
-var doNotTrack = false;
-if (!doNotTrack) {
-	window.dataLayer = window.dataLayer || [];
-	function gtag(){dataLayer.push(arguments);}
-	gtag('js', new Date());
-	gtag('config', 'G-XNKLBC4D9D', { 'anonymize_ip': false });
-}
-</script>
-
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-XNKLBC4D9D"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-XNKLBC4D9D');
+        }
+      </script>
 </header>
 
 
@@ -167,7 +166,7 @@ if (!doNotTrack) {
 
     <article>
       <h1 class="post-title">
-        <a href="https://Viuleeenz.github.io/posts/2024/03/understanding-api-hashing-and-build-a-rainbow-table-for-lummastealer/">Understanding API Hashing and build a rainbow table for LummaStealer</a>
+        <a href="http://localhost:56729/posts/2024/03/understanding-api-hashing-and-build-a-rainbow-table-for-lummastealer/">Understanding API Hashing and build a rainbow table for LummaStealer</a>
       </h1>
 
       
@@ -183,7 +182,7 @@ if (!doNotTrack) {
 </blockquote>
 <h2 id="resolving-hashes">Resolving Hashes</h2>
 <p>Starting from where we left in the last post, we could explore the function routine that is in charge of <strong>collecting function names from a DLL and then perform a hashing algorithm</strong> to find a match with the input name.</p>
-<p><img src="https://Viuleeenz.github.io/img/api_hashing/api_hashing_overview.png" alt="Figure 1: LummaStealer API Hashing overview"></p>
+<p><img src="/img/api_hashing/api_hashing_overview.png" alt="Figure 1: LummaStealer API Hashing overview"></p>
 <p>Figure 1: LummaStealer API Hashing overview</p>
 <p>At the first glance, this function could be disorienting, however, understanding that <strong>ecx</strong> contains the module <strong>BaseAddress</strong> (explained in the previous article) it is possible to set a comment that is going to make the whole function easier to understand. Moreover, it has been also divided in three main parts( first two are going to be detailed in the next sections):</p>
 <ol>
@@ -193,7 +192,7 @@ if (!doNotTrack) {
 </ol>
 <h3 id="collecting-exported-function-within-a-pe-file">Collecting exported function within a PE file</h3>
 <p>The first box starts with the instruction <strong>mov edi, ecx</strong> where <strong>ecx</strong> is a <em>BaseAddress</em> of a module that is going to be analyzed. This is a fundamental instruction that gives us a chance to infere the subsequent value of <strong>edi</strong> and <strong>ebx</strong>. In fact, if we rename values associated to these registers, it should be clear that this code is going to collect exported functions names through <strong>AddressOfNames</strong> and <strong>AddressOfNameOrdinals</strong> pointers.</p>
-<p><img src="https://Viuleeenz.github.io/img/api_hashing/resolving_structures_names.png" alt="Figure 2: Resolving structures names"></p>
+<p><img src="/img/api_hashing/resolving_structures_names.png" alt="Figure 2: Resolving structures names"></p>
 <p>Figure 2: Resolving structures names</p>
 <p>Those structures are very important in order to understand what is happening in the code. For now, you could think about those structures as <em>support structures</em> that could be chained together in order to collect the actual function pointer (after a match is found!)  within the <strong>Address of a Function structure</strong>.</p>
 <blockquote>
@@ -232,7 +231,7 @@ if (!doNotTrack) {
 </blockquote>
 <h3 id="retrieve-the-function-pointer">Retrieve the function pointer</h3>
 <p>Once the code in charge to collect and compare exported functions has been completed, and a match is found, it&rsquo;s time to retrieve the actual function pointer using some of the structures mentioned above. In fact, as you can see from the code related to the third box (that has been renamed accordingly), once the match if found, the structure <strong>AddressOfNameOrdinals</strong> it&rsquo;s used to retrieve the functions number that is going to address the structure <strong>AddressOfFunctions</strong> that contains the actual function pointers.</p>
-<p><img src="https://Viuleeenz.github.io/img/api_hashing/collect_api_pointer.png" alt="Figure 3: Collect the actual function pointer"></p>
+<p><img src="/img/api_hashing/collect_api_pointer.png" alt="Figure 3: Collect the actual function pointer"></p>
 <p>Figure 3: Collect the actual function pointer</p>
 <blockquote>
 <p>💡<em>I don’t want to bother you with so much details at this point, since we have already analyzed throughly some structures and we still have additional contents to discuss. However, the image above has been thought to be self-contained. That said, to not get lost please remember that <strong>edi</strong> represents the <strong>Ldr_Module.BaseAddress</strong></em></p>
@@ -240,7 +239,7 @@ if (!doNotTrack) {
 <h3 id="analyze-the-hashing-routine">Analyze the hashing routine</h3>
 <p>Through the information collected so far, this code should be childishly simple.</p>
 <p><strong>ecx</strong> contains the hash name extracted from the export table that is going to forward as input to the hash function (identified, <em>in this case, as <a href="https://github.com/abrandoned/murmur2/blob/master/MurmurHash2.c">murmur2</a></em>). The function itself is quite long but does not take too much time to be understood and reimplemented. However, the purpose of this article is to emulate this code in order to find out the values of all hardcoded hashes.</p>
-<p><img src="https://Viuleeenz.github.io/img/api_hashing/murmur2_hashing_routine.png" alt="Figure 4: MurMur2 hashing routine">
+<p><img src="/img/api_hashing/murmur2_hashing_routine.png" alt="Figure 4: MurMur2 hashing routine">
 Figure 4: MurMur2 hashing routine</p>
 <p>As we have <a href="https://viuleeenz.github.io/posts/2023/12/applied-emulation-decrypting-ursnif-strings-with-unicorn/">already done</a>, we could select the function opcodes (without the return instruction) and put them in our code emulator routine. It’s worth mentioning that, <strong>ecx</strong> contains the function name that is going to be used as argument for hashing routine, because of that, it’s important to assign that register properly.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">MurMurHash2</span>(func_name):
@@ -256,7 +255,7 @@ Figure 4: MurMur2 hashing routine</p>
 </span></span><span style="display:flex;"><span>    EAX <span style="color:#f92672">=</span> uc<span style="color:#f92672">.</span>reg_read(UC_X86_REG_EAX)
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> EAX
 </span></span></code></pre></div><p>Let’s take a test. Using the <strong>LoadLibraryW</strong> name, we get back <strong>0xab87776c</strong>. If we explore a little bit our code, we will find almost immediately this value! it is called each time a new hash needs to be resolved.</p>
-<p><img src="https://Viuleeenz.github.io/img/api_hashing/loadLibrary_hash.png" alt="Figure 5: LoadLibraryW Hash"></p>
+<p><img src="/img/api_hashing/loadLibrary_hash.png" alt="Figure 5: LoadLibraryW Hash"></p>
 <p>Figure 5: LoadLibraryW Hash</p>
 <p>This behavior is a clear indication that before proceeding to extract exported functions, we need to load the associated library (DLL) in memory. With that information we could be sure that our emulator works fine.</p>
 <h3 id="build-a-rainbow-table">Build a rainbow table</h3>
@@ -284,7 +283,7 @@ Figure 4: MurMur2 hashing routine</p>
 <p>Observing the code, an easy pattern to follow involves a register and an immediate values:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nasm" data-lang="nasm"><span style="display:flex;"><span><span style="color:#a6e22e">mov</span> REG, IMM
 </span></span></code></pre></div><p>Implementing this strategy and filtering results only on <em>kernel32.dll,</em> we are able to extract all referenced hashes:</p>
-<p><img src="https://Viuleeenz.github.io/img/api_hashing/hashes_resolved.png" alt="Figure 6: Some hashes related to Kernel32.dll "></p>
+<p><img src="/img/api_hashing/hashes_resolved.png" alt="Figure 6: Some hashes related to Kernel32.dll "></p>
 <p>Figure 6: Some hashes related to Kernel32.dll</p>
 <h2 id="conclusion">Conclusion</h2>
 <p>As always, going deep in each section requires an entire course and at the moment it’s an impossible challenge. However, through this blog post I tried to scratch the surface giving some essential concepts (that could be applied straightaway) to make reversing time a lot more fun.</p>
@@ -321,7 +320,7 @@ Figure 4: MurMur2 hashing routine</p>
 </ol>
 </li>
 </ol>
-<p><img src="https://Viuleeenz.github.io/img/api_hashing/functions_and_names_pointers.png" alt="Figure 7: How to retrieve functions names and pointers"></p>
+<p><img src="/img/api_hashing/functions_and_names_pointers.png" alt="Figure 7: How to retrieve functions names and pointers"></p>
 <p>Figure 7: How to retrieve functions names and pointers</p>
 <blockquote>
 <p>💡<em>If you want to experiment a little bit more with this concept, I suggest to take the kernel32.dll library and follows this algorithm using <a href="https://github.com/hasherezade/pe-bear">PE-Bear</a></em></p>
@@ -366,7 +365,6 @@ Figure 4: MurMur2 hashing routine</p>
 
     
 
-    
 
     
 
@@ -397,7 +395,7 @@ Figure 4: MurMur2 hashing routine</p>
 
 
 
-<script type="text/javascript" src="https://Viuleeenz.github.io/bundle.min.205d491810c28f95aa953fae884e1c27abe13fdf93ec63b882d0036b248d4a6282eb2d134e4e7225c6ad6e86db87b08488a361ca4a7383d01fcff43f3d57b9c3.js" integrity="sha512-IF1JGBDCj5WqlT&#43;uiE4cJ6vhP9&#43;T7GO4gtADaySNSmKC6y0TTk5yJcatbobbh7CEiKNhykpzg9Afz/Q/PVe5ww=="></script>
+<script type="text/javascript" src="/bundle.min.e89fda0f29b95d33f6f4224dd9e5cf69d84aff3818be2b0d73e731689cc374261b016d17d46f8381962fb4a1577ba3017b1f23509d894f6e66431f988c00889e.js" integrity="sha512-6J/aDym5XTP29CJN2eXPadhK/zgYvisNc&#43;cxaJzDdCYbAW0X1G&#43;DgZYvtKFXe6MBex8jUJ2JT25mQx&#43;YjACIng=="></script>
 
 
 

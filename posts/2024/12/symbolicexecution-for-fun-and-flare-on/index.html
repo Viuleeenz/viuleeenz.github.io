@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=56673&amp;path=livereload" data-no-instant defer></script>
+        <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="author" content="">
+<meta name="description" content="Emulation is my passion. I apply it as much as I can in countless scenarios—sometimes for practical purposes, and sometimes just for fun. Recently, I’ve been diving into angr, and after weeks of banging my head against it, a few questions crossed my mind:
+Has anyone ever tried using angr for something meaningful, only to end up frustrated because nothing seemed to work? Or followed an angr tutorial based on CTF code, thinking, “Wow, this looks easy—I’ve got this!”—only to realize you’re in way over your head?
+" />
+<meta name="keywords" content="malware, binary, digital forensics, exploit development, reverse engineering" />
+<meta name="robots" content="noodp" />
+<meta name="theme-color" content="" />
+<link rel="canonical" href="http://localhost:56673/posts/2024/12/symbolicexecution-for-fun-and-flare-on/" />
+
+
+    <title>
+        
+            SymbolicExecution for fun and Flare-on :: Security Undisguised 
+        
+    </title>
+
+
+
+
+
+    
+        
+        
+        <link rel="stylesheet" href="/scss/main.4c717a3dff5ec47ecfa7229b960ed715a5ad930b4079fbd0ed59f277863cf26c.css" integrity="sha256-THF6Pf9exH7PpyKblg7XFaWtkwtAefvQ7Vnyd4Y88mw=">
+    
+
+
+
+    
+        <link rel="stylesheet" type="text/css" href="/style.css">
+    
+
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <meta name="msapplication-TileColor" content="">
+
+
+
+  <meta itemprop="name" content="SymbolicExecution for fun and Flare-on">
+  <meta itemprop="description" content="Emulation is my passion. I apply it as much as I can in countless scenarios—sometimes for practical purposes, and sometimes just for fun. Recently, I’ve been diving into angr, and after weeks of banging my head against it, a few questions crossed my mind:
+Has anyone ever tried using angr for something meaningful, only to end up frustrated because nothing seemed to work? Or followed an angr tutorial based on CTF code, thinking, “Wow, this looks easy—I’ve got this!”—only to realize you’re in way over your head?">
+  <meta itemprop="datePublished" content="2024-12-27T00:00:00+00:00">
+  <meta itemprop="dateModified" content="2024-12-27T00:00:00+00:00">
+  <meta itemprop="wordCount" content="2573">
+  <meta itemprop="image" content="http://localhost:56673/">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="http://localhost:56673/">
+  <meta name="twitter:title" content="SymbolicExecution for fun and Flare-on">
+  <meta name="twitter:description" content="Emulation is my passion. I apply it as much as I can in countless scenarios—sometimes for practical purposes, and sometimes just for fun. Recently, I’ve been diving into angr, and after weeks of banging my head against it, a few questions crossed my mind:
+Has anyone ever tried using angr for something meaningful, only to end up frustrated because nothing seemed to work? Or followed an angr tutorial based on CTF code, thinking, “Wow, this looks easy—I’ve got this!”—only to realize you’re in way over your head?">
+
+
+    <meta property="og:url" content="http://localhost:56673/posts/2024/12/symbolicexecution-for-fun-and-flare-on/">
+  <meta property="og:site_name" content="Security Undisguised">
+  <meta property="og:title" content="SymbolicExecution for fun and Flare-on">
+  <meta property="og:description" content="Emulation is my passion. I apply it as much as I can in countless scenarios—sometimes for practical purposes, and sometimes just for fun. Recently, I’ve been diving into angr, and after weeks of banging my head against it, a few questions crossed my mind:
+Has anyone ever tried using angr for something meaningful, only to end up frustrated because nothing seemed to work? Or followed an angr tutorial based on CTF code, thinking, “Wow, this looks easy—I’ve got this!”—only to realize you’re in way over your head?">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-12-27T00:00:00+00:00">
+    <meta property="article:modified_time" content="2024-12-27T00:00:00+00:00">
+    <meta property="og:image" content="http://localhost:56673/">
+
+
+
+
+
+
+    <meta property="article:published_time" content="2024-12-27 00:00:00 &#43;0000 UTC" />
+
+
+
+
+
+
+
+
+
+    </head>
+
+    
+        <body>
+    
+    
+        <div class="container">
+            <header class="header">
+    <span class="header__inner">
+        <a href="/" style="text-decoration: none;">
+    <div class="logo">
+        
+            <span class="logo__mark">&gt;</span>
+            <span class="logo__text ">
+                $ cd /home/Viuleeenz</span>
+            <span class="logo__cursor" style=
+                  "
+                   
+                   ">
+            </span>
+        
+    </div>
+</a>
+
+        <span class="header__right">
+            
+                <nav class="menu">
+    <ul class="menu__inner"><li><a href="/about/">About</a></li><li><a href="/posts/">Posts</a></li><li><a href="/whitepapers/">Whitepapers</a></li>
+    </ul>
+</nav>
+
+                <span class="menu-trigger">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                    </svg>
+                </span>
+            
+                <span class="theme-toggle not-selectable"><svg class="theme-toggler" width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+   <path d="M22 41C32.4934 41 41 32.4934 41 22C41 11.5066 32.4934 3 22
+   3C11.5066 3 3 11.5066 3 22C3 32.4934 11.5066 41 22 41ZM7 22C7
+   13.7157 13.7157 7 22 7V37C13.7157 37 7 30.2843 7 22Z"/>
+ </svg></span>
+        </span>
+    </span>
+    
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-XNKLBC4D9D"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-XNKLBC4D9D');
+        }
+      </script>
+</header>
+
+
+            <div class="content">
+                
+  <main class="post">
+
+    <div class="post-info">
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        13 minutes
+
+        
+      </p>
+    </div>
+
+    <article>
+      <h1 class="post-title">
+        <a href="http://localhost:56673/posts/2024/12/symbolicexecution-for-fun-and-flare-on/">SymbolicExecution for fun and Flare-on</a>
+      </h1>
+
+      
+
+      
+
+      
+
+      <div class="post-content">
+        <p>Emulation is my passion. I apply it as much as I can in countless scenarios—sometimes for practical purposes, and sometimes just for fun. Recently, I’ve been diving into <strong>angr</strong>, and after weeks of banging my head against it, a few questions crossed my mind:</p>
+<p>Has anyone ever tried using angr for something meaningful, only to end up frustrated because nothing seemed to work? Or followed an angr tutorial based on CTF code, thinking, <em>“Wow, this looks easy—I’ve got this!”</em>—only to realize you’re in way over your head?</p>
+<p>Well, that’s exactly where I found myself. 😑</p>
+<p>Nevertheless, I found quite interesting tutorial about symbolic execution and I really recommend the course on <a href="https://p.ost2.fyi/courses/course-v1:OpenSecurityTraining2&#43;RE3201_symexec&#43;2021_V1/about">OpenSecurityTraining2</a>. It’s a generic course but it also gives some really good basic of angr usage. Unfortunately, what is really missing on the web (or at least I didn’t find it) is something that goes over the basic.</p>
+<p>Unfortunately, most of the tutorial covers the following scenario: “<em>Take a binary, run it from the beginning, set few values for addresses to reach and avoid, get the result”.</em> Through this post I would like to go a little bit further from the basic and setup angr properly in order to handle a function within the binary, setting the requirements and evaluate the actual result. In my opinion this simulates a more real case scenario where you don’t really need or can’t execute the whole binary from scratch. For this post I am going to use the <strong>challenge #10</strong> of <strong>Flare-on 2024.</strong> However, instead of starting the challenge from scratch, it would be more beneficial for this tutorial to focus directly to the angr-related concepts and general requirements needed for it.</p>
+<blockquote>
+<p>💡 <em>I’d like to point out that I always strive to create content with immediate, real-world applicability. While this post might initially seem CTF-oriented, it’s not—the challenge I’m discussing is particularly interesting because it closely resembles a “ransomware-like” binary. It involves file decryption and even a virtual machine interpreter, making it highly relevant beyond CTFs. Given the binary&rsquo;s complexity, it’s an excellent candidate for a test case. It’s also easy to obtain and far safer to experiment with than actual ransomware—perfect if you’d like to try it yourself.</em></p>
+</blockquote>
+<p><em><strong>Note</strong></em>: If you feel uncomfortable with this topic, please refer to the OpenSecurityTraining2 mentioned course.</p>
+<h3 id="delights-and-pains-of-using-angr">Delights and Pains of using Angr.</h3>
+<p>Angr is an entirely different beast compared to the emulators I’ve covered on this blog. To be honest, <strong>angr</strong> is more like a full-featured framework for analyzing binaries through symbolic execution. The <a href="https://docs.angr.io/en/latest/">angr documentation</a> is well-structured and covers a wide range of topics in detail. However, fully grasping the documentation is no small feat—it’s far from easy.</p>
+<p>I’ve spoken with several people who stay away from using <strong>angr</strong> because of its steep learning curve, and I have to agree—it can be challenging to get started.</p>
+<p>To use <strong>angr</strong> effectively, there are a few key concepts you absolutely need to understand. These requirements are not so different from the prerequisites discussed earlier on this blog for working with emulators. However, with <strong>angr</strong>, you also need to thoroughly understand <strong>what symbolic execution is and how it works.</strong></p>
+<p>The most critical step, though, is setting up <strong>angr</strong> correctly—especially when you need to focus on a specific piece of code rather than running the entire binary from the beginning.</p>
+<p>Having an idea of angr components and capabilities we could simplify its usage in two main cases:</p>
+<ol>
+<li>You need to symbolically execute the <strong>binary from scratch</strong> in order to understand <em><strong>which input could lead to a specific output</strong></em>. (Basic usage)</li>
+<li>You need to symbolically execute a <strong>function within the binary</strong> in order to understand the result of this function, <strong>setting up all the requirements</strong> (parameters) <strong>that are going to be used during the execution</strong>.</li>
+</ol>
+<p>When you run a binary with <strong>angr</strong>, you’ll rely on these components to find a “solution” that meets your specific needs. This solution could take many forms—it might be identifying a bug in a program to report an error, or it could be something entirely different, such as uncovering a passphrase or a product key</p>
+<blockquote>
+<p>💡 <em>Before diving into our example, you might wonder: “How can I determine if this function, or my goal, is a good fit for angr?” This is a great question, but unfortunately, it doesn’t have a straightforward answer. Generally speaking, you can use <strong>angr</strong> whenever you’re faced with a question like: “What input would produce this specific output?” While this isn’t a complete guideline, I’ve found that this question often arises when I encounter problems well-suited for an <strong>angr-like</strong> solution. That said, you also need to carefully consider the function or binary you plan to analyze. Since emulation is inherently slow, working with <strong>angr</strong> can lead to exponentially increasing complexity and execution time, depending on the task.</em></p>
+<p><em>My recommendation is to use <strong>angr</strong> for well-defined, specific tasks that align with the question above, rather than attempting to run it against the entire binary.</em></p>
+</blockquote>
+<h3 id="c4tbert--vs-angr">C4tbert  Vs. Angr</h3>
+<p>C4tbert is one of the most enjoyable challenges I’ve had the chance to tackle recently. It covers a variety of fascinating topics, including UEFI, cryptography, and virtual machines. In short, the goal is to find the correct passwords that will eventually decrypt files containing parts of the flag.</p>
+<p><img src="/img/symbolic_exe/decrypt_file.png" alt="Figure 1: Catbert Ransomware - attempt to decrypt file with random password"></p>
+<p>Figure 1: Catbert Ransomware - attempt to decrypt file with random password</p>
+<p>Does this sound familiar? It aligns perfectly with the question we discussed earlier: <em>“What input would produce this output?”</em> To answer this question using <strong>angr</strong>, we first need to explore the code, develop a high-level understanding of the input and output parameters, and define all the necessary requirements.</p>
+<p>Let’s start reversing a bit the interesting part of the binary avoiding to look closer on the challenge itself, but let’s try to focus on angr requirements.</p>
+<p><img src="/img/symbolic_exe/code_overview.png" alt="Figure 2: Decryption overview for angr requitements "></p>
+<p>Figure 2: Decryption overview for angr requitements</p>
+<blockquote>
+<p>💡 <em>To make it easier to follow, I have renamed most of the code. So it will be also possible to use line number as a reference.</em></p>
+</blockquote>
+<p>Looking at <strong>Figure 2</strong>, we can see that at <strong>line 170</strong>, the <strong>password</strong> is checked to ensure it is <strong>16 characters long</strong>. Before this, a <strong>bytecode</strong> is retrieved from a file (<strong>line 163</strong>) and later manipulated slightly (<strong>lines 180–194</strong>) by substituting some of its characters with values derived from our input key. Finally, the bytecode is passed to a <strong>virtual_machine_interpreter</strong> for processing. Based on these observations, we can start taking notes of the requirements we’ve uncovered so far and translate them into practical actions we need to perform with <strong>angr</strong>:</p>
+<ul>
+<li><strong>Bytecode</strong>: We need to allocate memory to hold the bytecode, which can be easily retrieved from the <code>.c4tb</code> file.</li>
+<li><strong>Password</strong>: This is the answer to our problem. We need to find a 16-character input that can successfully decrypt the file.</li>
+</ul>
+<p>Additionally, we must keep in mind that the <strong>password is mixed into the bytecode</strong> during its processing by the <strong>bytecode interpreter</strong> function. With a more clear understanding of those points, we can now move on to exploring the virtual machine code, which represents the part of the program we will execute</p>
+<p><img src="/img/symbolic_exe/vm_code.png" alt="Figure 3: Requirements for virtual_machine_interpreter function."></p>
+<p>Figure 3: Requirements for virtual_machine_interpreter function.</p>
+<p>To determine the function&rsquo;s requirements, we need to start our exploration from the very beginning. As we can see, the function involves a <strong>bytecode</strong> (which we’ve already noted), a <strong>status</strong> (representing the exit condition, as referenced in Figure X), and a <strong>stack</strong>.</p>
+<blockquote>
+<p>💡 <em>To keep things simple, I’ve referred to the additional memory needed in the function as a <strong>stack</strong>. You might ask, “How am I supposed to know that a stack is needed without analyzing the function?” Well, a stack is essentially just a block of memory. It’s called a <strong>stack</strong> because it’s typically accessed via a register pointing to it, but in general, we could call it anything we like. It’s important to note that I made this simplification to make the overall structure easier to understand. If you’re interested in reversing the code in detail, you’ll eventually discover that the virtual machine interpreter performs various operations on the stack, such as <strong>push</strong>, <strong>pop</strong>, <strong>rotate</strong>, and more.</em></p>
+</blockquote>
+<p>To effectively use <strong>angr</strong>, especially in our case, it’s crucial to identify the correct address to begin execution. Fortunately, this is straightforward in this scenario, as it corresponds to the very first instruction of the <strong>virtual_machine_interpreter</strong> (<strong>line 16</strong>).</p>
+<p>Another important aspect to consider when running an <strong>angr</strong> script are the <strong>find</strong> and <strong>avoid</strong> addresses. These special addresses represent success and failure conditions, respectively. However, instead of just specifying a simple address, you can also define a function to check the <strong>status</strong> variable in order to determine its value and any potential success condition. Looking at the code, we can easily see that if <strong>status</strong> equals 0, the program will follow the invalid key branch.</p>
+<p>Now that we have a general understanding of the code, we can begin writing our <strong>angr</strong> script.</p>
+<h3 id="writing-angr-script">Writing angr script</h3>
+<p>Let’s start writing down the requirements that we have discovered.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#bytecode</span>
+</span></span><span style="display:flex;"><span>data <span style="color:#f92672">=</span> list<span style="color:#f92672">(</span>f.read<span style="color:#f92672">(</span>size<span style="color:#f92672">))</span> 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#key</span>
+</span></span><span style="display:flex;"><span>key <span style="color:#f92672">=</span> <span style="color:#f92672">[</span>claripy.BVS<span style="color:#f92672">(</span>f<span style="color:#e6db74">&#39;k{i}&#39;</span>, 8<span style="color:#f92672">)</span> <span style="color:#66d9ef">for</span> i in range<span style="color:#f92672">(</span>16<span style="color:#f92672">)]</span> 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># mixing input key bytes within the bytecode</span>
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">[</span>5<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> key<span style="color:#f92672">[</span>0<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">[</span>4<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> key<span style="color:#f92672">[</span>1<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">[</span>12<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> key<span style="color:#f92672">[</span>2<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">[</span>11<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> key<span style="color:#f92672">[</span>3<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">[</span>19<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> key<span style="color:#f92672">[</span>4<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">[</span>18<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> key<span style="color:#f92672">[</span>5<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">[</span>26<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> key<span style="color:#f92672">[</span>6<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">[</span>25<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> key<span style="color:#f92672">[</span>7<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">[</span>33<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> key<span style="color:#f92672">[</span>8<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">[</span>32<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> key<span style="color:#f92672">[</span>9<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">[</span>40<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> key<span style="color:#f92672">[</span>10<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">[</span>39<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> key<span style="color:#f92672">[</span>11<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">[</span>47<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> key<span style="color:#f92672">[</span>12<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">[</span>46<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> key<span style="color:#f92672">[</span>13<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">[</span>54<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> key<span style="color:#f92672">[</span>14<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">[</span>53<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> key<span style="color:#f92672">[</span>15<span style="color:#f92672">]</span>
+</span></span></code></pre></div><p>The code above is fairly easy to understand. The <strong>data</strong> variable represents the bytes read from the <code>.c4tb</code> file, and the <strong>key</strong> is a <strong>bitvector</strong> that will hold our input.</p>
+<blockquote>
+<p>💡 <em>Angr’s solver engine, called Claripy, uses the syntax above to create a 16-byte array (or an array named ‘key’ with each cell being 8 bits). This assignment tells angr that the key array is our symbolic variable, which needs to be &ldquo;concretized&rdquo; to guess the correct decryption key. The subsequent mixing step simply assigns our key to the bytecode, which will then be interpreted.</em></p>
+</blockquote>
+<p>Next, we need to define the parameters necessary for properly handling the operations related to the bytecode, the <strong>status</strong> variable, and the entry and return addresses of the function we intend to execute. With this information, we’ll be ready to create the <strong>project</strong> and <strong>state</strong> variables for the calling function.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>RET_ADDR <span style="color:#f92672">=</span> <span style="color:#75715e"># Return address of virtual_machine_interpreter function.</span>
+</span></span><span style="display:flex;"><span>STATUS_ADDR <span style="color:#f92672">=</span> <span style="color:#75715e"># Address of status variable</span>
+</span></span><span style="display:flex;"><span>FUN_ENTRY_ADDR <span style="color:#f92672">=</span> <span style="color:#75715e"># Address of the first instruction of virtual_machine_interpreter</span>
+</span></span><span style="display:flex;"><span>DATA_PTR_ADDR <span style="color:#f92672">=</span> <span style="color:#75715e"># Address that is storing the bytecode</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>proj <span style="color:#f92672">=</span> angr.Project<span style="color:#f92672">(</span><span style="color:#e6db74">&#39;0.efi&#39;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>state <span style="color:#f92672">=</span> proj.factory.call_state<span style="color:#f92672">(</span>FUN_ENTRY_ADDR<span style="color:#f92672">)</span>
+</span></span></code></pre></div><blockquote>
+<p>💡 <em>As you can see, I’ve omitted the exact values for the addresses. This is because they depend on angr and where it loads the binary. Using specific addresses would be pointless for this tutorial, but for now, you can assume them to be correct. I’ll explain how to properly set them at the end of this section.</em></p>
+</blockquote>
+<p>Now that everything should be clear so far, it’s time to tighten your seatbelt because we’re about to dive a bit deeper.</p>
+<p>Up to this point, most of the requirements have been correctly defined. However, before moving forward, we need to allocate memory for our <strong>data</strong>. Keep in mind that the <strong>data</strong> variable <strong>contains the data extracted from the <code>.c4tb</code> file</strong>, but we haven’t assigned it to <strong>angr’s</strong> memory yet. Additionally, this assignment must be done correctly, matching the appropriate variable type.</p>
+<p>Looking more closely at the bytecode and <strong>key</strong> assignment, we can see that we’re using the lower byte of the <strong>RAX</strong> register (specifically <strong>AL</strong>) each time. This means we need exactly <strong>8 bits</strong> for each key value.</p>
+<p><img src="/img/symbolic_exe/bytecode.png" alt="Figure 4: Shuffle bytecode and key chars"></p>
+<p>Figure 4: Shuffle bytecode and key chars</p>
+<p>Armed with this knowledge, it is possible to allocate and assign angr memory accordingly.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>data_sec <span style="color:#f92672">=</span> state.heap.allocate<span style="color:#f92672">(</span>size<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> i in range<span style="color:#f92672">(</span>size<span style="color:#f92672">)</span>:
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e"># Each data of the bytecode is 1 byte long. </span>
+</span></span><span style="display:flex;"><span>  state.mem<span style="color:#f92672">[</span>data_sec + i<span style="color:#f92672">]</span>.uint8_t <span style="color:#f92672">=</span> data<span style="color:#f92672">[</span>i<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># For memory on 64bit architecture we need to use the right address size.</span>
+</span></span><span style="display:flex;"><span>state.mem<span style="color:#f92672">[</span>DATA_PTR_ADDR<span style="color:#f92672">]</span>.uint64_t <span style="color:#f92672">=</span> data_sec
+</span></span></code></pre></div><p>At this point, there isn’t much left to do. We can now initialize the simulation manager and define our <strong>find</strong> and <strong>avoid</strong> parameters.</p>
+<p>As mentioned earlier, we can use a function for our <strong>find</strong> parameter. In this case, this function will allow us to explore the value of the <strong>status</strong> variable, which will act as a switch to indicate whether we&rsquo;ve provided the correct password.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>simgr <span style="color:#f92672">=</span> proj<span style="color:#f92672">.</span>factory<span style="color:#f92672">.</span>simulation_manager(state)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#if I&#39;m reaching the end of the function I need to check the status variable.</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">found</span>(state):
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> state<span style="color:#f92672">.</span>addr <span style="color:#f92672">==</span> RET_ADDR:
+</span></span><span style="display:flex;"><span>    status <span style="color:#f92672">=</span> state<span style="color:#f92672">.</span>memory<span style="color:#f92672">.</span>load(STATUS_ADDR, <span style="color:#ae81ff">8</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># add a constraints to force status to be != from 0</span>
+</span></span><span style="display:flex;"><span>    state<span style="color:#f92672">.</span>add_constraints(status <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># return a simple true or false, depending on status.</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> state<span style="color:#f92672">.</span>solver<span style="color:#f92672">.</span>satisfiable()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># define a found function that is going to check the status variable</span>
+</span></span><span style="display:flex;"><span>simgr<span style="color:#f92672">.</span>explore(find<span style="color:#f92672">=</span>found)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># There is only a single solution.</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">assert</span> len(simgr<span style="color:#f92672">.</span>found) <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>state <span style="color:#f92672">=</span> simgr<span style="color:#f92672">.</span>found[<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>print(bytes((state<span style="color:#f92672">.</span>solver<span style="color:#f92672">.</span>eval(k) <span style="color:#66d9ef">for</span> k <span style="color:#f92672">in</span> key)))
+</span></span></code></pre></div><h3 id="setting-up-the-reference-addresses-properly">Setting up the reference addresses properly</h3>
+<p>How do we set <strong>RET_ADDR</strong>, <strong>STATUS_ADDR</strong>, <strong>FUN_ENTRY_ADDR</strong>, and <strong>DATA_PTR_ADDR</strong>? When executing code, it&rsquo;s crucial to align the addresses from the program with those in your disassembler or debugger if you want to track the program&rsquo;s flow accurately. In this case, <strong>angr</strong> loads the program into specific memory addresses. To set these variables correctly, you can retrieve the addresses used by <strong>angr</strong> and rebase the binary in <strong>IDA</strong> accordingly. After initializing the project, you can print the base address used by <strong>angr</strong> to get this information.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>base_addr <span style="color:#f92672">=</span> proj<span style="color:#f92672">.</span>loader<span style="color:#f92672">.</span>min_addr 
+</span></span><span style="display:flex;"><span>print(hex(base_addr))
+</span></span></code></pre></div><p>This is instruction actually prints the base address used by angr to load the binary. Matching this address in IDA will make all operation about addresses way more easier.</p>
+<p><img src="/img/symbolic_exe/rebase_program.png" alt="Figure 5: Rebase program with IDA"></p>
+<p>Figure 5: Rebase program with IDA</p>
+<h3 id="conclusion">Conclusion</h3>
+<p>Through this post, I’ve “closed the circle” (or at least tried) on emulation and symbolic execution, demonstrating how these techniques can be used to analyze real-world malware. While there are still unexplored topic (e.g., Qiling), I haven’t delved into it deeply. Despite being a potentially powerful tool, Qiling’s documentation isn’t well-maintained, and utilizing it might require significant effort. Nevertheless, I hope you’ve enjoyed reading all the posts and had as much fun exploring them as I did while explaining and experimenting with these topics.</p>
+<p>Recently, I’ve received a few messages asking why I stopped publishing on the blog. The truth is, most of my recent research has focused on very specific topics that might not appeal to a broad audience. Writing blog posts for such a niche can sometimes feel less beneficial for a general readership. So, what does the future hold?</p>
+<p>I don’t want to stop publishing entirely, even though I’ve been a bit inconsistent lately. However, I’m still figuring out which topics could be interesting to explore in the coming months. I enjoy exploring new ideas and conducting independent research on malware analysis and classification. I usually try to align this blog with my research, both to clarify my own thoughts and to provide useful content for a wider audience.</p>
+<p>At the moment, I have a few large projects under development that are keeping me quite busy. Still, I’m considering posting research-oriented content related to malware classification, possibly adopting a more formal, paper-oriented format (which I’d include in the whitepapers section). As for the future, it remains uncertain. As the saying goes, <em>“The best way to predict the future is to create it.”</em> I’ll continue exploring, experimenting, and sharing whenever inspiration strikes or a project feels worth sharing.</p>
+<p>Thank you for reading, and as always, keep reversing and have fun!</p>
+<h3 id="references">References</h3>
+<ul>
+<li><a href="https://www.notion.so/Angr-for-fun-and-Flare-on-15650d93e71b80429dd5de6f1c2c822f?pvs=21">Flare-on Challenge</a></li>
+<li><a href="https://p.ost2.fyi/courses/course-v1:OpenSecurityTraining2&#43;RE3201_symexec&#43;2021_V1/about">SymbolicExecution training</a></li>
+<li><a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/SymbolicExecution/catbert_ransomware.py">Catbert Ransomware solver</a></li>
+</ul>
+
+      </div>
+    </article>
+
+    <hr />
+
+    <div class="post-info">
+      
+      
+
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        2573 Words
+      </p>
+
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        
+          2024-12-27 01:00
+        
+
+         
+          
+        
+      </p>
+    </div>
+
+    
+
+
+    
+
+  </main>
+
+            </div>
+
+            
+                <footer class="footer">
+    
+    <div class="footer__inner">
+        <div class="footer__content">
+            <span>&copy; 2024</span>
+            
+            <span><a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></span>
+            
+            
+        </div>
+    </div>
+    
+    
+</footer>
+
+            
+        </div>
+
+        
+
+
+
+<script type="text/javascript" src="/bundle.min.e89fda0f29b95d33f6f4224dd9e5cf69d84aff3818be2b0d73e731689cc374261b016d17d46f8381962fb4a1577ba3017b1f23509d894f6e66431f988c00889e.js" integrity="sha512-6J/aDym5XTP29CJN2eXPadhK/zgYvisNc&#43;cxaJzDdCYbAW0X1G&#43;DgZYvtKFXe6MBex8jUJ2JT25mQx&#43;YjACIng=="></script>
+
+
+
+    </body>
+</html>

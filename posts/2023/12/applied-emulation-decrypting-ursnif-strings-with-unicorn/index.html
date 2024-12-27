@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=56729&amp;path=livereload" data-no-instant defer></script>
         <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="author" content="map[name:Alessandro Strino]">
-<meta name="description" content="Introduction Here we go with another chapter of the Applied Emulation series. In the previous blogpost we have talked about emulation and more specifically, the usage of Dumpulator to perform a quick triage. However, in this blogpost we are going to use a completely different approach, taking advantage of static analysis to understand and emulate a string decryption algorithm through Unicorn. As always, I would like to give a practical example on a real case scenario." />
+<meta name="description" content="Introduction Here we go with another chapter of the Applied Emulation series. In the previous blogpost we have talked about emulation and more specifically, the usage of Dumpulator to perform a quick triage. However, in this blogpost we are going to use a completely different approach, taking advantage of static analysis to understand and emulate a string decryption algorithm through Unicorn. As always, I would like to give a practical example on a real case scenario. Because of that, I have chosen to analyze an Ursnif sample.
+" />
 <meta name="keywords" content="malware, binary, digital forensics, exploit development, reverse engineering" />
 <meta name="robots" content="noodp" />
 <meta name="theme-color" content="" />
-<link rel="canonical" href="https://Viuleeenz.github.io/posts/2023/12/applied-emulation-decrypting-ursnif-strings-with-unicorn/" />
+<link rel="canonical" href="http://localhost:56729/posts/2023/12/applied-emulation-decrypting-ursnif-strings-with-unicorn/" />
 
 
     <title>
@@ -22,43 +23,52 @@
 
 
 
-<link rel="stylesheet" href="https://Viuleeenz.github.io/main.b78c3be9451dc4ca61ca377f3dc2cf2e6345a44c2bae46216a322ef366daa399.css" integrity="sha256-t4w76UUdxMphyjd/PcLPLmNFpEwrrkYhajIu82bao5k=">
+    
+        
+        
+        <link rel="stylesheet" href="/scss/main.4c717a3dff5ec47ecfa7229b960ed715a5ad930b4079fbd0ed59f277863cf26c.css" integrity="sha256-THF6Pf9exH7PpyKblg7XFaWtkwtAefvQ7Vnyd4Y88mw=">
+    
+
 
 
     
-        <link rel="stylesheet" type="text/css" href="https://Viuleeenz.github.io/style.css">
+        <link rel="stylesheet" type="text/css" href="/style.css">
     
 
 
-    <link rel="apple-touch-icon" sizes="180x180" href="https://Viuleeenz.github.io/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="https://Viuleeenz.github.io/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="https://Viuleeenz.github.io/favicon-16x16.png">
-    <link rel="manifest" href="https://Viuleeenz.github.io/site.webmanifest">
-    <link rel="mask-icon" href="https://Viuleeenz.github.io/safari-pinned-tab.svg" color="">
-    <link rel="shortcut icon" href="https://Viuleeenz.github.io/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+    <link rel="shortcut icon" href="/favicon.ico">
     <meta name="msapplication-TileColor" content="">
 
 
-<meta itemprop="name" content="Applied Emulation - Decrypting Ursnif strings with Unicorn">
-<meta itemprop="description" content="Introduction Here we go with another chapter of the Applied Emulation series. In the previous blogpost we have talked about emulation and more specifically, the usage of Dumpulator to perform a quick triage. However, in this blogpost we are going to use a completely different approach, taking advantage of static analysis to understand and emulate a string decryption algorithm through Unicorn. As always, I would like to give a practical example on a real case scenario."><meta itemprop="datePublished" content="2023-12-20T00:00:00+00:00" />
-<meta itemprop="dateModified" content="2023-12-20T00:00:00+00:00" />
-<meta itemprop="wordCount" content="1673"><meta itemprop="image" content="https://Viuleeenz.github.io/"/>
-<meta itemprop="keywords" content="" />
-<meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:image" content="https://Viuleeenz.github.io/"/>
 
-<meta name="twitter:title" content="Applied Emulation - Decrypting Ursnif strings with Unicorn"/>
-<meta name="twitter:description" content="Introduction Here we go with another chapter of the Applied Emulation series. In the previous blogpost we have talked about emulation and more specifically, the usage of Dumpulator to perform a quick triage. However, in this blogpost we are going to use a completely different approach, taking advantage of static analysis to understand and emulate a string decryption algorithm through Unicorn. As always, I would like to give a practical example on a real case scenario."/>
+  <meta itemprop="name" content="Applied Emulation - Decrypting Ursnif strings with Unicorn">
+  <meta itemprop="description" content="Introduction Here we go with another chapter of the Applied Emulation series. In the previous blogpost we have talked about emulation and more specifically, the usage of Dumpulator to perform a quick triage. However, in this blogpost we are going to use a completely different approach, taking advantage of static analysis to understand and emulate a string decryption algorithm through Unicorn. As always, I would like to give a practical example on a real case scenario. Because of that, I have chosen to analyze an Ursnif sample.">
+  <meta itemprop="datePublished" content="2023-12-20T00:00:00+00:00">
+  <meta itemprop="dateModified" content="2023-12-20T00:00:00+00:00">
+  <meta itemprop="wordCount" content="1673">
+  <meta itemprop="image" content="http://localhost:56729/">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="http://localhost:56729/">
+  <meta name="twitter:title" content="Applied Emulation - Decrypting Ursnif strings with Unicorn">
+  <meta name="twitter:description" content="Introduction Here we go with another chapter of the Applied Emulation series. In the previous blogpost we have talked about emulation and more specifically, the usage of Dumpulator to perform a quick triage. However, in this blogpost we are going to use a completely different approach, taking advantage of static analysis to understand and emulate a string decryption algorithm through Unicorn. As always, I would like to give a practical example on a real case scenario. Because of that, I have chosen to analyze an Ursnif sample.">
 
 
-
-    <meta property="og:title" content="Applied Emulation - Decrypting Ursnif strings with Unicorn" />
-<meta property="og:description" content="Introduction Here we go with another chapter of the Applied Emulation series. In the previous blogpost we have talked about emulation and more specifically, the usage of Dumpulator to perform a quick triage. However, in this blogpost we are going to use a completely different approach, taking advantage of static analysis to understand and emulate a string decryption algorithm through Unicorn. As always, I would like to give a practical example on a real case scenario." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://Viuleeenz.github.io/posts/2023/12/applied-emulation-decrypting-ursnif-strings-with-unicorn/" /><meta property="og:image" content="https://Viuleeenz.github.io/"/><meta property="article:section" content="posts" />
-<meta property="article:published_time" content="2023-12-20T00:00:00+00:00" />
-<meta property="article:modified_time" content="2023-12-20T00:00:00+00:00" />
-
+    <meta property="og:url" content="http://localhost:56729/posts/2023/12/applied-emulation-decrypting-ursnif-strings-with-unicorn/">
+  <meta property="og:site_name" content="Security Undisguised">
+  <meta property="og:title" content="Applied Emulation - Decrypting Ursnif strings with Unicorn">
+  <meta property="og:description" content="Introduction Here we go with another chapter of the Applied Emulation series. In the previous blogpost we have talked about emulation and more specifically, the usage of Dumpulator to perform a quick triage. However, in this blogpost we are going to use a completely different approach, taking advantage of static analysis to understand and emulate a string decryption algorithm through Unicorn. As always, I would like to give a practical example on a real case scenario. Because of that, I have chosen to analyze an Ursnif sample.">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2023-12-20T00:00:00+00:00">
+    <meta property="article:modified_time" content="2023-12-20T00:00:00+00:00">
+    <meta property="og:image" content="http://localhost:56729/">
 
 
 
@@ -75,20 +85,6 @@
 
 
 
-    
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-XNKLBC4D9D"></script>
-<script>
-var doNotTrack = false;
-if (!doNotTrack) {
-	window.dataLayer = window.dataLayer || [];
-	function gtag(){dataLayer.push(arguments);}
-	gtag('js', new Date());
-	gtag('config', 'G-XNKLBC4D9D', { 'anonymize_ip': false });
-}
-</script>
-
-
-
     </head>
 
     
@@ -98,7 +94,7 @@ if (!doNotTrack) {
         <div class="container">
             <header class="header">
     <span class="header__inner">
-        <a href="https://Viuleeenz.github.io/" style="text-decoration: none;">
+        <a href="/" style="text-decoration: none;">
     <div class="logo">
         
             <span class="logo__mark">&gt;</span>
@@ -116,7 +112,7 @@ if (!doNotTrack) {
         <span class="header__right">
             
                 <nav class="menu">
-    <ul class="menu__inner"><li><a href="https://Viuleeenz.github.io/about/">About</a></li><li><a href="https://Viuleeenz.github.io/posts/">Posts</a></li><li><a href="https://Viuleeenz.github.io/whitepapers/">Whitepapers</a></li>
+    <ul class="menu__inner"><li><a href="/about/">About</a></li><li><a href="/posts/">Posts</a></li><li><a href="/whitepapers/">Whitepapers</a></li>
     </ul>
 </nav>
 
@@ -135,17 +131,20 @@ if (!doNotTrack) {
         </span>
     </span>
     
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-XNKLBC4D9D"></script>
-<script>
-var doNotTrack = false;
-if (!doNotTrack) {
-	window.dataLayer = window.dataLayer || [];
-	function gtag(){dataLayer.push(arguments);}
-	gtag('js', new Date());
-	gtag('config', 'G-XNKLBC4D9D', { 'anonymize_ip': false });
-}
-</script>
-
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-XNKLBC4D9D"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-XNKLBC4D9D');
+        }
+      </script>
 </header>
 
 
@@ -167,7 +166,7 @@ if (!doNotTrack) {
 
     <article>
       <h1 class="post-title">
-        <a href="https://Viuleeenz.github.io/posts/2023/12/applied-emulation-decrypting-ursnif-strings-with-unicorn/">Applied Emulation - Decrypting Ursnif strings with Unicorn</a>
+        <a href="http://localhost:56729/posts/2023/12/applied-emulation-decrypting-ursnif-strings-with-unicorn/">Applied Emulation - Decrypting Ursnif strings with Unicorn</a>
       </h1>
 
       
@@ -194,7 +193,7 @@ if (!doNotTrack) {
 <p><strong>Dumpulator may not be usable if we are unable to run the code</strong> and set up the user mode space. Nevertheless, I strongly believe that it is more <strong>important to understand where and when a technique should be applied</strong>, even if it adds a few layers of complexity, rather than rushing for the easiest or the first solution that comes to our mind.</p>
 <h3 id="ursnif-decryption-routine">Ursnif decryption routine</h3>
 <p>Decryption routine is pretty straightforward to locate, it just follows the campaignDate variable that is going to be used as a decryption key for the .bss segment. Key generation algorithm has been already described <a href="https://www.0ffset.net/reverse-engineering/challenge-1-gozi-string-crypto/">here</a>, however, I would like to focus on the decryption routine itself, in order to understand all requirements to emulate this code.</p>
-<p><img src="https://Viuleeenz.github.io/img/emulation_ursnif/decryption_routine_explained.png" alt="Figure 1: Decryption routine explained">
+<p><img src="/img/emulation_ursnif/decryption_routine_explained.png" alt="Figure 1: Decryption routine explained">
 Figure 1: Decryption routine explained</p>
 <p>At the first glance we could see that the function is self-contained and most of the operations are simple math (sub, add) that involves the key and the encrypted data. However, before proceeding it&rsquo;s important to have a look at the following instruction:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nasm" data-lang="nasm"><span style="display:flex;"><span><span style="color:#a6e22e">mov</span> [ecx], eax
@@ -223,7 +222,7 @@ Figure 1: Decryption routine explained</p>
 </span></span></code></pre></div><p>First of all we need to import the Unicorn module and also unicorn constants that we are going to use to interact with registers. Then we could use the pefile module to load our bin file and take notes of <strong>.bss segment data.</strong>.</p>
 <p>Then, we need to take the whole code that needs to be emulated. Before proceeding, it&rsquo;s important to keep in mind that emulation is quite slow and we need to use only the code needed for our purpose. For instance, prolog and epilogue instructions are not very useful for us, since we are emulating a single function without knowing any information about previous ESP and EBP values. Because of that we could skip them.</p>
 <p>To get the proper bytes, with IDA, we could highlight the code that is going to be emulated and, using <strong>shift+e</strong>, spawn a popup with all selected bytes, ready to be pasted in our code.</p>
-<p><img src="https://Viuleeenz.github.io/img/emulation_ursnif/select_code_to_emulate.png" alt="Figure 2: Select code to emulate">
+<p><img src="/img/emulation_ursnif/select_code_to_emulate.png" alt="Figure 2: Select code to emulate">
 Figure 2: Select code to emulate</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>code <span style="color:#f92672">=</span> bytes<span style="color:#f92672">.</span>fromhex(<span style="color:#e6db74">&#39;8B040A8BF885C0750AC744241001000000EB0D2B74240C03C689018BF783C104FF4C241075DA&#39;</span>)
@@ -307,7 +306,7 @@ Figure 2: Select code to emulate</p>
 </span></span></code></pre></div><p>Now we have satisfied all setting requirements for our emulation and its time to test it out.</p>
 <h3 id="testing">Testing</h3>
 <p>Running our emulator against few Ursnif samples reveal that we have correctly settled all the environment variables. As you can see from the image below, it has been possible to retrieve all encrypted strings. Some of them could be very useful in order to do a step further in our analysis, since that we have references to infrastructure, powershell script as well as network requests template.</p>
-<p><img src="https://Viuleeenz.github.io/img/emulation_ursnif/decrypted_strings.png" alt="Figure 3: Decrypted strings">
+<p><img src="/img/emulation_ursnif/decrypted_strings.png" alt="Figure 3: Decrypted strings">
 Figure 3: Decrypted strings</p>
 <h3 id="conclusion--further-development">Conclusion &amp; Further Development</h3>
 <p>Emulation is a powerful tool, like a swiss knife, and it needs to be considered anytime we are dealing with malware automation. I hope that some of you had fun reading this post and learnt something new, to the point that you can&rsquo;t wait to apply this technique to your own sample.</p>
@@ -366,7 +365,6 @@ Figure 3: Decrypted strings</p>
 
     
 
-    
 
     
 
@@ -397,7 +395,7 @@ Figure 3: Decrypted strings</p>
 
 
 
-<script type="text/javascript" src="https://Viuleeenz.github.io/bundle.min.205d491810c28f95aa953fae884e1c27abe13fdf93ec63b882d0036b248d4a6282eb2d134e4e7225c6ad6e86db87b08488a361ca4a7383d01fcff43f3d57b9c3.js" integrity="sha512-IF1JGBDCj5WqlT&#43;uiE4cJ6vhP9&#43;T7GO4gtADaySNSmKC6y0TTk5yJcatbobbh7CEiKNhykpzg9Afz/Q/PVe5ww=="></script>
+<script type="text/javascript" src="/bundle.min.e89fda0f29b95d33f6f4224dd9e5cf69d84aff3818be2b0d73e731689cc374261b016d17d46f8381962fb4a1577ba3017b1f23509d894f6e66431f988c00889e.js" integrity="sha512-6J/aDym5XTP29CJN2eXPadhK/zgYvisNc&#43;cxaJzDdCYbAW0X1G&#43;DgZYvtKFXe6MBex8jUJ2JT25mQx&#43;YjACIng=="></script>
 
 
 

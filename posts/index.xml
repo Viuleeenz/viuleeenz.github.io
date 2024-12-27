@@ -1,22 +1,175 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
         <title>Posts on Security Undisguised</title>
-        <link>https://Viuleeenz.github.io/posts/</link>
+        <link>http://localhost:1313/posts/</link>
         <description>Recent content in Posts on Security Undisguised</description>
         <generator>Hugo -- gohugo.io</generator>
-        <language>en-us</language>
+        <language>en</language>
         <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
-        <lastBuildDate>Thu, 16 May 2024 00:00:00 +0000</lastBuildDate>
-        <atom:link href="https://Viuleeenz.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+        <lastBuildDate>Fri, 27 Dec 2024 00:00:00 +0000</lastBuildDate>
+        <atom:link href="http://localhost:1313/posts/index.xml" rel="self" type="application/rss+xml" />
+        
+        <item>
+            <title>Symbolic Execution for fun and Flare-on</title>
+            <link>http://localhost:1313/posts/2024/12/symbolic-execution-for-fun-and-flare-on/</link>
+            <pubDate>Fri, 27 Dec 2024 00:00:00 +0000</pubDate>
+            
+            <guid>http://localhost:1313/posts/2024/12/symbolic-execution-for-fun-and-flare-on/</guid>
+            <description>&lt;p&gt;Emulation is my passion. I apply it as much as I can in countless scenarios—sometimes for practical purposes, and sometimes just for fun. Recently, I’ve been diving into &lt;strong&gt;angr&lt;/strong&gt;, and after weeks of banging my head against it, a few questions crossed my mind:&lt;/p&gt;
+&lt;p&gt;Has anyone ever tried using angr for something meaningful, only to end up frustrated because nothing seemed to work? Or followed an angr tutorial based on CTF code, thinking, &lt;em&gt;“Wow, this looks easy—I’ve got this!”&lt;/em&gt;—only to realize you’re in way over your head?&lt;/p&gt;</description>
+            <content type="html"><![CDATA[<p>Emulation is my passion. I apply it as much as I can in countless scenarios—sometimes for practical purposes, and sometimes just for fun. Recently, I’ve been diving into <strong>angr</strong>, and after weeks of banging my head against it, a few questions crossed my mind:</p>
+<p>Has anyone ever tried using angr for something meaningful, only to end up frustrated because nothing seemed to work? Or followed an angr tutorial based on CTF code, thinking, <em>“Wow, this looks easy—I’ve got this!”</em>—only to realize you’re in way over your head?</p>
+<p>Well, that’s exactly where I found myself. 😑</p>
+<p>Nevertheless, I found quite interesting tutorial about symbolic execution and I really recommend the course on <a href="https://p.ost2.fyi/courses/course-v1:OpenSecurityTraining2&#43;RE3201_symexec&#43;2021_V1/about">OpenSecurityTraining2</a>. It’s a generic course but it also gives some really good basic of angr usage. Unfortunately, what is really missing on the web (or at least I didn’t find it) is something that goes over the basic.</p>
+<p>Unfortunately, most of the tutorial covers the following scenario: “<em>Take a binary, run it from the beginning, set few values for addresses to reach and avoid, get the result”.</em> Through this post I would like to go a little bit further from the basic and setup angr properly in order to handle a function within the binary, setting the requirements and evaluate the actual result. In my opinion this simulates a more real case scenario where you don’t really need or can’t execute the whole binary from scratch. For this post I am going to use the <strong>challenge #10</strong> of <strong>Flare-on 2024.</strong> However, instead of starting the challenge from scratch, it would be more beneficial for this tutorial to focus directly to the angr-related concepts and general requirements needed for it.</p>
+<blockquote>
+<p>💡 <em>I’d like to point out that I always strive to create content with immediate, real-world applicability. While this post might initially seem CTF-oriented, it’s not—the challenge I’m discussing is particularly interesting because it closely resembles a “ransomware-like” binary. It involves file decryption and even a virtual machine interpreter, making it highly relevant beyond CTFs. Given the binary&rsquo;s complexity, it’s an excellent candidate for a test case. It’s also easy to obtain and far safer to experiment with than actual ransomware—perfect if you’d like to try it yourself.</em></p>
+</blockquote>
+<p><em><strong>Note</strong></em>: If you feel uncomfortable with this topic, please refer to the OpenSecurityTraining2 mentioned course.</p>
+<h3 id="delights-and-pains-of-using-angr">Delights and Pains of using Angr.</h3>
+<p>Angr is an entirely different beast compared to the emulators I’ve covered on this blog. To be honest, <strong>angr</strong> is more like a full-featured framework for analyzing binaries through symbolic execution. The <a href="https://docs.angr.io/en/latest/">angr documentation</a> is well-structured and covers a wide range of topics in detail. However, fully grasping the documentation is no small feat—it’s far from easy.</p>
+<p>I’ve spoken with several people who stay away from using <strong>angr</strong> because of its steep learning curve, and I have to agree—it can be challenging to get started.</p>
+<p>To use <strong>angr</strong> effectively, there are a few key concepts you absolutely need to understand. These requirements are not so different from the prerequisites discussed earlier on this blog for working with emulators. However, with <strong>angr</strong>, you also need to thoroughly understand <strong>what symbolic execution is and how it works.</strong></p>
+<p>The most critical step, though, is setting up <strong>angr</strong> correctly—especially when you need to focus on a specific piece of code rather than running the entire binary from the beginning.</p>
+<p>Having an idea of angr components and capabilities we could simplify its usage in two main cases:</p>
+<ol>
+<li>You need to symbolically execute the <strong>binary from scratch</strong> in order to understand <em><strong>which input could lead to a specific output</strong></em>. (Basic usage)</li>
+<li>You need to symbolically execute a <strong>function within the binary</strong> in order to understand the result of this function, <strong>setting up all the requirements</strong> (parameters) <strong>that are going to be used during the execution</strong>.</li>
+</ol>
+<p>When you run a binary with <strong>angr</strong>, you’ll rely on these components to find a “solution” that meets your specific needs. This solution could take many forms—it might be identifying a bug in a program to report an error, or it could be something entirely different, such as uncovering a passphrase or a product key</p>
+<blockquote>
+<p>💡 <em>Before diving into our example, you might wonder: “How can I determine if this function, or my goal, is a good fit for angr?” This is a great question, but unfortunately, it doesn’t have a straightforward answer. Generally speaking, you can use <strong>angr</strong> whenever you’re faced with a question like: “What input would produce this specific output?” While this isn’t a complete guideline, I’ve found that this question often arises when I encounter problems well-suited for an <strong>angr-like</strong> solution. That said, you also need to carefully consider the function or binary you plan to analyze. Since emulation is inherently slow, working with <strong>angr</strong> can lead to exponentially increasing complexity and execution time, depending on the task.</em></p>
+<p><em>My recommendation is to use <strong>angr</strong> for well-defined, specific tasks that align with the question above, rather than attempting to run it against the entire binary.</em></p>
+</blockquote>
+<h3 id="c4tbert--vs-angr">C4tbert  Vs. Angr</h3>
+<p>C4tbert is one of the most enjoyable challenges I’ve had the chance to tackle recently. It covers a variety of fascinating topics, including UEFI, cryptography, and virtual machines. In short, the goal is to find the correct passwords that will eventually decrypt files containing parts of the flag.</p>
+<p><img src="/img/symbolic_exe/decrypt_file.png" alt="Figure 1: Catbert Ransomware - attempt to decrypt file with random password"></p>
+<p>Figure 1: Catbert Ransomware - attempt to decrypt file with random password</p>
+<p>Does this sound familiar? It aligns perfectly with the question we discussed earlier: <em>“What input would produce this output?”</em> To answer this question using <strong>angr</strong>, we first need to explore the code, develop a high-level understanding of the input and output parameters, and define all the necessary requirements.</p>
+<p>Let’s start reversing a bit the interesting part of the binary avoiding to look closer on the challenge itself, but let’s try to focus on angr requirements.</p>
+<p><img src="/img/symbolic_exe/code_overview.png" alt="Figure 2: Decryption overview for angr requitements "></p>
+<p>Figure 2: Decryption overview for angr requitements</p>
+<blockquote>
+<p>💡 <em>To make it easier to follow, I have renamed most of the code. So it will be also possible to use line number as a reference.</em></p>
+</blockquote>
+<p>Looking at <strong>Figure 2</strong>, we can see that at <strong>line 170</strong>, the <strong>password</strong> is checked to ensure it is <strong>16 characters long</strong>. Before this, a <strong>bytecode</strong> is retrieved from a file (<strong>line 163</strong>) and later manipulated slightly (<strong>lines 180–194</strong>) by substituting some of its characters with values derived from our input key. Finally, the bytecode is passed to a <strong>virtual_machine_interpreter</strong> for processing. Based on these observations, we can start taking notes of the requirements we’ve uncovered so far and translate them into practical actions we need to perform with <strong>angr</strong>:</p>
+<ul>
+<li><strong>Bytecode</strong>: We need to allocate memory to hold the bytecode, which can be easily retrieved from the <code>.c4tb</code> file.</li>
+<li><strong>Password</strong>: This is the answer to our problem. We need to find a 16-character input that can successfully decrypt the file.</li>
+</ul>
+<p>Additionally, we must keep in mind that the <strong>password is mixed into the bytecode</strong> during its processing by the <strong>bytecode interpreter</strong> function. With a more clear understanding of those points, we can now move on to exploring the virtual machine code, which represents the part of the program we will execute</p>
+<p><img src="/img/symbolic_exe/vm_code.png" alt="Figure 3: Requirements for virtual_machine_interpreter function."></p>
+<p>Figure 3: Requirements for virtual_machine_interpreter function.</p>
+<p>To determine the function&rsquo;s requirements, we need to start our exploration from the very beginning. As we can see, the function involves a <strong>bytecode</strong> (which we’ve already noted), a <strong>status</strong> (representing the exit condition, as referenced in Figure X), and a <strong>stack</strong>.</p>
+<blockquote>
+<p>💡 <em>To keep things simple, I’ve referred to the additional memory needed in the function as a <strong>stack</strong>. You might ask, “How am I supposed to know that a stack is needed without analyzing the function?” Well, a stack is essentially just a block of memory. It’s called a <strong>stack</strong> because it’s typically accessed via a register pointing to it, but in general, we could call it anything we like. It’s important to note that I made this simplification to make the overall structure easier to understand. If you’re interested in reversing the code in detail, you’ll eventually discover that the virtual machine interpreter performs various operations on the stack, such as <strong>push</strong>, <strong>pop</strong>, <strong>rotate</strong>, and more.</em></p>
+</blockquote>
+<p>To effectively use <strong>angr</strong>, especially in our case, it’s crucial to identify the correct address to begin execution. Fortunately, this is straightforward in this scenario, as it corresponds to the very first instruction of the <strong>virtual_machine_interpreter</strong> (<strong>line 16</strong>).</p>
+<p>Another important aspect to consider when running an <strong>angr</strong> script are the <strong>find</strong> and <strong>avoid</strong> addresses. These special addresses represent success and failure conditions, respectively. However, instead of just specifying a simple address, you can also define a function to check the <strong>status</strong> variable in order to determine its value and any potential success condition. Looking at the code, we can easily see that if <strong>status</strong> equals 0, the program will follow the invalid key branch.</p>
+<p>Now that we have a general understanding of the code, we can begin writing our <strong>angr</strong> script.</p>
+<h3 id="writing-angr-script">Writing angr script</h3>
+<p>Let’s start writing down the requirements that we have discovered.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#bytecode</span>
+</span></span><span style="display:flex;"><span>data <span style="color:#f92672">=</span> list<span style="color:#f92672">(</span>f.read<span style="color:#f92672">(</span>size<span style="color:#f92672">))</span> 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#key</span>
+</span></span><span style="display:flex;"><span>key <span style="color:#f92672">=</span> <span style="color:#f92672">[</span>claripy.BVS<span style="color:#f92672">(</span>f<span style="color:#e6db74">&#39;k{i}&#39;</span>, 8<span style="color:#f92672">)</span> <span style="color:#66d9ef">for</span> i in range<span style="color:#f92672">(</span>16<span style="color:#f92672">)]</span> 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># mixing input key bytes within the bytecode</span>
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">[</span>5<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> key<span style="color:#f92672">[</span>0<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">[</span>4<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> key<span style="color:#f92672">[</span>1<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">[</span>12<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> key<span style="color:#f92672">[</span>2<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">[</span>11<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> key<span style="color:#f92672">[</span>3<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">[</span>19<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> key<span style="color:#f92672">[</span>4<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">[</span>18<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> key<span style="color:#f92672">[</span>5<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">[</span>26<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> key<span style="color:#f92672">[</span>6<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">[</span>25<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> key<span style="color:#f92672">[</span>7<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">[</span>33<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> key<span style="color:#f92672">[</span>8<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">[</span>32<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> key<span style="color:#f92672">[</span>9<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">[</span>40<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> key<span style="color:#f92672">[</span>10<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">[</span>39<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> key<span style="color:#f92672">[</span>11<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">[</span>47<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> key<span style="color:#f92672">[</span>12<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">[</span>46<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> key<span style="color:#f92672">[</span>13<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">[</span>54<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> key<span style="color:#f92672">[</span>14<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">[</span>53<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> key<span style="color:#f92672">[</span>15<span style="color:#f92672">]</span>
+</span></span></code></pre></div><p>The code above is fairly easy to understand. The <strong>data</strong> variable represents the bytes read from the <code>.c4tb</code> file, and the <strong>key</strong> is a <strong>bitvector</strong> that will hold our input.</p>
+<blockquote>
+<p>💡 <em>Angr’s solver engine, called Claripy, uses the syntax above to create a 16-byte array (or an array named ‘key’ with each cell being 8 bits). This assignment tells angr that the key array is our symbolic variable, which needs to be &ldquo;concretized&rdquo; to guess the correct decryption key. The subsequent mixing step simply assigns our key to the bytecode, which will then be interpreted.</em></p>
+</blockquote>
+<p>Next, we need to define the parameters necessary for properly handling the operations related to the bytecode, the <strong>status</strong> variable, and the entry and return addresses of the function we intend to execute. With this information, we’ll be ready to create the <strong>project</strong> and <strong>state</strong> variables for the calling function.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>RET_ADDR <span style="color:#f92672">=</span> <span style="color:#75715e"># Return address of virtual_machine_interpreter function.</span>
+</span></span><span style="display:flex;"><span>STATUS_ADDR <span style="color:#f92672">=</span> <span style="color:#75715e"># Address of status variable</span>
+</span></span><span style="display:flex;"><span>FUN_ENTRY_ADDR <span style="color:#f92672">=</span> <span style="color:#75715e"># Address of the first instruction of virtual_machine_interpreter</span>
+</span></span><span style="display:flex;"><span>DATA_PTR_ADDR <span style="color:#f92672">=</span> <span style="color:#75715e"># Address that is storing the bytecode</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>proj <span style="color:#f92672">=</span> angr.Project<span style="color:#f92672">(</span><span style="color:#e6db74">&#39;0.efi&#39;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>state <span style="color:#f92672">=</span> proj.factory.call_state<span style="color:#f92672">(</span>FUN_ENTRY_ADDR<span style="color:#f92672">)</span>
+</span></span></code></pre></div><blockquote>
+<p>💡 <em>As you can see, I’ve omitted the exact values for the addresses. This is because they depend on angr and where it loads the binary. Using specific addresses would be pointless for this tutorial, but for now, you can assume them to be correct. I’ll explain how to properly set them at the end of this section.</em></p>
+</blockquote>
+<p>Now that everything should be clear so far, it’s time to tighten your seatbelt because we’re about to dive a bit deeper.</p>
+<p>Up to this point, most of the requirements have been correctly defined. However, before moving forward, we need to allocate memory for our <strong>data</strong>. Keep in mind that the <strong>data</strong> variable <strong>contains the data extracted from the <code>.c4tb</code> file</strong>, but we haven’t assigned it to <strong>angr’s</strong> memory yet. Additionally, this assignment must be done correctly, matching the appropriate variable type.</p>
+<p>Looking more closely at the bytecode and <strong>key</strong> assignment, we can see that we’re using the lower byte of the <strong>RAX</strong> register (specifically <strong>AL</strong>) each time. This means we need exactly <strong>8 bits</strong> for each key value.</p>
+<p><img src="/img/symbolic_exe/bytecode.png" alt="Figure 4: Shuffle bytecode and key chars"></p>
+<p>Figure 4: Shuffle bytecode and key chars</p>
+<p>Armed with this knowledge, it is possible to allocate and assign angr memory accordingly.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>data_sec <span style="color:#f92672">=</span> state.heap.allocate<span style="color:#f92672">(</span>size<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> i in range<span style="color:#f92672">(</span>size<span style="color:#f92672">)</span>:
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e"># Each data of the bytecode is 1 byte long. </span>
+</span></span><span style="display:flex;"><span>  state.mem<span style="color:#f92672">[</span>data_sec + i<span style="color:#f92672">]</span>.uint8_t <span style="color:#f92672">=</span> data<span style="color:#f92672">[</span>i<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># For memory on 64bit architecture we need to use the right address size.</span>
+</span></span><span style="display:flex;"><span>state.mem<span style="color:#f92672">[</span>DATA_PTR_ADDR<span style="color:#f92672">]</span>.uint64_t <span style="color:#f92672">=</span> data_sec
+</span></span></code></pre></div><p>At this point, there isn’t much left to do. We can now initialize the simulation manager and define our <strong>find</strong> and <strong>avoid</strong> parameters.</p>
+<p>As mentioned earlier, we can use a function for our <strong>find</strong> parameter. In this case, this function will allow us to explore the value of the <strong>status</strong> variable, which will act as a switch to indicate whether we&rsquo;ve provided the correct password.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>simgr <span style="color:#f92672">=</span> proj<span style="color:#f92672">.</span>factory<span style="color:#f92672">.</span>simulation_manager(state)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#if I&#39;m reaching the end of the function I need to check the status variable.</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">found</span>(state):
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> state<span style="color:#f92672">.</span>addr <span style="color:#f92672">==</span> RET_ADDR:
+</span></span><span style="display:flex;"><span>    status <span style="color:#f92672">=</span> state<span style="color:#f92672">.</span>memory<span style="color:#f92672">.</span>load(STATUS_ADDR, <span style="color:#ae81ff">8</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># add a constraints to force status to be != from 0</span>
+</span></span><span style="display:flex;"><span>    state<span style="color:#f92672">.</span>add_constraints(status <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># return a simple true or false, depending on status.</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> state<span style="color:#f92672">.</span>solver<span style="color:#f92672">.</span>satisfiable()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># define a found function that is going to check the status variable</span>
+</span></span><span style="display:flex;"><span>simgr<span style="color:#f92672">.</span>explore(find<span style="color:#f92672">=</span>found)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># There is only a single solution.</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">assert</span> len(simgr<span style="color:#f92672">.</span>found) <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>state <span style="color:#f92672">=</span> simgr<span style="color:#f92672">.</span>found[<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>print(bytes((state<span style="color:#f92672">.</span>solver<span style="color:#f92672">.</span>eval(k) <span style="color:#66d9ef">for</span> k <span style="color:#f92672">in</span> key)))
+</span></span></code></pre></div><h3 id="setting-up-the-reference-addresses-properly">Setting up the reference addresses properly</h3>
+<p>How do we set <strong>RET_ADDR</strong>, <strong>STATUS_ADDR</strong>, <strong>FUN_ENTRY_ADDR</strong>, and <strong>DATA_PTR_ADDR</strong>? When executing code, it&rsquo;s crucial to align the addresses from the program with those in your disassembler or debugger if you want to track the program&rsquo;s flow accurately. In this case, <strong>angr</strong> loads the program into specific memory addresses. To set these variables correctly, you can retrieve the addresses used by <strong>angr</strong> and rebase the binary in <strong>IDA</strong> accordingly. After initializing the project, you can print the base address used by <strong>angr</strong> to get this information.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>base_addr <span style="color:#f92672">=</span> proj<span style="color:#f92672">.</span>loader<span style="color:#f92672">.</span>min_addr 
+</span></span><span style="display:flex;"><span>print(hex(base_addr))
+</span></span></code></pre></div><p>This is instruction actually prints the base address used by angr to load the binary. Matching this address in IDA will make all operation about addresses way more easier.</p>
+<p><img src="/img/symbolic_exe/rebase_program.png" alt="Figure 5: Rebase program with IDA"></p>
+<p>Figure 5: Rebase program with IDA</p>
+<h3 id="conclusion">Conclusion</h3>
+<p>Through this post, I’ve “closed the circle” (or at least tried) on emulation and symbolic execution, demonstrating how these techniques can be used to analyze real-world malware. While there are still unexplored topic (e.g., Qiling), I haven’t delved into it deeply. Despite being a potentially powerful tool, Qiling’s documentation isn’t well-maintained, and utilizing it might require significant effort. Nevertheless, I hope you’ve enjoyed reading all the posts and had as much fun exploring them as I did while explaining and experimenting with these topics.</p>
+<p>Recently, I’ve received a few messages asking why I stopped publishing on the blog. The truth is, most of my recent research has focused on very specific topics that might not appeal to a broad audience. Writing blog posts for such a niche can sometimes feel less beneficial for a general readership. So, what does the future hold?</p>
+<p>I don’t want to stop publishing entirely, even though I’ve been a bit inconsistent lately. However, I’m still figuring out which topics could be interesting to explore in the coming months. I enjoy exploring new ideas and conducting independent research on malware analysis and classification. I usually try to align this blog with my research, both to clarify my own thoughts and to provide useful content for a wider audience.</p>
+<p>At the moment, I have a few large projects under development that are keeping me quite busy. Still, I’m considering posting research-oriented content related to malware classification, possibly adopting a more formal, paper-oriented format (which I’d include in the whitepapers section). As for the future, it remains uncertain. As the saying goes, <em>“The best way to predict the future is to create it.”</em> I’ll continue exploring, experimenting, and sharing whenever inspiration strikes or a project feels worth sharing.</p>
+<p>Thank you for reading, and as always, keep reversing and have fun!</p>
+<h3 id="references">References</h3>
+<ul>
+<li><a href="https://www.notion.so/Angr-for-fun-and-Flare-on-15650d93e71b80429dd5de6f1c2c822f?pvs=21">Flare-on Challenge</a></li>
+<li><a href="https://p.ost2.fyi/courses/course-v1:OpenSecurityTraining2&#43;RE3201_symexec&#43;2021_V1/about">SymbolicExecution training</a></li>
+<li><a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/SymbolicExecution/catbert_ransomware.py">Catbert Ransomware solver</a></li>
+</ul>
+]]></content>
+        </item>
         
         <item>
             <title>Emulating inline decryption for triaging C&#43;&#43; malware</title>
-            <link>https://Viuleeenz.github.io/posts/2024/05/emulating-inline-decryption-for-triaging-c-malware/</link>
+            <link>http://localhost:1313/posts/2024/05/emulating-inline-decryption-for-triaging-c-malware/</link>
             <pubDate>Thu, 16 May 2024 00:00:00 +0000</pubDate>
             
-            <guid>https://Viuleeenz.github.io/posts/2024/05/emulating-inline-decryption-for-triaging-c-malware/</guid>
-            <description>What we need to know? C and C++ binaries share several commonalities, however, some additional features and complexities introduced by C++ can make reverse engineering C++ binaries more challenging compared to C binaries. Some of the most important features are:
-Name Mangling: C++ compilers often use name mangling to encode additional information about functions and classes into the symbol names in the binary. This can make it more challenging to understand the code&amp;rsquo;s structure and functionality by simply looking at symbol names.</description>
+            <guid>http://localhost:1313/posts/2024/05/emulating-inline-decryption-for-triaging-c-malware/</guid>
+            <description>&lt;h2 id=&#34;what-we-need-to-know&#34;&gt;What we need to know?&lt;/h2&gt;
+&lt;p&gt;C and C++ binaries share several commonalities, however, some additional features and complexities introduced by C++ can make reverse engineering C++ binaries more challenging compared to C binaries. Some of the most important features are:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Name Mangling&lt;/strong&gt;: C++ compilers often use name mangling to encode additional information about functions and classes into the symbol names in the binary. This can make it more challenging to understand the code&amp;rsquo;s structure and functionality by simply looking at symbol names.&lt;/p&gt;</description>
             <content type="html"><![CDATA[<h2 id="what-we-need-to-know">What we need to know?</h2>
 <p>C and C++ binaries share several commonalities, however, some additional features and complexities introduced by C++ can make reverse engineering C++ binaries more challenging compared to C binaries. Some of the most important features are:</p>
 <p><strong>Name Mangling</strong>: C++ compilers often use name mangling to encode additional information about functions and classes into the symbol names in the binary. This can make it more challenging to understand the code&rsquo;s structure and functionality by simply looking at symbol names.</p>
@@ -109,11 +262,11 @@ Name Mangling: C++ compilers often use name mangling to encode additional inform
         
         <item>
             <title>Understanding API Hashing and build a rainbow table for LummaStealer</title>
-            <link>https://Viuleeenz.github.io/posts/2024/03/understanding-api-hashing-and-build-a-rainbow-table-for-lummastealer/</link>
+            <link>http://localhost:1313/posts/2024/03/understanding-api-hashing-and-build-a-rainbow-table-for-lummastealer/</link>
             <pubDate>Sun, 24 Mar 2024 00:00:00 +0000</pubDate>
             
-            <guid>https://Viuleeenz.github.io/posts/2024/03/understanding-api-hashing-and-build-a-rainbow-table-for-lummastealer/</guid>
-            <description>Understanding PEB and Ldr structures represents a starting point when we are dealing with API hashing. However, before proceeding to analyze a sample it’s always necessary to recover obfuscated, encrypted or hashed data. Because of that, through this blogpost I would like to continue what I have started in the previous post, using emulation to create a rainbow table for LummaStealer and then write a little resolver script that is going to use the information extracted to resolve all hashes.</description>
+            <guid>http://localhost:1313/posts/2024/03/understanding-api-hashing-and-build-a-rainbow-table-for-lummastealer/</guid>
+            <description>&lt;p&gt;Understanding PEB and Ldr structures represents a starting point when we are dealing with API hashing. However, before proceeding to analyze a sample it’s always necessary to recover  obfuscated, encrypted or hashed data. Because of that, through this blogpost I would like to continue what I have started in the &lt;a href=&#34;https://viuleeenz.github.io/posts/2024/02/understanding-peb-and-ldr-structures-using-ida-and-lummastealer/&#34;&gt;previous post&lt;/a&gt;, using emulation to create a rainbow table for LummaStealer and then write a little resolver script that is going to use the information extracted to resolve all hashes.&lt;/p&gt;</description>
             <content type="html"><![CDATA[<p>Understanding PEB and Ldr structures represents a starting point when we are dealing with API hashing. However, before proceeding to analyze a sample it’s always necessary to recover  obfuscated, encrypted or hashed data. Because of that, through this blogpost I would like to continue what I have started in the <a href="https://viuleeenz.github.io/posts/2024/02/understanding-peb-and-ldr-structures-using-ida-and-lummastealer/">previous post</a>, using emulation to create a rainbow table for LummaStealer and then write a little resolver script that is going to use the information extracted to resolve all hashes.</p>
 <blockquote>
 <p>💡<em>It’s worth mentioning that I’m trying to create self-contained posts. Of course, previous information will give a more comprehensive understanding of the whole process, however, the goal for this post is to have a guide that could be applied overtime even on different samples not related to LummaStealer.</em></p>
@@ -268,11 +421,11 @@ Figure 4: MurMur2 hashing routine</p>
         
         <item>
             <title>Understanding PEB and LDR Structures using IDA and LummaStealer</title>
-            <link>https://Viuleeenz.github.io/posts/2024/02/understanding-peb-and-ldr-structures-using-ida-and-lummastealer/</link>
+            <link>http://localhost:1313/posts/2024/02/understanding-peb-and-ldr-structures-using-ida-and-lummastealer/</link>
             <pubDate>Sun, 04 Feb 2024 00:00:00 +0000</pubDate>
             
-            <guid>https://Viuleeenz.github.io/posts/2024/02/understanding-peb-and-ldr-structures-using-ida-and-lummastealer/</guid>
-            <description>In this post I’m going to explain how Process Environment Block (PEB) is parsed by malware devs and how that structure is abused. Instead of going too deep into a lot of details, I would like to follow an easier approach pairing the theory with a practical real example using IDA and LummaStealer, without overwhelming the reader with a lot of technical details trying to simplify the data structure involved in the process.</description>
+            <guid>http://localhost:1313/posts/2024/02/understanding-peb-and-ldr-structures-using-ida-and-lummastealer/</guid>
+            <description>&lt;p&gt;In this post I’m going to explain how Process Environment Block (PEB) is parsed by malware devs and how that structure is abused. Instead of going too deep into a lot of details, I would like to follow an easier approach pairing the theory with a practical real example using IDA and LummaStealer, without overwhelming the reader with a lot of technical details trying to simplify the data structure involved in the process. At the end of the theory part, I’m going to &lt;strong&gt;apply PEB and all related structures in IDA&lt;/strong&gt;, inspecting malware parsing capabilities that are going to be applied for resolving hashed APIs.&lt;/p&gt;</description>
             <content type="html"><![CDATA[<p>In this post I’m going to explain how Process Environment Block (PEB) is parsed by malware devs and how that structure is abused. Instead of going too deep into a lot of details, I would like to follow an easier approach pairing the theory with a practical real example using IDA and LummaStealer, without overwhelming the reader with a lot of technical details trying to simplify the data structure involved in the process. At the end of the theory part, I’m going to <strong>apply PEB and all related structures in IDA</strong>, inspecting malware parsing capabilities that are going to be applied for resolving hashed APIs.</p>
 <p>Let’s start.</p>
 <h3 id="peb-structure">PEB Structure</h3>
@@ -363,11 +516,12 @@ loaded modules (the module database).</li>
         
         <item>
             <title>Applied Emulation - Decrypting Ursnif strings with Unicorn</title>
-            <link>https://Viuleeenz.github.io/posts/2023/12/applied-emulation-decrypting-ursnif-strings-with-unicorn/</link>
+            <link>http://localhost:1313/posts/2023/12/applied-emulation-decrypting-ursnif-strings-with-unicorn/</link>
             <pubDate>Wed, 20 Dec 2023 00:00:00 +0000</pubDate>
             
-            <guid>https://Viuleeenz.github.io/posts/2023/12/applied-emulation-decrypting-ursnif-strings-with-unicorn/</guid>
-            <description>Introduction Here we go with another chapter of the Applied Emulation series. In the previous blogpost we have talked about emulation and more specifically, the usage of Dumpulator to perform a quick triage. However, in this blogpost we are going to use a completely different approach, taking advantage of static analysis to understand and emulate a string decryption algorithm through Unicorn. As always, I would like to give a practical example on a real case scenario.</description>
+            <guid>http://localhost:1313/posts/2023/12/applied-emulation-decrypting-ursnif-strings-with-unicorn/</guid>
+            <description>&lt;h3 id=&#34;introduction&#34;&gt;Introduction&lt;/h3&gt;
+&lt;p&gt;Here we go with another chapter of the Applied Emulation series. In the previous blogpost we have talked about emulation and more specifically, the usage of &lt;em&gt;Dumpulator&lt;/em&gt; to perform a quick triage. However, in this blogpost we are going to use a completely different approach, taking advantage of &lt;strong&gt;static analysis to&lt;/strong&gt; &lt;strong&gt;understand and emulate a string decryption algorithm through &lt;a href=&#34;https://www.unicorn-engine.org/&#34;&gt;Unicorn&lt;/a&gt;&lt;/strong&gt;. As always, I would like to give a practical example on a real case scenario. Because of that, I have chosen to analyze an &lt;strong&gt;Ursnif&lt;/strong&gt; sample.&lt;/p&gt;</description>
             <content type="html"><![CDATA[<h3 id="introduction">Introduction</h3>
 <p>Here we go with another chapter of the Applied Emulation series. In the previous blogpost we have talked about emulation and more specifically, the usage of <em>Dumpulator</em> to perform a quick triage. However, in this blogpost we are going to use a completely different approach, taking advantage of <strong>static analysis to</strong> <strong>understand and emulate a string decryption algorithm through <a href="https://www.unicorn-engine.org/">Unicorn</a></strong>. As always, I would like to give a practical example on a real case scenario. Because of that, I have chosen to analyze an <strong>Ursnif</strong> sample.</p>
 <p>It’s worth mentioning that this sample is part of weekly challenges related to the <a href="https://courses.zero2auto.com/">Zero2Auto</a> course. However, instead of automating the full code extraction, as requested by the challenge, I found even more interesting going into unexplored paths applying emulation instead.</p>
@@ -522,11 +676,12 @@ Figure 3: Decrypted strings</p>
         
         <item>
             <title>Applied Emulation - Analysis of MarsStealer</title>
-            <link>https://Viuleeenz.github.io/posts/2023/11/applied-emulation-analysis-of-marsstealer/</link>
+            <link>http://localhost:1313/posts/2023/11/applied-emulation-analysis-of-marsstealer/</link>
             <pubDate>Wed, 15 Nov 2023 00:00:00 +0000</pubDate>
             
-            <guid>https://Viuleeenz.github.io/posts/2023/11/applied-emulation-analysis-of-marsstealer/</guid>
-            <description>Introduction Emulation is a technique that could be very handy and effective when we have to deal with malware triage, configuration extractor and deobfuscate part of the code without rewriting complex algorithms. Even if it seems magic (and it&amp;rsquo;s not unfortunately) it&amp;rsquo;s still not possible to apply emulation on random code. However, if applied correctly this method could really speed up our malware analysis and triage. Through this blogpost I would like to give an overview about emulation usage and apply it in a real case scenario.</description>
+            <guid>http://localhost:1313/posts/2023/11/applied-emulation-analysis-of-marsstealer/</guid>
+            <description>&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;Emulation is a technique that could be very handy and effective&lt;/strong&gt; when we have to deal with &lt;strong&gt;malware triage&lt;/strong&gt;, &lt;strong&gt;configuration extractor&lt;/strong&gt; and &lt;strong&gt;deobfuscate part of the code without rewriting complex algorithms&lt;/strong&gt;. Even if it seems magic (and it&amp;rsquo;s not unfortunately) it&amp;rsquo;s still not possible to apply emulation on random code. However, if applied correctly this method could really speed up our malware analysis and triage. Through this blogpost I would like to give an overview about emulation usage and apply it in a real case scenario.&lt;/p&gt;</description>
             <content type="html"><![CDATA[<h2 id="introduction">Introduction</h2>
 <p><strong>Emulation is a technique that could be very handy and effective</strong> when we have to deal with <strong>malware triage</strong>, <strong>configuration extractor</strong> and <strong>deobfuscate part of the code without rewriting complex algorithms</strong>. Even if it seems magic (and it&rsquo;s not unfortunately) it&rsquo;s still not possible to apply emulation on random code. However, if applied correctly this method could really speed up our malware analysis and triage. Through this blogpost I would like to give an overview about emulation usage and apply it in a real case scenario.</p>
 <p>Recently, I followed a twitter warning about Vidar malware in the wild and eager to revalidate an IDA-python script to deobfuscate strings, I immediately jumped into it. However, extracting that sample it was pretty obvious that I was dealing with another stealer, called MarsStealer. Since I did have a lot of information about that sample, I thought that could be a good choice to experiment with emulation. The result was quite promising and because of that <strong>I want to take this occasion to show a few basic emulations that could, hopefully, help someone else to speed up its analysis</strong>.</p>
@@ -629,11 +784,12 @@ Figure 3: Decrypted strings</p>
         
         <item>
             <title>Vidar - payload inspection with static analysis</title>
-            <link>https://Viuleeenz.github.io/posts/2023/10/vidar-payload-inspection-with-static-analysis/</link>
+            <link>http://localhost:1313/posts/2023/10/vidar-payload-inspection-with-static-analysis/</link>
             <pubDate>Wed, 25 Oct 2023 00:00:00 +0000</pubDate>
             
-            <guid>https://Viuleeenz.github.io/posts/2023/10/vidar-payload-inspection-with-static-analysis/</guid>
-            <description>Behind this post Through this blogpost I’m going to talk about one of the latest Vidar samples that I had a chance to analyze. The payload is actually part of a campaign delivered in July 2023 using PEC mails and this analysis comes from a post related to Cert-Agid in the same period. Even if the payload seems to be out of time, it&amp;rsquo;s still a valid example for further analysis of more recents ones.</description>
+            <guid>http://localhost:1313/posts/2023/10/vidar-payload-inspection-with-static-analysis/</guid>
+            <description>&lt;h2 id=&#34;behind-this-post&#34;&gt;Behind this post&lt;/h2&gt;
+&lt;p&gt;Through this blogpost I’m going to talk about one of the latest Vidar samples that I had a chance to analyze. The payload is actually part of a campaign delivered in July 2023 using PEC mails and this analysis comes from a post related to &lt;a href=&#34;https://cert-agid.gov.it/tag/vidar/&#34;&gt;Cert-Agid&lt;/a&gt; in the same period. Even if the payload seems to be out of time, it&amp;rsquo;s still a valid example for further analysis of more recents ones.&lt;/p&gt;</description>
             <content type="html"><![CDATA[<h2 id="behind-this-post">Behind this post</h2>
 <p>Through this blogpost I’m going to talk about one of the latest Vidar samples that I had a chance to analyze. The payload is actually part of a campaign delivered in July 2023 using PEC mails and this analysis comes from a post related to <a href="https://cert-agid.gov.it/tag/vidar/">Cert-Agid</a> in the same period. Even if the payload seems to be out of time, it&rsquo;s still a valid example for further analysis of more recents ones.</p>
 <p>The purpose of this article is to give an overview of Vidar, helping people that are tracking this threat to properly deal with it. Moreover, it is also an excuse <strong>to tweak a little bit with IDA to show a possible solution related to common issues when we are dealing with highly obfuscated malware</strong>.</p>
@@ -728,298 +884,298 @@ Microsoft Defender&rsquo;s Sandbox:</li>
 <li>
 <p>Targets</p>
 <table>
-<thead>
-<tr>
-<th>Browsers</th>
-<th>Browser Extensions - Wallets</th>
-<th>Authenticator/Password Manager</th>
-<th>Desktop Programs</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Mozilla Firefox</td>
-<td>TronLink</td>
-<td>Authenticator</td>
-<td>LevelDB</td>
-</tr>
-<tr>
-<td>Pale Moon</td>
-<td>Meta</td>
-<td>Authy</td>
-<td>Thunderbird</td>
-</tr>
-<tr>
-<td>Google Chrome</td>
-<td>BinanceChainWallet</td>
-<td>EOS Authenticator</td>
-<td>Telegram</td>
-</tr>
-<tr>
-<td>Chromium</td>
-<td>Yoroi</td>
-<td>GAuth Authenticator</td>
-<td>WinSCP</td>
-</tr>
-<tr>
-<td>Amigo</td>
-<td>NiftyWallet</td>
-<td></td>
-<td>IndexedDB</td>
-</tr>
-<tr>
-<td>Torch</td>
-<td>MathWallet</td>
-<td></td>
-<td>Steam</td>
-</tr>
-<tr>
-<td>Comodo Dragon</td>
-<td>Coinbase</td>
-<td></td>
-<td>Jaxx_Desktop</td>
-</tr>
-<tr>
-<td>Epic Privacy Browser</td>
-<td>Guarda</td>
-<td></td>
-<td>Binance Desktop</td>
-</tr>
-<tr>
-<td>Vivaldi</td>
-<td>EQUALWallet</td>
-<td></td>
-<td>Bitcoin Core</td>
-</tr>
-<tr>
-<td>CocCoc</td>
-<td>JaxxLiberty</td>
-<td></td>
-<td>Bitcoin Core Old</td>
-</tr>
-<tr>
-<td>Cent Browser</td>
-<td>BitAppWallet</td>
-<td></td>
-<td>Raven Core</td>
-</tr>
-<tr>
-<td>TorBro Browser</td>
-<td>iWallet</td>
-<td></td>
-<td>Ledger Live</td>
-</tr>
-<tr>
-<td>Chedot Browser</td>
-<td>Wombat</td>
-<td></td>
-<td>Blockstream</td>
-</tr>
-<tr>
-<td>Brave_Old</td>
-<td>MewCx</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>7Star</td>
-<td>GuildWallet</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>Microsoft Edge</td>
-<td>RoninWallet</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>360 Browser</td>
-<td>NeoLine</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>QQBrowser</td>
-<td>CloverWallet</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>Opera</td>
-<td>LiqualityWallet</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>OperaGX</td>
-<td>Terra_Station</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>CryptoTab Browser</td>
-<td>Keplr</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>Brave</td>
-<td>Sollet</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>AuroWallet</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>PolymeshWallet</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>ICONex</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>Harmony</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>EVER Wallet</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>KardiaChain</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>Trezor Password Manager</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>Rabby</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>Phantom</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>BraveWallet</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>PaliWallet</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>BoltX</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>Xdefi</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>Nami</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>MaiarDeFiWallet</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>WavesKeeper</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>Solflare</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>CyanoWallet</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>KHC</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>TezBox</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>Temple</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>Goby</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>RoninWalletEdge</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>Wasabi Wallet</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>Daedalus Mainnet</td>
-<td></td>
-<td></td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>Browsers</th>
+          <th>Browser Extensions - Wallets</th>
+          <th>Authenticator/Password Manager</th>
+          <th>Desktop Programs</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Mozilla Firefox</td>
+          <td>TronLink</td>
+          <td>Authenticator</td>
+          <td>LevelDB</td>
+      </tr>
+      <tr>
+          <td>Pale Moon</td>
+          <td>Meta</td>
+          <td>Authy</td>
+          <td>Thunderbird</td>
+      </tr>
+      <tr>
+          <td>Google Chrome</td>
+          <td>BinanceChainWallet</td>
+          <td>EOS Authenticator</td>
+          <td>Telegram</td>
+      </tr>
+      <tr>
+          <td>Chromium</td>
+          <td>Yoroi</td>
+          <td>GAuth Authenticator</td>
+          <td>WinSCP</td>
+      </tr>
+      <tr>
+          <td>Amigo</td>
+          <td>NiftyWallet</td>
+          <td></td>
+          <td>IndexedDB</td>
+      </tr>
+      <tr>
+          <td>Torch</td>
+          <td>MathWallet</td>
+          <td></td>
+          <td>Steam</td>
+      </tr>
+      <tr>
+          <td>Comodo Dragon</td>
+          <td>Coinbase</td>
+          <td></td>
+          <td>Jaxx_Desktop</td>
+      </tr>
+      <tr>
+          <td>Epic Privacy Browser</td>
+          <td>Guarda</td>
+          <td></td>
+          <td>Binance Desktop</td>
+      </tr>
+      <tr>
+          <td>Vivaldi</td>
+          <td>EQUALWallet</td>
+          <td></td>
+          <td>Bitcoin Core</td>
+      </tr>
+      <tr>
+          <td>CocCoc</td>
+          <td>JaxxLiberty</td>
+          <td></td>
+          <td>Bitcoin Core Old</td>
+      </tr>
+      <tr>
+          <td>Cent Browser</td>
+          <td>BitAppWallet</td>
+          <td></td>
+          <td>Raven Core</td>
+      </tr>
+      <tr>
+          <td>TorBro Browser</td>
+          <td>iWallet</td>
+          <td></td>
+          <td>Ledger Live</td>
+      </tr>
+      <tr>
+          <td>Chedot Browser</td>
+          <td>Wombat</td>
+          <td></td>
+          <td>Blockstream</td>
+      </tr>
+      <tr>
+          <td>Brave_Old</td>
+          <td>MewCx</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>7Star</td>
+          <td>GuildWallet</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>Microsoft Edge</td>
+          <td>RoninWallet</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>360 Browser</td>
+          <td>NeoLine</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>QQBrowser</td>
+          <td>CloverWallet</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>Opera</td>
+          <td>LiqualityWallet</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>OperaGX</td>
+          <td>Terra_Station</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>CryptoTab Browser</td>
+          <td>Keplr</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>Brave</td>
+          <td>Sollet</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>AuroWallet</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>PolymeshWallet</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>ICONex</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>Harmony</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>EVER Wallet</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>KardiaChain</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>Trezor Password Manager</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>Rabby</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>Phantom</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>BraveWallet</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>PaliWallet</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>BoltX</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>Xdefi</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>Nami</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>MaiarDeFiWallet</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>WavesKeeper</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>Solflare</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>CyanoWallet</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>KHC</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>TezBox</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>Temple</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>Goby</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>RoninWalletEdge</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>Wasabi Wallet</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>Daedalus Mainnet</td>
+          <td></td>
+          <td></td>
+      </tr>
+  </tbody>
 </table>
 </li>
 </ul>
@@ -1028,11 +1184,12 @@ Microsoft Defender&rsquo;s Sandbox:</li>
         
         <item>
             <title>Agent Tesla - Building an effective decryptor</title>
-            <link>https://Viuleeenz.github.io/posts/2023/08/agent-tesla-building-an-effective-decryptor/</link>
+            <link>http://localhost:1313/posts/2023/08/agent-tesla-building-an-effective-decryptor/</link>
             <pubDate>Tue, 29 Aug 2023 00:00:00 +0000</pubDate>
             
-            <guid>https://Viuleeenz.github.io/posts/2023/08/agent-tesla-building-an-effective-decryptor/</guid>
-            <description>General Information and preface Agent Tesla, according to the data provided by CERT-EU, is one the most prominent threats that are hitting European cyberspace. Because of that, I found that it could be quite interesting understanding its behavior. However, as I usually prefer, instead of focusing on the infection chain or information about TA methodologies, sharing knowledge that were already provided by more authoritative sources, I preferred to focus mostly on malware analysis and in this specific case to the latest encryption algorithm adopted.</description>
+            <guid>http://localhost:1313/posts/2023/08/agent-tesla-building-an-effective-decryptor/</guid>
+            <description>&lt;h3 id=&#34;general-information-and-preface&#34;&gt;General Information and preface&lt;/h3&gt;
+&lt;p&gt;Agent Tesla, according to the &lt;a href=&#34;https://cert.europa.eu/static/threat-intelligence/TLP-CLEAR-CB-23-08.pdf&#34;&gt;data&lt;/a&gt; provided by CERT-EU, is one the most prominent threats that are hitting European cyberspace. Because of that, I found that it could be quite interesting understanding its behavior. However, as I usually prefer, instead of focusing on the infection chain or information about TA methodologies, sharing knowledge that were already provided by more authoritative sources, I preferred to focus mostly on malware analysis and in this specific case to the latest encryption algorithm adopted. Then, upon the knowledge acquired, I would like to write a decryptor script that extracts payload configuration.&lt;/p&gt;</description>
             <content type="html"><![CDATA[<h3 id="general-information-and-preface">General Information and preface</h3>
 <p>Agent Tesla, according to the <a href="https://cert.europa.eu/static/threat-intelligence/TLP-CLEAR-CB-23-08.pdf">data</a> provided by CERT-EU, is one the most prominent threats that are hitting European cyberspace. Because of that, I found that it could be quite interesting understanding its behavior. However, as I usually prefer, instead of focusing on the infection chain or information about TA methodologies, sharing knowledge that were already provided by more authoritative sources, I preferred to focus mostly on malware analysis and in this specific case to the latest encryption algorithm adopted. Then, upon the knowledge acquired, I would like to write a decryptor script that extracts payload configuration.</p>
 <h3 id="encryption-variants">Encryption variants</h3>
@@ -1127,12 +1284,13 @@ Microsoft Defender&rsquo;s Sandbox:</li>
         
         <item>
             <title>IDA-Python - Locate a function independently from its offset</title>
-            <link>https://Viuleeenz.github.io/posts/2023/06/ida-python-locate-a-function-independently-from-its-offset/</link>
+            <link>http://localhost:1313/posts/2023/06/ida-python-locate-a-function-independently-from-its-offset/</link>
             <pubDate>Tue, 27 Jun 2023 00:00:00 +0000</pubDate>
             
-            <guid>https://Viuleeenz.github.io/posts/2023/06/ida-python-locate-a-function-independently-from-its-offset/</guid>
-            <description>Introduction Analyzing samples statically could be not an easy going taks, especially when you deal with heavily obfuscated or encrypted data. Because of that, it’s useful to find out the decryption/deobfuscation routine and write a little script that makes sense of strings or function names before starting to analyze the whole sample.
-The idea behind this technique was inspired by the infinite amount of tweaking I have made to run multiple Ida-python scripts that were heavily machine-setting dependents.</description>
+            <guid>http://localhost:1313/posts/2023/06/ida-python-locate-a-function-independently-from-its-offset/</guid>
+            <description>&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;Analyzing samples statically could be not an easy going taks, especially when you deal with heavily obfuscated or encrypted data. Because of that, it’s useful to find out the decryption/deobfuscation routine and write a little script that makes sense of strings or function names before starting to analyze the whole sample.&lt;/p&gt;
+&lt;p&gt;The idea behind this technique was inspired by the infinite amount of tweaking I have made to run multiple Ida-python scripts that were heavily machine-setting dependents. The idea is very simple and it’s based on pattern matching as for YARA rules. The scope here is to create a kind of signature for a function that we would like to locate (e.g., deobfuscation routine) and apply its execution to its parameters in order to simplify our analysis &lt;strong&gt;without tweaking specific parameters&lt;/strong&gt; making it &lt;strong&gt;independent from the function offset&lt;/strong&gt;. I have already got good results experimenting with malware samples (e.g, Qbot) and custom binaries from CTFs as well as other samples that used some sort of obfuscation. Because of that, I decided to create this post to share this approach that could be useful for writing better scripts.&lt;/p&gt;</description>
             <content type="html"><![CDATA[<h2 id="introduction">Introduction</h2>
 <p>Analyzing samples statically could be not an easy going taks, especially when you deal with heavily obfuscated or encrypted data. Because of that, it’s useful to find out the decryption/deobfuscation routine and write a little script that makes sense of strings or function names before starting to analyze the whole sample.</p>
 <p>The idea behind this technique was inspired by the infinite amount of tweaking I have made to run multiple Ida-python scripts that were heavily machine-setting dependents. The idea is very simple and it’s based on pattern matching as for YARA rules. The scope here is to create a kind of signature for a function that we would like to locate (e.g., deobfuscation routine) and apply its execution to its parameters in order to simplify our analysis <strong>without tweaking specific parameters</strong> making it <strong>independent from the function offset</strong>. I have already got good results experimenting with malware samples (e.g, Qbot) and custom binaries from CTFs as well as other samples that used some sort of obfuscation. Because of that, I decided to create this post to share this approach that could be useful for writing better scripts.</p>
@@ -1239,12 +1397,13 @@ Figure 5 - Variable deobfuscated successfully</p>
         
         <item>
             <title>Extracting DDosia targets from process memory</title>
-            <link>https://Viuleeenz.github.io/posts/2023/05/extracting-ddosia-targets-from-process-memory/</link>
+            <link>http://localhost:1313/posts/2023/05/extracting-ddosia-targets-from-process-memory/</link>
             <pubDate>Mon, 08 May 2023 00:00:00 +0000</pubDate>
             
-            <guid>https://Viuleeenz.github.io/posts/2023/05/extracting-ddosia-targets-from-process-memory/</guid>
-            <description>Introduction This post is part of an analysis that I have carried out during my spare time, motivated by a friend that asked me to have a look at the DDosia project related to the NoName057(16) group. The reason behind this request was caused by DDosia client changes for performing the DDos attacks. Because of that, all procedures used so far for monitoring NoName057(16) activities did not work anymore.
-Before starting to reverse DDosia Windows sample, I preferred to gather as much information as possible about NoName057(16) TTPs and a few references to their samples.</description>
+            <guid>http://localhost:1313/posts/2023/05/extracting-ddosia-targets-from-process-memory/</guid>
+            <description>&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;This post is part of an analysis that I have carried out during my spare time, motivated by a friend that asked me to have a look at the DDosia project related to the NoName057(16) group. The reason behind this request was caused by DDosia client changes for performing the DDos attacks. Because of that, all procedures used so far for monitoring NoName057(16) activities did not work anymore.&lt;/p&gt;
+&lt;p&gt;Before starting to reverse DDosia Windows sample, I preferred to gather as much information as possible about NoName057(16) TTPs and a few references to their samples.&lt;/p&gt;</description>
             <content type="html"><![CDATA[<h2 id="introduction">Introduction</h2>
 <p>This post is part of an analysis that I have carried out during my spare time, motivated by a friend that asked me to have a look at the DDosia project related to the NoName057(16) group. The reason behind this request was caused by DDosia client changes for performing the DDos attacks. Because of that, all procedures used so far for monitoring NoName057(16) activities did not work anymore.</p>
 <p>Before starting to reverse DDosia Windows sample, I preferred to gather as much information as possible about NoName057(16) TTPs and a few references to their samples.</p>
@@ -1310,36 +1469,37 @@ Figure 4 - Target stored in cleartext within process memory</p>
 <hr>
 <h3 id="references">References:</h3>
 <table>
-<thead>
-<tr>
-<th>FileName</th>
-<th>Sha256</th>
-<th>Date</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="(https://www.virustotal.com/gui/file/726c2c2b35cb1adbe59039193030f23e552a28226ecf0b175ec5eba9dbcd336e)">d_windows_amd64.exe</a></td>
-<td>726c2c2b35cb1adbe59039193030f23e552a28226ecf0b175ec5eba9dbcd336e</td>
-<td>2023/04/19</td>
-</tr>
-<tr>
-<td>(new sample) <a href="https://www.virustotal.com/gui/file/1b53443ebaabafd6f511d4cf7cb85ddf9fa32540c5dd5621f04a3c5eefa663a9">d_win_x64.exe</a></td>
-<td>1b53443ebaabafd6f511d4cf7cb85ddf9fa32540c5dd5621f04a3c5eefa663a9</td>
-<td>2023/11/09</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>FileName</th>
+          <th>Sha256</th>
+          <th>Date</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>[d_windows_amd64.exe]((<a href="https://www.virustotal.com/gui/file/726c2c2b35cb1adbe59039193030f23e552a28226ecf0b175ec5eba9dbcd336e">https://www.virustotal.com/gui/file/726c2c2b35cb1adbe59039193030f23e552a28226ecf0b175ec5eba9dbcd336e</a>)</td>
+          <td>726c2c2b35cb1adbe59039193030f23e552a28226ecf0b175ec5eba9dbcd336e</td>
+          <td>2023/04/19</td>
+      </tr>
+      <tr>
+          <td>(new sample) <a href="https://www.virustotal.com/gui/file/1b53443ebaabafd6f511d4cf7cb85ddf9fa32540c5dd5621f04a3c5eefa663a9">d_win_x64.exe</a></td>
+          <td>1b53443ebaabafd6f511d4cf7cb85ddf9fa32540c5dd5621f04a3c5eefa663a9</td>
+          <td>2023/11/09</td>
+      </tr>
+  </tbody>
 </table>
 ]]></content>
         </item>
         
         <item>
             <title>Dynamic Binary Instrumentation for Malware Analysis</title>
-            <link>https://Viuleeenz.github.io/posts/2023/03/dynamic-binary-instrumentation-for-malware-analysis/</link>
+            <link>http://localhost:1313/posts/2023/03/dynamic-binary-instrumentation-for-malware-analysis/</link>
             <pubDate>Tue, 14 Mar 2023 00:00:00 +0000</pubDate>
             
-            <guid>https://Viuleeenz.github.io/posts/2023/03/dynamic-binary-instrumentation-for-malware-analysis/</guid>
-            <description>Introduction Because of the massive Ursnif campaigns that hit Italy during the last weeks, I was looking for a lightweight method to quickly extract the last infection stage of all collected samples, in order to start further analysis effectively. Due to this, I wrote a little frida script that performs basic Dynamic Binary Instrumentation (DBI) to monitor useful function calls and extracts the Ursnif payload. In this article I am going to briefly discuss this script and the steps needed to start analyzing the resulting binary.</description>
+            <guid>http://localhost:1313/posts/2023/03/dynamic-binary-instrumentation-for-malware-analysis/</guid>
+            <description>&lt;h2 id=&#34;introduction&#34;&gt;&lt;strong&gt;Introduction&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;Because of the massive Ursnif campaigns that hit Italy during the last weeks, I was looking for a lightweight method to quickly extract the last infection stage of all collected samples, in order to start further analysis effectively. Due to this, I wrote a little frida script that performs basic Dynamic Binary Instrumentation (DBI) to monitor useful function calls and extracts the Ursnif payload. In this article I am going to briefly discuss this script and the steps needed to start analyzing the resulting binary.&lt;/p&gt;</description>
             <content type="html"><![CDATA[<h2 id="introduction"><strong>Introduction</strong></h2>
 <p>Because of the massive Ursnif campaigns that hit Italy during the last weeks, I was looking for a lightweight method to quickly extract the last infection stage of all collected samples, in order to start further analysis effectively. Due to this, I wrote a little frida script that performs basic Dynamic Binary Instrumentation (DBI) to monitor useful function calls and extracts the Ursnif payload. In this article I am going to briefly discuss this script and the steps needed to start analyzing the resulting binary.</p>
 <p>Since I would like to skip redundant topics that are already written all over the internet by people that are Jedi in this field, I’m going to limit this post linking references that would be nice to have to understand everything easily.</p>
@@ -1388,11 +1548,15 @@ Figure 4 - Target stored in cleartext within process memory</p>
         
         <item>
             <title>Manually unpacking of packed executable</title>
-            <link>https://Viuleeenz.github.io/posts/2021/09/manually-unpacking-of-packed-executable/</link>
+            <link>http://localhost:1313/posts/2021/09/manually-unpacking-of-packed-executable/</link>
             <pubDate>Thu, 02 Sep 2021 00:00:00 +0000</pubDate>
             
-            <guid>https://Viuleeenz.github.io/posts/2021/09/manually-unpacking-of-packed-executable/</guid>
-            <description>Introduction In this post, I will show how to manually unpack a simple executable that has been packed with WinUPack. However, the goal of this post is to provide a general approach to start reversing code and, in general, packers. Because of that it will be hard to cover all the techniques and strategies that could be applied, but I will try to give the rights hints and the mindset to approach these challenges.</description>
+            <guid>http://localhost:1313/posts/2021/09/manually-unpacking-of-packed-executable/</guid>
+            <description>&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;In this post, I will show how to manually unpack a simple executable that has been packed with WinUPack.
+However, the goal of this post is to provide a general approach to start reversing code and, in general, packers.
+Because of that it will be hard to cover all the techniques and strategies that could be applied,
+but I will try to give the rights hints and the mindset to approach these challenges.&lt;/p&gt;</description>
             <content type="html"><![CDATA[<h2 id="introduction">Introduction</h2>
 <p>In this post, I will show how to manually unpack a simple executable that has been packed with WinUPack.
 However, the goal of this post is to provide a general approach to start reversing code and, in general, packers.
