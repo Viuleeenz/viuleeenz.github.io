@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Series on Security Undisguised</title>
-    <link>http://localhost:56729/series/</link>
+    <link>https://Viuleeenz.github.io/series/</link>
     <description>Recent content in Series on Security Undisguised</description>
     <generator>Hugo</generator>
     <language>en</language>
     <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
     <lastBuildDate>Thu, 02 Sep 2021 00:00:00 +0000</lastBuildDate>
-    <atom:link href="http://localhost:56729/series/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://Viuleeenz.github.io/series/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Unpacking Executables 1</title>
-      <link>http://localhost:56729/series/unpacking-executables-1/</link>
+      <link>https://Viuleeenz.github.io/series/unpacking-executables-1/</link>
       <pubDate>Thu, 02 Sep 2021 00:00:00 +0000</pubDate>
-      <guid>http://localhost:56729/series/unpacking-executables-1/</guid>
+      <guid>https://Viuleeenz.github.io/series/unpacking-executables-1/</guid>
       <description></description>
     </item>
   </channel>

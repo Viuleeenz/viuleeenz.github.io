@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=56729&amp;path=livereload" data-no-instant defer></script>
+    <head>
         <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -11,7 +11,7 @@ Before starting to reverse DDosia Windows sample, I preferred to gather as much 
 <meta name="keywords" content="malware, binary, digital forensics, exploit development, reverse engineering" />
 <meta name="robots" content="noodp" />
 <meta name="theme-color" content="" />
-<link rel="canonical" href="http://localhost:56729/posts/2023/05/extracting-ddosia-targets-from-process-memory/" />
+<link rel="canonical" href="https://Viuleeenz.github.io/posts/2023/05/extracting-ddosia-targets-from-process-memory/" />
 
 
     <title>
@@ -27,22 +27,22 @@ Before starting to reverse DDosia Windows sample, I preferred to gather as much 
     
         
         
-        <link rel="stylesheet" href="/scss/main.4c717a3dff5ec47ecfa7229b960ed715a5ad930b4079fbd0ed59f277863cf26c.css" integrity="sha256-THF6Pf9exH7PpyKblg7XFaWtkwtAefvQ7Vnyd4Y88mw=">
+        <link rel="stylesheet" href="../../../../scss/main.c2f26a20d135ff7bc7091bb95e626c68bc9d8e4c0852d733dbfe9527448dfa92.css" integrity="sha256-wvJqINE1/3vHCRu5XmJsaLydjkwIUtcz2/6VJ0SN&#43;pI=">
     
 
 
 
     
-        <link rel="stylesheet" type="text/css" href="/style.css">
+        <link rel="stylesheet" type="text/css" href="../../../../style.css">
     
 
 
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="manifest" href="/site.webmanifest">
-    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
-    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="../../../../apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../../../../favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../../../../favicon-16x16.png">
+    <link rel="manifest" href="../../../../site.webmanifest">
+    <link rel="mask-icon" href="../../../../safari-pinned-tab.svg" color="">
+    <link rel="shortcut icon" href="../../../../favicon.ico">
     <meta name="msapplication-TileColor" content="">
 
 
@@ -53,16 +53,16 @@ Before starting to reverse DDosia Windows sample, I preferred to gather as much 
   <meta itemprop="datePublished" content="2023-05-08T00:00:00+00:00">
   <meta itemprop="dateModified" content="2023-05-08T00:00:00+00:00">
   <meta itemprop="wordCount" content="1374">
-  <meta itemprop="image" content="http://localhost:56729/">
+  <meta itemprop="image" content="https://Viuleeenz.github.io/">
 
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="http://localhost:56729/">
+  <meta name="twitter:image" content="https://Viuleeenz.github.io/">
   <meta name="twitter:title" content="Extracting DDosia targets from process memory">
   <meta name="twitter:description" content="Introduction This post is part of an analysis that I have carried out during my spare time, motivated by a friend that asked me to have a look at the DDosia project related to the NoName057(16) group. The reason behind this request was caused by DDosia client changes for performing the DDos attacks. Because of that, all procedures used so far for monitoring NoName057(16) activities did not work anymore.
 Before starting to reverse DDosia Windows sample, I preferred to gather as much information as possible about NoName057(16) TTPs and a few references to their samples.">
 
 
-    <meta property="og:url" content="http://localhost:56729/posts/2023/05/extracting-ddosia-targets-from-process-memory/">
+    <meta property="og:url" content="https://Viuleeenz.github.io/posts/2023/05/extracting-ddosia-targets-from-process-memory/">
   <meta property="og:site_name" content="Security Undisguised">
   <meta property="og:title" content="Extracting DDosia targets from process memory">
   <meta property="og:description" content="Introduction This post is part of an analysis that I have carried out during my spare time, motivated by a friend that asked me to have a look at the DDosia project related to the NoName057(16) group. The reason behind this request was caused by DDosia client changes for performing the DDos attacks. Because of that, all procedures used so far for monitoring NoName057(16) activities did not work anymore.
@@ -72,7 +72,7 @@ Before starting to reverse DDosia Windows sample, I preferred to gather as much 
     <meta property="article:section" content="posts">
     <meta property="article:published_time" content="2023-05-08T00:00:00+00:00">
     <meta property="article:modified_time" content="2023-05-08T00:00:00+00:00">
-    <meta property="og:image" content="http://localhost:56729/">
+    <meta property="og:image" content="https://Viuleeenz.github.io/">
 
 
 
@@ -98,7 +98,7 @@ Before starting to reverse DDosia Windows sample, I preferred to gather as much 
         <div class="container">
             <header class="header">
     <span class="header__inner">
-        <a href="/" style="text-decoration: none;">
+        <a href="../../../../" style="text-decoration: none;">
     <div class="logo">
         
             <span class="logo__mark">&gt;</span>
@@ -116,7 +116,7 @@ Before starting to reverse DDosia Windows sample, I preferred to gather as much 
         <span class="header__right">
             
                 <nav class="menu">
-    <ul class="menu__inner"><li><a href="/about/">About</a></li><li><a href="/posts/">Posts</a></li><li><a href="/whitepapers/">Whitepapers</a></li>
+    <ul class="menu__inner"><li><a href="../../../../about/">About</a></li><li><a href="../../../../posts/">Posts</a></li><li><a href="../../../../whitepapers/">Whitepapers</a></li>
     </ul>
 </nav>
 
@@ -170,7 +170,7 @@ Before starting to reverse DDosia Windows sample, I preferred to gather as much 
 
     <article>
       <h1 class="post-title">
-        <a href="http://localhost:56729/posts/2023/05/extracting-ddosia-targets-from-process-memory/">Extracting DDosia targets from process memory</a>
+        <a href="https://Viuleeenz.github.io/posts/2023/05/extracting-ddosia-targets-from-process-memory/">Extracting DDosia targets from process memory</a>
       </h1>
 
       
@@ -186,7 +186,7 @@ Before starting to reverse DDosia Windows sample, I preferred to gather as much 
 <p><a href="https://decoded.avast.io/martinchlumecky/ddosia-project-how-noname05716-is-trying-to-improve-the-efficiency-of-ddos-attacks/">Avast</a> wrote a very detailed article about that project and described thoroughly all changes observed in the last few months. Because of that, before proceeding with this post, If you feel you are missing something, I strongly  recommend that you read their article.</p>
 <h2 id="client-setup">Client Setup</h2>
 <p>According to the information retrieved from the Telegram channel of DDosia Project, there are a couple of requirements before executing the client. The very first action is to create your id through a dedicated bot that will be used later on for authentication purposes. After that, it&rsquo;s necessary to put the client_id.txt file (generated from DDosia bot) and the executable file in the same folder. If everything has been done properly, it should be possible to observe that authentication process will be done correctly and the client is going to download targets from its server:</p>
-<p><img src="/img/ddosia/c_a.png" alt="Figure 1: Client authenticated correctly"></p>
+<p><img src="../../../../img/ddosia/c_a.png" alt="Figure 1: Client authenticated correctly"></p>
 <p>Figure 1: Client authenticated correctly</p>
 <h2 id="dynamic-analysis-and-process-memory-inspection">Dynamic analysis and process memory inspection</h2>
 <p>Here we are with the fun part. Because of the issues of analyzing GO binaries statically, I preferred to use a dynamic approach supported by Cape sandbox. In fact, executing the client with Cape it was possible to gather behavioral information to speed up our analysis (<a href="https://capesandbox.com/analysis/385183/">ref</a>). Since the executable is going to be used for DDoS attacks, it&rsquo;s easy to expect that most of the functions are related to network routines. One of the most interesting WindowsAPI refers to <a href="https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-wsastartup">WSAStartup</a>. This is interesting for us, because according to Microsoft documentation, it must be the first function to be used in order to retrieve socket implementation for further network operations:</p>
@@ -194,13 +194,13 @@ Before starting to reverse DDosia Windows sample, I preferred to gather as much 
 <p>The WSAStartup function must be the first Windows Sockets function called by an application or DLL. It allows an application or DLL to specify the version of Windows Sockets required and retrieve details of the specific Windows Sockets implementation. The application or DLL can only issue further Windows Sockets functions after successfully calling WSAStartup.</p>
 </blockquote>
 <p>Moreover, starting to monitor network requests with Wireshark, give us additional information about client-server interactions and targets retrieving procedure:</p>
-<p><img src="/img/ddosia/network_communication.png" alt="Figure 2 - Request for target list"></p>
+<p><img src="../../../../img/ddosia/network_communication.png" alt="Figure 2 - Request for target list"></p>
 <p>Figure 2 - Request for target list</p>
 <p>As already mentioned on Avast blogspot, the target list is encrypted and retrieved after the authentication process. However, performing DDoS attacks requires a decryption routine to make targets in cleartext and forward them to a proper procedure. With this insight, it’s possible to open up a debugger and set a breakpoint of WSAStartup and start exploring the process flow from that point.</p>
-<p><img src="/img/ddosia/control_flow.png" alt="Figure 3 - Exploring DDosia executable control flow"></p>
+<p><img src="../../../../img/ddosia/control_flow.png" alt="Figure 3 - Exploring DDosia executable control flow"></p>
 <p>Figure 3 - Exploring DDosia executable control flow</p>
 <p>Exploring the process execution, it’s possible to observe that <strong>WSAStartup API is called two times before starting the attack.</strong> The first one has been used from the main thread to perform the authentication process on the server side, instead the second call will be done right after retrieving the target file and it will be used from another thread to start the attack phase. Since that information we are looking for has been already downloaded and hopefully decrypted (at the time of the second call) we could explore the process memory trying to identify our target list.</p>
-<p><img src="/img/ddosia/cleartext_targets.png" alt="Figure 4 - Target stored in cleartext within process memory">
+<p><img src="../../../../img/ddosia/cleartext_targets.png" alt="Figure 4 - Target stored in cleartext within process memory">
 Figure 4 - Target stored in cleartext within process memory</p>
 <p>As we expected, information is actually decrypted right before being used from threads that are in charge to flood the targets. From the cleartext sample, it’s also possible to reconstruct the original json file structure that follow this format:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{<span style="color:#f92672">&#34;target_id&#34;</span>:<span style="color:#e6db74">&#34;435te3af574b95e395847362&#34;</span>,<span style="color:#f92672">&#34;request_id&#34;</span>:<span style="color:#e6db74">&#34;23cer8c5mmp4434dlad53f2s&#34;</span>,<span style="color:#f92672">&#34;host&#34;</span>:<span style="color:#e6db74">&#34;www.tartuhly.ee&#34;</span>,<span style="color:#f92672">&#34;ip&#34;</span>:<span style="color:#e6db74">&#34;90.190.99.85&#34;</span>,<span style="color:#f92672">&#34;type&#34;</span>:<span style="color:#e6db74">&#34;http&#34;</span>,<span style="color:#f92672">&#34;method&#34;</span>:<span style="color:#e6db74">&#34;GET&#34;</span>,<span style="color:#f92672">&#34;port&#34;</span>:<span style="color:#ae81ff">443</span>,<span style="color:#f92672">&#34;use_ssl&#34;</span>:<span style="color:#66d9ef">true</span>,<span style="color:#f92672">&#34;path&#34;</span>:<span style="color:#e6db74">&#34;/otsi/$_1&#34;</span>,<span style="color:#f92672">&#34;body&#34;</span>:{<span style="color:#f92672">&#34;type&#34;</span>:<span style="color:#e6db74">&#34;&#34;</span>,<span style="color:#f92672">&#34;value&#34;</span>:<span style="color:#e6db74">&#34;&#34;</span>},<span style="color:#f92672">&#34;headers&#34;</span>:<span style="color:#66d9ef">null</span>}
@@ -224,11 +224,11 @@ Figure 4 - Target stored in cleartext within process memory</p>
 <p>If all requirements are satisfied it’s just a matter of running those scripts and getting the results. The first step is to run frida.exe, using the targets.js file that contains all the information to dump the process memory:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>frida.exe &lt;ddosia_client.exe&gt;  -l targets.js
 </span></span></code></pre></div><p>If everything has been done correctly (please keep in mind the requirements), you should be able to see a message “[END] Memory dumped correctly” in your console.</p>
-<p><img src="/img/ddosia/frida_dump.png" alt="Figure 5 - Dumping process Memory with Frida"></p>
+<p><img src="../../../../img/ddosia/frida_dump.png" alt="Figure 5 - Dumping process Memory with Frida"></p>
 <p>Figure 5 - Dumping process Memory with Frida</p>
 <p>Now you can navigate in dumps folder and run the python script using the following command line that is going to forward all dumped file from the current directory to the script that is going to print the result in your console:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>python.exe recover.py (Get-Item .\*dump)
-</span></span></code></pre></div><p><img src="/img/ddosia/target_extraction.png" alt="Figure 6 - Extracting DDosia targets from dumped files"></p>
+</span></span></code></pre></div><p><img src="../../../../img/ddosia/target_extraction.png" alt="Figure 6 - Extracting DDosia targets from dumped files"></p>
 <p>Figure 6 - Extracting DDosia targets from dump files</p>
 <h2 id="final-notes">Final Notes</h2>
 <p>Before concluding, It’s worth mentioning that updates on these scripts and new techniques to dealing with further improvements of DDosia project are not going to be shown, because it represents a topic that I’m not following personally and I’m sure that more authoritative voices will keep track of this threat and its evolution.</p>
@@ -335,7 +335,7 @@ Figure 4 - Target stored in cleartext within process memory</p>
 
 
 
-<script type="text/javascript" src="/bundle.min.e89fda0f29b95d33f6f4224dd9e5cf69d84aff3818be2b0d73e731689cc374261b016d17d46f8381962fb4a1577ba3017b1f23509d894f6e66431f988c00889e.js" integrity="sha512-6J/aDym5XTP29CJN2eXPadhK/zgYvisNc&#43;cxaJzDdCYbAW0X1G&#43;DgZYvtKFXe6MBex8jUJ2JT25mQx&#43;YjACIng=="></script>
+<script type="text/javascript" src="../../../../bundle.min.e89fda0f29b95d33f6f4224dd9e5cf69d84aff3818be2b0d73e731689cc374261b016d17d46f8381962fb4a1577ba3017b1f23509d894f6e66431f988c00889e.js" integrity="sha512-6J/aDym5XTP29CJN2eXPadhK/zgYvisNc&#43;cxaJzDdCYbAW0X1G&#43;DgZYvtKFXe6MBex8jUJ2JT25mQx&#43;YjACIng=="></script>
 
 
 

@@ -27,22 +27,22 @@ Has anyone ever tried using angr for something meaningful, only to end up frustr
     
         
         
-        <link rel="stylesheet" href="/scss/main.c2f26a20d135ff7bc7091bb95e626c68bc9d8e4c0852d733dbfe9527448dfa92.css" integrity="sha256-wvJqINE1/3vHCRu5XmJsaLydjkwIUtcz2/6VJ0SN&#43;pI=">
+        <link rel="stylesheet" href="../../../../scss/main.c2f26a20d135ff7bc7091bb95e626c68bc9d8e4c0852d733dbfe9527448dfa92.css" integrity="sha256-wvJqINE1/3vHCRu5XmJsaLydjkwIUtcz2/6VJ0SN&#43;pI=">
     
 
 
 
     
-        <link rel="stylesheet" type="text/css" href="/style.css">
+        <link rel="stylesheet" type="text/css" href="../../../../style.css">
     
 
 
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="manifest" href="/site.webmanifest">
-    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
-    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="../../../../apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../../../../favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../../../../favicon-16x16.png">
+    <link rel="manifest" href="../../../../site.webmanifest">
+    <link rel="mask-icon" href="../../../../safari-pinned-tab.svg" color="">
+    <link rel="shortcut icon" href="../../../../favicon.ico">
     <meta name="msapplication-TileColor" content="">
 
 
@@ -98,7 +98,7 @@ Has anyone ever tried using angr for something meaningful, only to end up frustr
         <div class="container">
             <header class="header">
     <span class="header__inner">
-        <a href="/" style="text-decoration: none;">
+        <a href="../../../../" style="text-decoration: none;">
     <div class="logo">
         
             <span class="logo__mark">&gt;</span>
@@ -116,7 +116,7 @@ Has anyone ever tried using angr for something meaningful, only to end up frustr
         <span class="header__right">
             
                 <nav class="menu">
-    <ul class="menu__inner"><li><a href="/about/">About</a></li><li><a href="/posts/">Posts</a></li><li><a href="/whitepapers/">Whitepapers</a></li>
+    <ul class="menu__inner"><li><a href="../../../../about/">About</a></li><li><a href="../../../../posts/">Posts</a></li><li><a href="../../../../whitepapers/">Whitepapers</a></li>
     </ul>
 </nav>
 
@@ -206,11 +206,11 @@ Has anyone ever tried using angr for something meaningful, only to end up frustr
 </blockquote>
 <h3 id="c4tbert--vs-angr">C4tbert  Vs. Angr</h3>
 <p>C4tbert is one of the most enjoyable challenges I’ve had the chance to tackle recently. It covers a variety of fascinating topics, including UEFI, cryptography, and virtual machines. In short, the goal is to find the correct passwords that will eventually decrypt files containing parts of the flag.</p>
-<p><img src="/img/symbolic_exe/decrypt_file.png" alt="Figure 1: Catbert Ransomware - attempt to decrypt file with random password"></p>
+<p><img src="../../../../img/symbolic_exe/decrypt_file.png" alt="Figure 1: Catbert Ransomware - attempt to decrypt file with random password"></p>
 <p>Figure 1: Catbert Ransomware - attempt to decrypt file with random password</p>
 <p>Does this sound familiar? It aligns perfectly with the question we discussed earlier: <em>“What input would produce this output?”</em> To answer this question using <strong>angr</strong>, we first need to explore the code, develop a high-level understanding of the input and output parameters, and define all the necessary requirements.</p>
 <p>Let’s start reversing a bit the interesting part of the binary avoiding to look closer on the challenge itself, but let’s try to focus on angr requirements.</p>
-<p><img src="/img/symbolic_exe/code_overview.png" alt="Figure 2: Decryption overview for angr requitements "></p>
+<p><img src="../../../../img/symbolic_exe/code_overview.png" alt="Figure 2: Decryption overview for angr requitements "></p>
 <p>Figure 2: Decryption overview for angr requitements</p>
 <blockquote>
 <p>💡 <em>To make it easier to follow, I have renamed most of the code. So it will be also possible to use line number as a reference.</em></p>
@@ -221,7 +221,7 @@ Has anyone ever tried using angr for something meaningful, only to end up frustr
 <li><strong>Password</strong>: This is the answer to our problem. We need to find a 16-character input that can successfully decrypt the file.</li>
 </ul>
 <p>Additionally, we must keep in mind that the <strong>password is mixed into the bytecode</strong> during its processing by the <strong>bytecode interpreter</strong> function. With a more clear understanding of those points, we can now move on to exploring the virtual machine code, which represents the part of the program we will execute</p>
-<p><img src="/img/symbolic_exe/vm_code.png" alt="Figure 3: Requirements for virtual_machine_interpreter function."></p>
+<p><img src="../../../../img/symbolic_exe/vm_code.png" alt="Figure 3: Requirements for virtual_machine_interpreter function."></p>
 <p>Figure 3: Requirements for virtual_machine_interpreter function.</p>
 <p>To determine the function&rsquo;s requirements, we need to start our exploration from the very beginning. As we can see, the function involves a <strong>bytecode</strong> (which we’ve already noted), a <strong>status</strong> (representing the exit condition, as referenced in Figure 3), and a <strong>stack</strong>.</p>
 <blockquote>
@@ -274,7 +274,7 @@ Has anyone ever tried using angr for something meaningful, only to end up frustr
 <p>Now that everything should be clear so far, it’s time to tighten your seatbelt because we’re about to dive a bit deeper.</p>
 <p>Up to this point, most of the requirements have been correctly defined. However, before moving forward, we need to allocate memory for our <strong>data</strong>. Keep in mind that the <strong>data</strong> variable <strong>contains the data extracted from the <code>.c4tb</code> file</strong>, but we haven’t assigned it to <strong>angr’s</strong> memory yet. Additionally, this assignment must be done correctly, matching the appropriate variable type.</p>
 <p>Looking more closely at the bytecode and <strong>key</strong> assignment, we can see that we’re using the lower byte of the <strong>RAX</strong> register (specifically <strong>AL</strong>) each time. This means we need exactly <strong>8 bits</strong> for each key value.</p>
-<p><img src="/img/symbolic_exe/bytecode.png" alt="Figure 4: Shuffle bytecode and key chars"></p>
+<p><img src="../../../../img/symbolic_exe/bytecode.png" alt="Figure 4: Shuffle bytecode and key chars"></p>
 <p>Figure 4: Shuffle bytecode and key chars</p>
 <p>Armed with this knowledge, it is possible to allocate and assign angr memory accordingly.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>data_sec <span style="color:#f92672">=</span> state.heap.allocate<span style="color:#f92672">(</span>size<span style="color:#f92672">)</span>
@@ -307,7 +307,7 @@ Has anyone ever tried using angr for something meaningful, only to end up frustr
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>base_addr <span style="color:#f92672">=</span> proj<span style="color:#f92672">.</span>loader<span style="color:#f92672">.</span>min_addr 
 </span></span><span style="display:flex;"><span>print(hex(base_addr))
 </span></span></code></pre></div><p>This is instruction actually prints the base address used by angr to load the binary. Matching this address in IDA will make all operation about addresses way more easier.</p>
-<p><img src="/img/symbolic_exe/rebase_program.png" alt="Figure 5: Rebase program with IDA"></p>
+<p><img src="../../../../img/symbolic_exe/rebase_program.png" alt="Figure 5: Rebase program with IDA"></p>
 <p>Figure 5: Rebase program with IDA</p>
 <h3 id="conclusion">Conclusion</h3>
 <p>Through this post, I’ve “closed the circle” (or at least tried) on emulation and symbolic execution, demonstrating how these techniques can be used to analyze real-world malware. While there are still unexplored topic (e.g., Qiling), I haven’t delved into it deeply. Despite being a potentially powerful tool, Qiling’s documentation isn’t well-maintained, and utilizing it might require significant effort. Nevertheless, I hope you’ve enjoyed reading all the posts and had as much fun exploring them as I did while explaining and experimenting with these topics.</p>
@@ -391,7 +391,7 @@ Has anyone ever tried using angr for something meaningful, only to end up frustr
 
 
 
-<script type="text/javascript" src="/bundle.min.e89fda0f29b95d33f6f4224dd9e5cf69d84aff3818be2b0d73e731689cc374261b016d17d46f8381962fb4a1577ba3017b1f23509d894f6e66431f988c00889e.js" integrity="sha512-6J/aDym5XTP29CJN2eXPadhK/zgYvisNc&#43;cxaJzDdCYbAW0X1G&#43;DgZYvtKFXe6MBex8jUJ2JT25mQx&#43;YjACIng=="></script>
+<script type="text/javascript" src="../../../../bundle.min.e89fda0f29b95d33f6f4224dd9e5cf69d84aff3818be2b0d73e731689cc374261b016d17d46f8381962fb4a1577ba3017b1f23509d894f6e66431f988c00889e.js" integrity="sha512-6J/aDym5XTP29CJN2eXPadhK/zgYvisNc&#43;cxaJzDdCYbAW0X1G&#43;DgZYvtKFXe6MBex8jUJ2JT25mQx&#43;YjACIng=="></script>
 
 
 
