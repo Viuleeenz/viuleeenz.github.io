@@ -1,23 +1,5 @@
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-    <channel>
-        <title>Posts on Security Undisguised</title>
-        <link>http://localhost:1313/posts/</link>
-        <description>Recent content in Posts on Security Undisguised</description>
-        <generator>Hugo -- gohugo.io</generator>
-        <language>en</language>
-        <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
-        <lastBuildDate>Thu, 28 Aug 2025 00:00:00 +0000</lastBuildDate>
-        <atom:link href="http://localhost:1313/posts/index.xml" rel="self" type="application/rss+xml" />
-        
-        <item>
-            <title>From one to many - one IOC to hunt them ALL</title>
-            <link>http://localhost:1313/posts/2025/08/from-one-to-many-one-ioc-to-hunt-them-all/</link>
-            <pubDate>Thu, 28 Aug 2025 00:00:00 +0000</pubDate>
-            
-            <guid>http://localhost:1313/posts/2025/08/from-one-to-many-one-ioc-to-hunt-them-all/</guid>
-            <description>&lt;p&gt;&lt;em&gt;If you are a threat researcher reading a blog post about a novel threat that could potentially impact your organization, or if you need to investigate this threat to enrich your internal telemetry for better tracking and detection, how would you proceed?&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;This was the question that come up in my mind, out of the blue, reading an article from Unit42 where they start to talk about a novel malware sold in the underground named &lt;a href=&#34;https://unit42.paloaltonetworks.com/new-malware-gremlin-stealer-for-sale-on-telegram/&#34;&gt;Gremlin stealer&lt;/a&gt;. As always the article is very well detailed, carefully explaining the malware’s characteristics and objectives while also providing the SHA-256 hash of the analyzed sample.&lt;/p&gt;</description>
-            <content type="html"><![CDATA[<p><em>If you are a threat researcher reading a blog post about a novel threat that could potentially impact your organization, or if you need to investigate this threat to enrich your internal telemetry for better tracking and detection, how would you proceed?</em></p>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on Security Undisguised</title><link>https://Viuleeenz.github.io/posts/</link><description>Recent content in Posts on Security Undisguised</description><generator>Hugo -- gohugo.io</generator><language>en</language><copyright>&lt;a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0&lt;/a></copyright><lastBuildDate>Thu, 28 Aug 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://Viuleeenz.github.io/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>From one to many - one IOC to hunt them ALL</title><link>https://Viuleeenz.github.io/posts/2025/08/from-one-to-many-one-ioc-to-hunt-them-all/</link><pubDate>Thu, 28 Aug 2025 00:00:00 +0000</pubDate><guid>https://Viuleeenz.github.io/posts/2025/08/from-one-to-many-one-ioc-to-hunt-them-all/</guid><description>&lt;p>&lt;em>If you are a threat researcher reading a blog post about a novel threat that could potentially impact your organization, or if you need to investigate this threat to enrich your internal telemetry for better tracking and detection, how would you proceed?&lt;/em>&lt;/p>
+&lt;p>This was the question that come up in my mind, out of the blue, reading an article from Unit42 where they start to talk about a novel malware sold in the underground named &lt;a href="https://unit42.paloaltonetworks.com/new-malware-gremlin-stealer-for-sale-on-telegram/">Gremlin stealer&lt;/a>. As always the article is very well detailed, carefully explaining the malware’s characteristics and objectives while also providing the SHA-256 hash of the analyzed sample.&lt;/p></description><content type="html"><![CDATA[<p><em>If you are a threat researcher reading a blog post about a novel threat that could potentially impact your organization, or if you need to investigate this threat to enrich your internal telemetry for better tracking and detection, how would you proceed?</em></p>
 <p>This was the question that come up in my mind, out of the blue, reading an article from Unit42 where they start to talk about a novel malware sold in the underground named <a href="https://unit42.paloaltonetworks.com/new-malware-gremlin-stealer-for-sale-on-telegram/">Gremlin stealer</a>. As always the article is very well detailed, carefully explaining the malware’s characteristics and objectives while also providing the SHA-256 hash of the analyzed sample.</p>
 <p>Generally speaking, shared IOCs are invaluable resources for the security community, as detection capabilities often depend on the breadth of threat intelligence available in your platform. However, IOC collections can vary dramatically in quality and scope. Sometimes you&rsquo;ll find comprehensive lists containing everything from phishing email hashes and malware stages to domains and JavaScript files. Other times, you&rsquo;re left with minimal intelligence—perhaps just a single hash and a brief description—making threat hunting significantly more challenging.</p>
 <blockquote>
@@ -331,18 +313,8 @@
 </table>
 </li>
 </ul>
-]]></content>
-        </item>
-        
-        <item>
-            <title>Symbolic Execution for fun and Flare-On</title>
-            <link>http://localhost:1313/posts/2024/12/symbolic-execution-for-fun-and-flare-on/</link>
-            <pubDate>Fri, 27 Dec 2024 00:00:00 +0000</pubDate>
-            
-            <guid>http://localhost:1313/posts/2024/12/symbolic-execution-for-fun-and-flare-on/</guid>
-            <description>&lt;p&gt;Emulation is my passion. I apply it as much as I can in countless scenarios—sometimes for practical purposes, and sometimes just for fun. Recently, I’ve been diving into &lt;strong&gt;angr&lt;/strong&gt;, and after weeks of banging my head against it, a few questions crossed my mind:&lt;/p&gt;
-&lt;p&gt;Has anyone ever tried using angr for something meaningful, only to end up frustrated because nothing seemed to work? Or followed an angr tutorial based on CTF code, thinking, &lt;em&gt;“Wow, this looks easy—I’ve got this!”&lt;/em&gt;—only to realize you’re in way over your head?&lt;/p&gt;</description>
-            <content type="html"><![CDATA[<p>Emulation is my passion. I apply it as much as I can in countless scenarios—sometimes for practical purposes, and sometimes just for fun. Recently, I’ve been diving into <strong>angr</strong>, and after weeks of banging my head against it, a few questions crossed my mind:</p>
+]]></content></item><item><title>Symbolic Execution for fun and Flare-On</title><link>https://Viuleeenz.github.io/posts/2024/12/symbolic-execution-for-fun-and-flare-on/</link><pubDate>Fri, 27 Dec 2024 00:00:00 +0000</pubDate><guid>https://Viuleeenz.github.io/posts/2024/12/symbolic-execution-for-fun-and-flare-on/</guid><description>&lt;p>Emulation is my passion. I apply it as much as I can in countless scenarios—sometimes for practical purposes, and sometimes just for fun. Recently, I’ve been diving into &lt;strong>angr&lt;/strong>, and after weeks of banging my head against it, a few questions crossed my mind:&lt;/p>
+&lt;p>Has anyone ever tried using angr for something meaningful, only to end up frustrated because nothing seemed to work? Or followed an angr tutorial based on CTF code, thinking, &lt;em>“Wow, this looks easy—I’ve got this!”&lt;/em>—only to realize you’re in way over your head?&lt;/p></description><content type="html"><![CDATA[<p>Emulation is my passion. I apply it as much as I can in countless scenarios—sometimes for practical purposes, and sometimes just for fun. Recently, I’ve been diving into <strong>angr</strong>, and after weeks of banging my head against it, a few questions crossed my mind:</p>
 <p>Has anyone ever tried using angr for something meaningful, only to end up frustrated because nothing seemed to work? Or followed an angr tutorial based on CTF code, thinking, <em>“Wow, this looks easy—I’ve got this!”</em>—only to realize you’re in way over your head?</p>
 <p>Well, that’s exactly where I found myself. 😑</p>
 <p>Nevertheless, I found quite interesting tutorial about symbolic execution and I really recommend the course on <a href="https://p.ost2.fyi/courses/course-v1:OpenSecurityTraining2&#43;RE3201_symexec&#43;2021_V1/about">OpenSecurityTraining2</a>. It’s a generic course but it also gives some really good basic of angr usage. Unfortunately, what is really missing on the web (or at least I didn’t find it) is something that goes over the basic.</p>
@@ -490,19 +462,9 @@
 <li><a href="https://p.ost2.fyi/courses/course-v1:OpenSecurityTraining2&#43;RE3201_symexec&#43;2021_V1/about">SymbolicExecution training</a></li>
 <li><a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/SymbolicExecution/catbert_ransomware.py">Catbert Ransomware solver</a></li>
 </ul>
-]]></content>
-        </item>
-        
-        <item>
-            <title>Emulating inline decryption for triaging C&#43;&#43; malware</title>
-            <link>http://localhost:1313/posts/2024/05/emulating-inline-decryption-for-triaging-c-malware/</link>
-            <pubDate>Thu, 16 May 2024 00:00:00 +0000</pubDate>
-            
-            <guid>http://localhost:1313/posts/2024/05/emulating-inline-decryption-for-triaging-c-malware/</guid>
-            <description>&lt;h2 id=&#34;what-we-need-to-know&#34;&gt;What we need to know?&lt;/h2&gt;
-&lt;p&gt;C and C++ binaries share several commonalities, however, some additional features and complexities introduced by C++ can make reverse engineering C++ binaries more challenging compared to C binaries. Some of the most important features are:&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Name Mangling&lt;/strong&gt;: C++ compilers often use name mangling to encode additional information about functions and classes into the symbol names in the binary. This can make it more challenging to understand the code&amp;rsquo;s structure and functionality by simply looking at symbol names.&lt;/p&gt;</description>
-            <content type="html"><![CDATA[<h2 id="what-we-need-to-know">What we need to know?</h2>
+]]></content></item><item><title>Emulating inline decryption for triaging C++ malware</title><link>https://Viuleeenz.github.io/posts/2024/05/emulating-inline-decryption-for-triaging-c-malware/</link><pubDate>Thu, 16 May 2024 00:00:00 +0000</pubDate><guid>https://Viuleeenz.github.io/posts/2024/05/emulating-inline-decryption-for-triaging-c-malware/</guid><description>&lt;h2 id="what-we-need-to-know">What we need to know?&lt;/h2>
+&lt;p>C and C++ binaries share several commonalities, however, some additional features and complexities introduced by C++ can make reverse engineering C++ binaries more challenging compared to C binaries. Some of the most important features are:&lt;/p>
+&lt;p>&lt;strong>Name Mangling&lt;/strong>: C++ compilers often use name mangling to encode additional information about functions and classes into the symbol names in the binary. This can make it more challenging to understand the code&amp;rsquo;s structure and functionality by simply looking at symbol names.&lt;/p></description><content type="html"><![CDATA[<h2 id="what-we-need-to-know">What we need to know?</h2>
 <p>C and C++ binaries share several commonalities, however, some additional features and complexities introduced by C++ can make reverse engineering C++ binaries more challenging compared to C binaries. Some of the most important features are:</p>
 <p><strong>Name Mangling</strong>: C++ compilers often use name mangling to encode additional information about functions and classes into the symbol names in the binary. This can make it more challenging to understand the code&rsquo;s structure and functionality by simply looking at symbol names.</p>
 <p><strong>Object-Oriented Features</strong>: C++ supports object-oriented programming (OOP) features such as classes, inheritance, polymorphism, and virtual functions. Reverse engineering C++ binaries may involve identifying and understanding these constructs, which may not exist in C binaries.</p>
@@ -589,17 +551,7 @@
 <li><a href="https://fumik0.com/2019/12/25/lets-play-again-with-predator-the-thief/">Let’s play (again) with Predator the thief</a></li>
 <li><a href="https://outpost24.com/blog/an-in-depth-analysis-of-the-new-taurus-stealer/">An In-Depth analysis of the new Taurus Stealer</a></li>
 </ul>
-]]></content>
-        </item>
-        
-        <item>
-            <title>Understanding API Hashing and build a rainbow table for LummaStealer</title>
-            <link>http://localhost:1313/posts/2024/03/understanding-api-hashing-and-build-a-rainbow-table-for-lummastealer/</link>
-            <pubDate>Sun, 24 Mar 2024 00:00:00 +0000</pubDate>
-            
-            <guid>http://localhost:1313/posts/2024/03/understanding-api-hashing-and-build-a-rainbow-table-for-lummastealer/</guid>
-            <description>&lt;p&gt;Understanding PEB and Ldr structures represents a starting point when we are dealing with API hashing. However, before proceeding to analyze a sample it’s always necessary to recover  obfuscated, encrypted or hashed data. Because of that, through this blogpost I would like to continue what I have started in the &lt;a href=&#34;https://viuleeenz.github.io/posts/2024/02/understanding-peb-and-ldr-structures-using-ida-and-lummastealer/&#34;&gt;previous post&lt;/a&gt;, using emulation to create a rainbow table for LummaStealer and then write a little resolver script that is going to use the information extracted to resolve all hashes.&lt;/p&gt;</description>
-            <content type="html"><![CDATA[<p>Understanding PEB and Ldr structures represents a starting point when we are dealing with API hashing. However, before proceeding to analyze a sample it’s always necessary to recover  obfuscated, encrypted or hashed data. Because of that, through this blogpost I would like to continue what I have started in the <a href="https://viuleeenz.github.io/posts/2024/02/understanding-peb-and-ldr-structures-using-ida-and-lummastealer/">previous post</a>, using emulation to create a rainbow table for LummaStealer and then write a little resolver script that is going to use the information extracted to resolve all hashes.</p>
+]]></content></item><item><title>Understanding API Hashing and build a rainbow table for LummaStealer</title><link>https://Viuleeenz.github.io/posts/2024/03/understanding-api-hashing-and-build-a-rainbow-table-for-lummastealer/</link><pubDate>Sun, 24 Mar 2024 00:00:00 +0000</pubDate><guid>https://Viuleeenz.github.io/posts/2024/03/understanding-api-hashing-and-build-a-rainbow-table-for-lummastealer/</guid><description>&lt;p>Understanding PEB and Ldr structures represents a starting point when we are dealing with API hashing. However, before proceeding to analyze a sample it’s always necessary to recover obfuscated, encrypted or hashed data. Because of that, through this blogpost I would like to continue what I have started in the &lt;a href="https://viuleeenz.github.io/posts/2024/02/understanding-peb-and-ldr-structures-using-ida-and-lummastealer/">previous post&lt;/a>, using emulation to create a rainbow table for LummaStealer and then write a little resolver script that is going to use the information extracted to resolve all hashes.&lt;/p></description><content type="html"><![CDATA[<p>Understanding PEB and Ldr structures represents a starting point when we are dealing with API hashing. However, before proceeding to analyze a sample it’s always necessary to recover  obfuscated, encrypted or hashed data. Because of that, through this blogpost I would like to continue what I have started in the <a href="https://viuleeenz.github.io/posts/2024/02/understanding-peb-and-ldr-structures-using-ida-and-lummastealer/">previous post</a>, using emulation to create a rainbow table for LummaStealer and then write a little resolver script that is going to use the information extracted to resolve all hashes.</p>
 <blockquote>
 <p>💡<em>It’s worth mentioning that I’m trying to create self-contained posts. Of course, previous information will give a more comprehensive understanding of the whole process, however, the goal for this post is to have a guide that could be applied overtime even on different samples not related to LummaStealer.</em></p>
 </blockquote>
@@ -748,17 +700,7 @@ Figure 4: MurMur2 hashing routine</p>
 <blockquote>
 <p>💡<em>If you want to experiment a little bit more with this concept, I suggest to take the kernel32.dll library and follows this algorithm using <a href="https://github.com/hasherezade/pe-bear">PE-Bear</a></em></p>
 </blockquote>
-]]></content>
-        </item>
-        
-        <item>
-            <title>Understanding PEB and LDR Structures using IDA and LummaStealer</title>
-            <link>http://localhost:1313/posts/2024/02/understanding-peb-and-ldr-structures-using-ida-and-lummastealer/</link>
-            <pubDate>Sun, 04 Feb 2024 00:00:00 +0000</pubDate>
-            
-            <guid>http://localhost:1313/posts/2024/02/understanding-peb-and-ldr-structures-using-ida-and-lummastealer/</guid>
-            <description>&lt;p&gt;In this post I’m going to explain how Process Environment Block (PEB) is parsed by malware devs and how that structure is abused. Instead of going too deep into a lot of details, I would like to follow an easier approach pairing the theory with a practical real example using IDA and LummaStealer, without overwhelming the reader with a lot of technical details trying to simplify the data structure involved in the process. At the end of the theory part, I’m going to &lt;strong&gt;apply PEB and all related structures in IDA&lt;/strong&gt;, inspecting malware parsing capabilities that are going to be applied for resolving hashed APIs.&lt;/p&gt;</description>
-            <content type="html"><![CDATA[<p>In this post I’m going to explain how Process Environment Block (PEB) is parsed by malware devs and how that structure is abused. Instead of going too deep into a lot of details, I would like to follow an easier approach pairing the theory with a practical real example using IDA and LummaStealer, without overwhelming the reader with a lot of technical details trying to simplify the data structure involved in the process. At the end of the theory part, I’m going to <strong>apply PEB and all related structures in IDA</strong>, inspecting malware parsing capabilities that are going to be applied for resolving hashed APIs.</p>
+]]></content></item><item><title>Understanding PEB and LDR Structures using IDA and LummaStealer</title><link>https://Viuleeenz.github.io/posts/2024/02/understanding-peb-and-ldr-structures-using-ida-and-lummastealer/</link><pubDate>Sun, 04 Feb 2024 00:00:00 +0000</pubDate><guid>https://Viuleeenz.github.io/posts/2024/02/understanding-peb-and-ldr-structures-using-ida-and-lummastealer/</guid><description>&lt;p>In this post I’m going to explain how Process Environment Block (PEB) is parsed by malware devs and how that structure is abused. Instead of going too deep into a lot of details, I would like to follow an easier approach pairing the theory with a practical real example using IDA and LummaStealer, without overwhelming the reader with a lot of technical details trying to simplify the data structure involved in the process. At the end of the theory part, I’m going to &lt;strong>apply PEB and all related structures in IDA&lt;/strong>, inspecting malware parsing capabilities that are going to be applied for resolving hashed APIs.&lt;/p></description><content type="html"><![CDATA[<p>In this post I’m going to explain how Process Environment Block (PEB) is parsed by malware devs and how that structure is abused. Instead of going too deep into a lot of details, I would like to follow an easier approach pairing the theory with a practical real example using IDA and LummaStealer, without overwhelming the reader with a lot of technical details trying to simplify the data structure involved in the process. At the end of the theory part, I’m going to <strong>apply PEB and all related structures in IDA</strong>, inspecting malware parsing capabilities that are going to be applied for resolving hashed APIs.</p>
 <p>Let’s start.</p>
 <h3 id="peb-structure">PEB Structure</h3>
 <p>The PEB is a crucial data structure that contains various <strong>information</strong> about a <strong>running process</strong>. Unlike other Windows structure (e.g., EPROCESS, ETHREAD, etc..), it exists in the user address space and is available for every process at a <strong>fixed</strong> address in memory (PEB can be found at <code>fs:[0x30]</code> in the Thread Environment Block (TEB) for x86 processes as well as at <code>gs:[0x60]</code> for x64 processes). Some of documented fields that it’s worth knowing are:</p>
@@ -843,18 +785,8 @@ loaded modules (the module database).</li>
 <ul>
 <li><a href="https://bazaar.abuse.ch/sample/277d7f450268aeb4e7fe942f70a9df63aa429d703e9400370f0621a438e918bf/">MalwareBazaar</a></li>
 </ul>
-]]></content>
-        </item>
-        
-        <item>
-            <title>Applied Emulation - Decrypting Ursnif strings with Unicorn</title>
-            <link>http://localhost:1313/posts/2023/12/applied-emulation-decrypting-ursnif-strings-with-unicorn/</link>
-            <pubDate>Wed, 20 Dec 2023 00:00:00 +0000</pubDate>
-            
-            <guid>http://localhost:1313/posts/2023/12/applied-emulation-decrypting-ursnif-strings-with-unicorn/</guid>
-            <description>&lt;h3 id=&#34;introduction&#34;&gt;Introduction&lt;/h3&gt;
-&lt;p&gt;Here we go with another chapter of the Applied Emulation series. In the previous blogpost we have talked about emulation and more specifically, the usage of &lt;em&gt;Dumpulator&lt;/em&gt; to perform a quick triage. However, in this blogpost we are going to use a completely different approach, taking advantage of &lt;strong&gt;static analysis to&lt;/strong&gt; &lt;strong&gt;understand and emulate a string decryption algorithm through &lt;a href=&#34;https://www.unicorn-engine.org/&#34;&gt;Unicorn&lt;/a&gt;&lt;/strong&gt;. As always, I would like to give a practical example on a real case scenario. Because of that, I have chosen to analyze an &lt;strong&gt;Ursnif&lt;/strong&gt; sample.&lt;/p&gt;</description>
-            <content type="html"><![CDATA[<h3 id="introduction">Introduction</h3>
+]]></content></item><item><title>Applied Emulation - Decrypting Ursnif strings with Unicorn</title><link>https://Viuleeenz.github.io/posts/2023/12/applied-emulation-decrypting-ursnif-strings-with-unicorn/</link><pubDate>Wed, 20 Dec 2023 00:00:00 +0000</pubDate><guid>https://Viuleeenz.github.io/posts/2023/12/applied-emulation-decrypting-ursnif-strings-with-unicorn/</guid><description>&lt;h3 id="introduction">Introduction&lt;/h3>
+&lt;p>Here we go with another chapter of the Applied Emulation series. In the previous blogpost we have talked about emulation and more specifically, the usage of &lt;em>Dumpulator&lt;/em> to perform a quick triage. However, in this blogpost we are going to use a completely different approach, taking advantage of &lt;strong>static analysis to&lt;/strong> &lt;strong>understand and emulate a string decryption algorithm through &lt;a href="https://www.unicorn-engine.org/">Unicorn&lt;/a>&lt;/strong>. As always, I would like to give a practical example on a real case scenario. Because of that, I have chosen to analyze an &lt;strong>Ursnif&lt;/strong> sample.&lt;/p></description><content type="html"><![CDATA[<h3 id="introduction">Introduction</h3>
 <p>Here we go with another chapter of the Applied Emulation series. In the previous blogpost we have talked about emulation and more specifically, the usage of <em>Dumpulator</em> to perform a quick triage. However, in this blogpost we are going to use a completely different approach, taking advantage of <strong>static analysis to</strong> <strong>understand and emulate a string decryption algorithm through <a href="https://www.unicorn-engine.org/">Unicorn</a></strong>. As always, I would like to give a practical example on a real case scenario. Because of that, I have chosen to analyze an <strong>Ursnif</strong> sample.</p>
 <p>It’s worth mentioning that this sample is part of weekly challenges related to the <a href="https://courses.zero2auto.com/">Zero2Auto</a> course. However, instead of automating the full code extraction, as requested by the challenge, I found even more interesting going into unexplored paths applying emulation instead.</p>
 <h3 id="unicorn-challenges">Unicorn challenges</h3>
@@ -1003,18 +935,8 @@ Figure 3: Decrypted strings</p>
 <ul>
 <li><a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/MalwareAutomation/Ursnif/ursnif_emulate_decryption.py">ursnif_string_decryptor.py</a></li>
 </ul>
-]]></content>
-        </item>
-        
-        <item>
-            <title>Applied Emulation - Analysis of MarsStealer</title>
-            <link>http://localhost:1313/posts/2023/11/applied-emulation-analysis-of-marsstealer/</link>
-            <pubDate>Wed, 15 Nov 2023 00:00:00 +0000</pubDate>
-            
-            <guid>http://localhost:1313/posts/2023/11/applied-emulation-analysis-of-marsstealer/</guid>
-            <description>&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;
-&lt;p&gt;&lt;strong&gt;Emulation is a technique that could be very handy and effective&lt;/strong&gt; when we have to deal with &lt;strong&gt;malware triage&lt;/strong&gt;, &lt;strong&gt;configuration extractor&lt;/strong&gt; and &lt;strong&gt;deobfuscate part of the code without rewriting complex algorithms&lt;/strong&gt;. Even if it seems magic (and it&amp;rsquo;s not unfortunately) it&amp;rsquo;s still not possible to apply emulation on random code. However, if applied correctly this method could really speed up our malware analysis and triage. Through this blogpost I would like to give an overview about emulation usage and apply it in a real case scenario.&lt;/p&gt;</description>
-            <content type="html"><![CDATA[<h2 id="introduction">Introduction</h2>
+]]></content></item><item><title>Applied Emulation - Analysis of MarsStealer</title><link>https://Viuleeenz.github.io/posts/2023/11/applied-emulation-analysis-of-marsstealer/</link><pubDate>Wed, 15 Nov 2023 00:00:00 +0000</pubDate><guid>https://Viuleeenz.github.io/posts/2023/11/applied-emulation-analysis-of-marsstealer/</guid><description>&lt;h2 id="introduction">Introduction&lt;/h2>
+&lt;p>&lt;strong>Emulation is a technique that could be very handy and effective&lt;/strong> when we have to deal with &lt;strong>malware triage&lt;/strong>, &lt;strong>configuration extractor&lt;/strong> and &lt;strong>deobfuscate part of the code without rewriting complex algorithms&lt;/strong>. Even if it seems magic (and it&amp;rsquo;s not unfortunately) it&amp;rsquo;s still not possible to apply emulation on random code. However, if applied correctly this method could really speed up our malware analysis and triage. Through this blogpost I would like to give an overview about emulation usage and apply it in a real case scenario.&lt;/p></description><content type="html"><![CDATA[<h2 id="introduction">Introduction</h2>
 <p><strong>Emulation is a technique that could be very handy and effective</strong> when we have to deal with <strong>malware triage</strong>, <strong>configuration extractor</strong> and <strong>deobfuscate part of the code without rewriting complex algorithms</strong>. Even if it seems magic (and it&rsquo;s not unfortunately) it&rsquo;s still not possible to apply emulation on random code. However, if applied correctly this method could really speed up our malware analysis and triage. Through this blogpost I would like to give an overview about emulation usage and apply it in a real case scenario.</p>
 <p>Recently, I followed a twitter warning about Vidar malware in the wild and eager to revalidate an IDA-python script to deobfuscate strings, I immediately jumped into it. However, extracting that sample it was pretty obvious that I was dealing with another stealer, called MarsStealer. Since I did have a lot of information about that sample, I thought that could be a good choice to experiment with emulation. The result was quite promising and because of that <strong>I want to take this occasion to show a few basic emulations that could, hopefully, help someone else to speed up its analysis</strong>.</p>
 <h3 id="payload-extraction">Payload extraction</h3>
@@ -1111,18 +1033,8 @@ Figure 3: Decrypted strings</p>
 <ul>
 <li><a href="https://github.com/mrexodia/dumpulator">Reference</a></li>
 </ul>
-]]></content>
-        </item>
-        
-        <item>
-            <title>Vidar - payload inspection with static analysis</title>
-            <link>http://localhost:1313/posts/2023/10/vidar-payload-inspection-with-static-analysis/</link>
-            <pubDate>Wed, 25 Oct 2023 00:00:00 +0000</pubDate>
-            
-            <guid>http://localhost:1313/posts/2023/10/vidar-payload-inspection-with-static-analysis/</guid>
-            <description>&lt;h2 id=&#34;behind-this-post&#34;&gt;Behind this post&lt;/h2&gt;
-&lt;p&gt;Through this blogpost I’m going to talk about one of the latest Vidar samples that I had a chance to analyze. The payload is actually part of a campaign delivered in July 2023 using PEC mails and this analysis comes from a post related to &lt;a href=&#34;https://cert-agid.gov.it/tag/vidar/&#34;&gt;Cert-Agid&lt;/a&gt; in the same period. Even if the payload seems to be out of time, it&amp;rsquo;s still a valid example for further analysis of more recents ones.&lt;/p&gt;</description>
-            <content type="html"><![CDATA[<h2 id="behind-this-post">Behind this post</h2>
+]]></content></item><item><title>Vidar - payload inspection with static analysis</title><link>https://Viuleeenz.github.io/posts/2023/10/vidar-payload-inspection-with-static-analysis/</link><pubDate>Wed, 25 Oct 2023 00:00:00 +0000</pubDate><guid>https://Viuleeenz.github.io/posts/2023/10/vidar-payload-inspection-with-static-analysis/</guid><description>&lt;h2 id="behind-this-post">Behind this post&lt;/h2>
+&lt;p>Through this blogpost I’m going to talk about one of the latest Vidar samples that I had a chance to analyze. The payload is actually part of a campaign delivered in July 2023 using PEC mails and this analysis comes from a post related to &lt;a href="https://cert-agid.gov.it/tag/vidar/">Cert-Agid&lt;/a> in the same period. Even if the payload seems to be out of time, it&amp;rsquo;s still a valid example for further analysis of more recents ones.&lt;/p></description><content type="html"><![CDATA[<h2 id="behind-this-post">Behind this post</h2>
 <p>Through this blogpost I’m going to talk about one of the latest Vidar samples that I had a chance to analyze. The payload is actually part of a campaign delivered in July 2023 using PEC mails and this analysis comes from a post related to <a href="https://cert-agid.gov.it/tag/vidar/">Cert-Agid</a> in the same period. Even if the payload seems to be out of time, it&rsquo;s still a valid example for further analysis of more recents ones.</p>
 <p>The purpose of this article is to give an overview of Vidar, helping people that are tracking this threat to properly deal with it. Moreover, it is also an excuse <strong>to tweak a little bit with IDA to show a possible solution related to common issues when we are dealing with highly obfuscated malware</strong>.</p>
 <h2 id="static-analysis">Static Analysis</h2>
@@ -1511,18 +1423,8 @@ Microsoft Defender&rsquo;s Sandbox:</li>
 </table>
 </li>
 </ul>
-]]></content>
-        </item>
-        
-        <item>
-            <title>Agent Tesla - Building an effective decryptor</title>
-            <link>http://localhost:1313/posts/2023/08/agent-tesla-building-an-effective-decryptor/</link>
-            <pubDate>Tue, 29 Aug 2023 00:00:00 +0000</pubDate>
-            
-            <guid>http://localhost:1313/posts/2023/08/agent-tesla-building-an-effective-decryptor/</guid>
-            <description>&lt;h3 id=&#34;general-information-and-preface&#34;&gt;General Information and preface&lt;/h3&gt;
-&lt;p&gt;Agent Tesla, according to the &lt;a href=&#34;https://cert.europa.eu/static/threat-intelligence/TLP-CLEAR-CB-23-08.pdf&#34;&gt;data&lt;/a&gt; provided by CERT-EU, is one the most prominent threats that are hitting European cyberspace. Because of that, I found that it could be quite interesting understanding its behavior. However, as I usually prefer, instead of focusing on the infection chain or information about TA methodologies, sharing knowledge that were already provided by more authoritative sources, I preferred to focus mostly on malware analysis and in this specific case to the latest encryption algorithm adopted. Then, upon the knowledge acquired, I would like to write a decryptor script that extracts payload configuration.&lt;/p&gt;</description>
-            <content type="html"><![CDATA[<h3 id="general-information-and-preface">General Information and preface</h3>
+]]></content></item><item><title>Agent Tesla - Building an effective decryptor</title><link>https://Viuleeenz.github.io/posts/2023/08/agent-tesla-building-an-effective-decryptor/</link><pubDate>Tue, 29 Aug 2023 00:00:00 +0000</pubDate><guid>https://Viuleeenz.github.io/posts/2023/08/agent-tesla-building-an-effective-decryptor/</guid><description>&lt;h3 id="general-information-and-preface">General Information and preface&lt;/h3>
+&lt;p>Agent Tesla, according to the &lt;a href="https://cert.europa.eu/static/threat-intelligence/TLP-CLEAR-CB-23-08.pdf">data&lt;/a> provided by CERT-EU, is one the most prominent threats that are hitting European cyberspace. Because of that, I found that it could be quite interesting understanding its behavior. However, as I usually prefer, instead of focusing on the infection chain or information about TA methodologies, sharing knowledge that were already provided by more authoritative sources, I preferred to focus mostly on malware analysis and in this specific case to the latest encryption algorithm adopted. Then, upon the knowledge acquired, I would like to write a decryptor script that extracts payload configuration.&lt;/p></description><content type="html"><![CDATA[<h3 id="general-information-and-preface">General Information and preface</h3>
 <p>Agent Tesla, according to the <a href="https://cert.europa.eu/static/threat-intelligence/TLP-CLEAR-CB-23-08.pdf">data</a> provided by CERT-EU, is one the most prominent threats that are hitting European cyberspace. Because of that, I found that it could be quite interesting understanding its behavior. However, as I usually prefer, instead of focusing on the infection chain or information about TA methodologies, sharing knowledge that were already provided by more authoritative sources, I preferred to focus mostly on malware analysis and in this specific case to the latest encryption algorithm adopted. Then, upon the knowledge acquired, I would like to write a decryptor script that extracts payload configuration.</p>
 <h3 id="encryption-variants">Encryption variants</h3>
 <p>Agent Tesla first appeared in 2014, however, its evolution over time could be tracked by multiple TTPs. For the purpose of this article, I’m versioning it through the encryption algorithm adopted. At the time of writing there have been 4 different versions with unique characteristics:</p>
@@ -1611,19 +1513,9 @@ Microsoft Defender&rsquo;s Sandbox:</li>
 <li>acedd97c8350bacc485e87ae56c851d08b497c202deb46df28c3e7218cb4469a (SHA256) <a href="https://bazaar.abuse.ch/sample/acedd97c8350bacc485e87ae56c851d08b497c202deb46df28c3e7218cb4469a/">MalwareBazaar</a></li>
 <li>f5751d89bc6f15c3ade6513d3cf44f92a25e8cd25d2f5ad239b8c44f8f732cb8 (SHA256)<a href="https://bazaar.abuse.ch/sample/f5751d89bc6f15c3ade6513d3cf44f92a25e8cd25d2f5ad239b8c44f8f732cb8">MalwareBazaar</a></li>
 </ul>
-]]></content>
-        </item>
-        
-        <item>
-            <title>IDA-Python - Locate a function independently from its offset</title>
-            <link>http://localhost:1313/posts/2023/06/ida-python-locate-a-function-independently-from-its-offset/</link>
-            <pubDate>Tue, 27 Jun 2023 00:00:00 +0000</pubDate>
-            
-            <guid>http://localhost:1313/posts/2023/06/ida-python-locate-a-function-independently-from-its-offset/</guid>
-            <description>&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;
-&lt;p&gt;Analyzing samples statically could be not an easy going taks, especially when you deal with heavily obfuscated or encrypted data. Because of that, it’s useful to find out the decryption/deobfuscation routine and write a little script that makes sense of strings or function names before starting to analyze the whole sample.&lt;/p&gt;
-&lt;p&gt;The idea behind this technique was inspired by the infinite amount of tweaking I have made to run multiple Ida-python scripts that were heavily machine-setting dependents. The idea is very simple and it’s based on pattern matching as for YARA rules. The scope here is to create a kind of signature for a function that we would like to locate (e.g., deobfuscation routine) and apply its execution to its parameters in order to simplify our analysis &lt;strong&gt;without tweaking specific parameters&lt;/strong&gt; making it &lt;strong&gt;independent from the function offset&lt;/strong&gt;. I have already got good results experimenting with malware samples (e.g, Qbot) and custom binaries from CTFs as well as other samples that used some sort of obfuscation. Because of that, I decided to create this post to share this approach that could be useful for writing better scripts.&lt;/p&gt;</description>
-            <content type="html"><![CDATA[<h2 id="introduction">Introduction</h2>
+]]></content></item><item><title>IDA-Python - Locate a function independently from its offset</title><link>https://Viuleeenz.github.io/posts/2023/06/ida-python-locate-a-function-independently-from-its-offset/</link><pubDate>Tue, 27 Jun 2023 00:00:00 +0000</pubDate><guid>https://Viuleeenz.github.io/posts/2023/06/ida-python-locate-a-function-independently-from-its-offset/</guid><description>&lt;h2 id="introduction">Introduction&lt;/h2>
+&lt;p>Analyzing samples statically could be not an easy going taks, especially when you deal with heavily obfuscated or encrypted data. Because of that, it’s useful to find out the decryption/deobfuscation routine and write a little script that makes sense of strings or function names before starting to analyze the whole sample.&lt;/p>
+&lt;p>The idea behind this technique was inspired by the infinite amount of tweaking I have made to run multiple Ida-python scripts that were heavily machine-setting dependents. The idea is very simple and it’s based on pattern matching as for YARA rules. The scope here is to create a kind of signature for a function that we would like to locate (e.g., deobfuscation routine) and apply its execution to its parameters in order to simplify our analysis &lt;strong>without tweaking specific parameters&lt;/strong> making it &lt;strong>independent from the function offset&lt;/strong>. I have already got good results experimenting with malware samples (e.g, Qbot) and custom binaries from CTFs as well as other samples that used some sort of obfuscation. Because of that, I decided to create this post to share this approach that could be useful for writing better scripts.&lt;/p></description><content type="html"><![CDATA[<h2 id="introduction">Introduction</h2>
 <p>Analyzing samples statically could be not an easy going taks, especially when you deal with heavily obfuscated or encrypted data. Because of that, it’s useful to find out the decryption/deobfuscation routine and write a little script that makes sense of strings or function names before starting to analyze the whole sample.</p>
 <p>The idea behind this technique was inspired by the infinite amount of tweaking I have made to run multiple Ida-python scripts that were heavily machine-setting dependents. The idea is very simple and it’s based on pattern matching as for YARA rules. The scope here is to create a kind of signature for a function that we would like to locate (e.g., deobfuscation routine) and apply its execution to its parameters in order to simplify our analysis <strong>without tweaking specific parameters</strong> making it <strong>independent from the function offset</strong>. I have already got good results experimenting with malware samples (e.g, Qbot) and custom binaries from CTFs as well as other samples that used some sort of obfuscation. Because of that, I decided to create this post to share this approach that could be useful for writing better scripts.</p>
 <p>Generally speaking, approaching to these sample could be done through multiple perspective (e.g., starting with dynamic analysis and proceeding backwards), however, for the purpose of this blogpost I’m going to take a custom sample written by me, where strings are partially obfuscated with custom algorithm and I’m going to show an easy but effective method to write an ida-python script to <strong>locate and deobfuscate variables</strong>.</p>
@@ -1724,19 +1616,9 @@ Figure 5 - Variable deobfuscated successfully</p>
 <li>source code: <a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/IDA-python/function_search/test/obfuscation.c">obfuscation.c</a></li>
 <li>compiled sample: <a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/IDA-python/function_search/test/obfuscation.exe">obfuscation.exe</a></li>
 </ul>
-]]></content>
-        </item>
-        
-        <item>
-            <title>Extracting DDosia targets from process memory</title>
-            <link>http://localhost:1313/posts/2023/05/extracting-ddosia-targets-from-process-memory/</link>
-            <pubDate>Mon, 08 May 2023 00:00:00 +0000</pubDate>
-            
-            <guid>http://localhost:1313/posts/2023/05/extracting-ddosia-targets-from-process-memory/</guid>
-            <description>&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;
-&lt;p&gt;This post is part of an analysis that I have carried out during my spare time, motivated by a friend that asked me to have a look at the DDosia project related to the NoName057(16) group. The reason behind this request was caused by DDosia client changes for performing the DDos attacks. Because of that, all procedures used so far for monitoring NoName057(16) activities did not work anymore.&lt;/p&gt;
-&lt;p&gt;Before starting to reverse DDosia Windows sample, I preferred to gather as much information as possible about NoName057(16) TTPs and a few references to their samples.&lt;/p&gt;</description>
-            <content type="html"><![CDATA[<h2 id="introduction">Introduction</h2>
+]]></content></item><item><title>Extracting DDosia targets from process memory</title><link>https://Viuleeenz.github.io/posts/2023/05/extracting-ddosia-targets-from-process-memory/</link><pubDate>Mon, 08 May 2023 00:00:00 +0000</pubDate><guid>https://Viuleeenz.github.io/posts/2023/05/extracting-ddosia-targets-from-process-memory/</guid><description>&lt;h2 id="introduction">Introduction&lt;/h2>
+&lt;p>This post is part of an analysis that I have carried out during my spare time, motivated by a friend that asked me to have a look at the DDosia project related to the NoName057(16) group. The reason behind this request was caused by DDosia client changes for performing the DDos attacks. Because of that, all procedures used so far for monitoring NoName057(16) activities did not work anymore.&lt;/p>
+&lt;p>Before starting to reverse DDosia Windows sample, I preferred to gather as much information as possible about NoName057(16) TTPs and a few references to their samples.&lt;/p></description><content type="html"><![CDATA[<h2 id="introduction">Introduction</h2>
 <p>This post is part of an analysis that I have carried out during my spare time, motivated by a friend that asked me to have a look at the DDosia project related to the NoName057(16) group. The reason behind this request was caused by DDosia client changes for performing the DDos attacks. Because of that, all procedures used so far for monitoring NoName057(16) activities did not work anymore.</p>
 <p>Before starting to reverse DDosia Windows sample, I preferred to gather as much information as possible about NoName057(16) TTPs and a few references to their samples.</p>
 <p><a href="https://decoded.avast.io/martinchlumecky/ddosia-project-how-noname05716-is-trying-to-improve-the-efficiency-of-ddos-attacks/">Avast</a> wrote a very detailed article about that project and described thoroughly all changes observed in the last few months. Because of that, before proceeding with this post, If you feel you are missing something, I strongly  recommend that you read their article.</p>
@@ -1821,18 +1703,8 @@ Figure 4 - Target stored in cleartext within process memory</p>
       </tr>
   </tbody>
 </table>
-]]></content>
-        </item>
-        
-        <item>
-            <title>Dynamic Binary Instrumentation for Malware Analysis</title>
-            <link>http://localhost:1313/posts/2023/03/dynamic-binary-instrumentation-for-malware-analysis/</link>
-            <pubDate>Tue, 14 Mar 2023 00:00:00 +0000</pubDate>
-            
-            <guid>http://localhost:1313/posts/2023/03/dynamic-binary-instrumentation-for-malware-analysis/</guid>
-            <description>&lt;h2 id=&#34;introduction&#34;&gt;&lt;strong&gt;Introduction&lt;/strong&gt;&lt;/h2&gt;
-&lt;p&gt;Because of the massive Ursnif campaigns that hit Italy during the last weeks, I was looking for a lightweight method to quickly extract the last infection stage of all collected samples, in order to start further analysis effectively. Due to this, I wrote a little frida script that performs basic Dynamic Binary Instrumentation (DBI) to monitor useful function calls and extracts the Ursnif payload. In this article I am going to briefly discuss this script and the steps needed to start analyzing the resulting binary.&lt;/p&gt;</description>
-            <content type="html"><![CDATA[<h2 id="introduction"><strong>Introduction</strong></h2>
+]]></content></item><item><title>Dynamic Binary Instrumentation for Malware Analysis</title><link>https://Viuleeenz.github.io/posts/2023/03/dynamic-binary-instrumentation-for-malware-analysis/</link><pubDate>Tue, 14 Mar 2023 00:00:00 +0000</pubDate><guid>https://Viuleeenz.github.io/posts/2023/03/dynamic-binary-instrumentation-for-malware-analysis/</guid><description>&lt;h2 id="introduction">&lt;strong>Introduction&lt;/strong>&lt;/h2>
+&lt;p>Because of the massive Ursnif campaigns that hit Italy during the last weeks, I was looking for a lightweight method to quickly extract the last infection stage of all collected samples, in order to start further analysis effectively. Due to this, I wrote a little frida script that performs basic Dynamic Binary Instrumentation (DBI) to monitor useful function calls and extracts the Ursnif payload. In this article I am going to briefly discuss this script and the steps needed to start analyzing the resulting binary.&lt;/p></description><content type="html"><![CDATA[<h2 id="introduction"><strong>Introduction</strong></h2>
 <p>Because of the massive Ursnif campaigns that hit Italy during the last weeks, I was looking for a lightweight method to quickly extract the last infection stage of all collected samples, in order to start further analysis effectively. Due to this, I wrote a little frida script that performs basic Dynamic Binary Instrumentation (DBI) to monitor useful function calls and extracts the Ursnif payload. In this article I am going to briefly discuss this script and the steps needed to start analyzing the resulting binary.</p>
 <p>Since I would like to skip redundant topics that are already written all over the internet by people that are Jedi in this field, I’m going to limit this post linking references that would be nice to have to understand everything easily.</p>
 <ul>
@@ -1875,21 +1747,11 @@ Figure 4 - Target stored in cleartext within process memory</p>
 <ul>
 <li>DBI script: <a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/DynamicBinaryInstrumentation/mon.js">mon.py</a></li>
 </ul>
-]]></content>
-        </item>
-        
-        <item>
-            <title>Manually unpacking of packed executable</title>
-            <link>http://localhost:1313/posts/2021/09/manually-unpacking-of-packed-executable/</link>
-            <pubDate>Thu, 02 Sep 2021 00:00:00 +0000</pubDate>
-            
-            <guid>http://localhost:1313/posts/2021/09/manually-unpacking-of-packed-executable/</guid>
-            <description>&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;
-&lt;p&gt;In this post, I will show how to manually unpack a simple executable that has been packed with WinUPack.
+]]></content></item><item><title>Manually unpacking of packed executable</title><link>https://Viuleeenz.github.io/posts/2021/09/manually-unpacking-of-packed-executable/</link><pubDate>Thu, 02 Sep 2021 00:00:00 +0000</pubDate><guid>https://Viuleeenz.github.io/posts/2021/09/manually-unpacking-of-packed-executable/</guid><description>&lt;h2 id="introduction">Introduction&lt;/h2>
+&lt;p>In this post, I will show how to manually unpack a simple executable that has been packed with WinUPack.
 However, the goal of this post is to provide a general approach to start reversing code and, in general, packers.
 Because of that it will be hard to cover all the techniques and strategies that could be applied,
-but I will try to give the rights hints and the mindset to approach these challenges.&lt;/p&gt;</description>
-            <content type="html"><![CDATA[<h2 id="introduction">Introduction</h2>
+but I will try to give the rights hints and the mindset to approach these challenges.&lt;/p></description><content type="html"><![CDATA[<h2 id="introduction">Introduction</h2>
 <p>In this post, I will show how to manually unpack a simple executable that has been packed with WinUPack.
 However, the goal of this post is to provide a general approach to start reversing code and, in general, packers.
 Because of that it will be hard to cover all the techniques and strategies that could be applied,
@@ -1988,8 +1850,4 @@ that these function are actually called within the UnPackMe address space. In my
 <p>To conclude, in this brief post we saw how to manually examine a binary that has been packed, looking for clues, formulate hypothesis and then working to confirm or reject them.</p>
 <p>In my experience, reversing isn&rsquo;t going in the middle of the code without an idea, it’s important to follow a method that should be as general as possible. In order to get better, I strongly recommend to practice with other sample trying to apply the same approach we saw here.</p>
 <p>In case of doubts, unclear part, or just feedback about this post, feel free to reach me on my mail account.</p>
-]]></content>
-        </item>
-        
-    </channel>
-</rss>
+]]></content></item></channel></rss>
