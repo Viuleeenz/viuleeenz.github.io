@@ -22,10 +22,9 @@
 </li>
 <li>
 <p><strong>Misleading Copyright Information</strong></p>
-<blockquote>
-<p>“LLC &lsquo;Windows&rsquo; &amp; Copyright © 2024”</p>
-<p>While it attempts to <strong>mimic legitimate Microsoft software</strong>, the naming convention is <strong>incorrect</strong>.</p>
-</blockquote>
+<ul>
+<li>“LLC &lsquo;Windows&rsquo; &amp; Copyright © 2024” ( Attempts to mimic legitimate Microsoft software, the naming convention is incorrect.)</li>
+</ul>
 </li>
 <li>
 <p><strong>.NET Assembly Metadata</strong></p>
@@ -188,13 +187,11 @@
 </li>
 <li><strong>.NET Compilation Identifiers</strong>
 <ul>
-<li>Uses <code>TypeLib ID</code> and <code>Module Version ID</code> for clustering</li>
-<li>Very strong, but can be <strong>overly restrictive</strong> if the malware author recompiles</li>
+<li>Uses <code>TypeLib ID</code> and <code>Module Version ID</code> for clustering ( very strong, but can be <strong>overly restrictive</strong> if the malware author recompiles )</li>
 </ul>
 </li>
 <li><strong>Functional Capabilities</strong>
 <ul>
-<li>Matches keywords related to <strong>crypto wallet theft</strong></li>
 <li>Includes critical <strong>Windows DLLs</strong> commonly referenced by Gremlin Stealer</li>
 </ul>
 </li>
