@@ -1,102 +1,403 @@
-<!doctype html><html lang=en><head><meta charset=UTF-8><meta http-equiv=X-UA-Compatible content="ie=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=author content="map[name:Alessandro Strino]"><meta name=description content="Introduction Here we go with another chapter of the Applied Emulation series. In the previous blogpost we have talked about emulation and more specifically, the usage of Dumpulator to perform a quick triage. However, in this blogpost we are going to use a completely different approach, taking advantage of static analysis to understand and emulate a string decryption algorithm through Unicorn. As always, I would like to give a practical example on a real case scenario. Because of that, I have chosen to analyze an Ursnif sample.
-"><meta name=keywords content="malware,binary,digital forensics,exploit development,reverse engineering"><meta name=robots content="noodp"><meta name=theme-color content><link rel=canonical href=https://Viuleeenz.github.io/posts/2023/12/applied-emulation-decrypting-ursnif-strings-with-unicorn/><title>Applied Emulation - Decrypting Ursnif strings with Unicorn :: Security Undisguised
-</title><link rel=stylesheet href=../../../../scss/main.c2f26a20d135ff7bc7091bb95e626c68bc9d8e4c0852d733dbfe9527448dfa92.css integrity="sha256-wvJqINE1/3vHCRu5XmJsaLydjkwIUtcz2/6VJ0SN+pI="><link rel=stylesheet type=text/css href=../../../../style.css><link rel=apple-touch-icon sizes=180x180 href=../../../../apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=../../../../favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=../../../../favicon-16x16.png><link rel=manifest href=../../../../site.webmanifest><link rel=mask-icon href=../../../../safari-pinned-tab.svg color><link rel="shortcut icon" href=../../../../favicon.ico><meta name=msapplication-TileColor content><meta itemprop=name content="Applied Emulation - Decrypting Ursnif strings with Unicorn"><meta itemprop=description content="Introduction Here we go with another chapter of the Applied Emulation series. In the previous blogpost we have talked about emulation and more specifically, the usage of Dumpulator to perform a quick triage. However, in this blogpost we are going to use a completely different approach, taking advantage of static analysis to understand and emulate a string decryption algorithm through Unicorn. As always, I would like to give a practical example on a real case scenario. Because of that, I have chosen to analyze an Ursnif sample."><meta itemprop=datePublished content="2023-12-20T00:00:00+00:00"><meta itemprop=dateModified content="2023-12-20T00:00:00+00:00"><meta itemprop=wordCount content="1673"><meta itemprop=image content="https://Viuleeenz.github.io/"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://Viuleeenz.github.io/"><meta name=twitter:title content="Applied Emulation - Decrypting Ursnif strings with Unicorn"><meta name=twitter:description content="Introduction Here we go with another chapter of the Applied Emulation series. In the previous blogpost we have talked about emulation and more specifically, the usage of Dumpulator to perform a quick triage. However, in this blogpost we are going to use a completely different approach, taking advantage of static analysis to understand and emulate a string decryption algorithm through Unicorn. As always, I would like to give a practical example on a real case scenario. Because of that, I have chosen to analyze an Ursnif sample."><meta property="og:url" content="https://Viuleeenz.github.io/posts/2023/12/applied-emulation-decrypting-ursnif-strings-with-unicorn/"><meta property="og:site_name" content="Security Undisguised"><meta property="og:title" content="Applied Emulation - Decrypting Ursnif strings with Unicorn"><meta property="og:description" content="Introduction Here we go with another chapter of the Applied Emulation series. In the previous blogpost we have talked about emulation and more specifically, the usage of Dumpulator to perform a quick triage. However, in this blogpost we are going to use a completely different approach, taking advantage of static analysis to understand and emulate a string decryption algorithm through Unicorn. As always, I would like to give a practical example on a real case scenario. Because of that, I have chosen to analyze an Ursnif sample."><meta property="og:locale" content="en"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2023-12-20T00:00:00+00:00"><meta property="article:modified_time" content="2023-12-20T00:00:00+00:00"><meta property="og:image" content="https://Viuleeenz.github.io/"><meta property="article:published_time" content="2023-12-20 00:00:00 +0000 UTC"></head><body><div class=container><header class=header><span class=header__inner><a href=../../../../ style=text-decoration:none><div class=logo><span class=logo__mark>></span>
-<span class=logo__text>$ cd /home/Viuleeenz</span>
-<span class=logo__cursor></span></div></a><span class=header__right><nav class=menu><ul class=menu__inner><li><a href=../../../../about/>About</a></li><li><a href=../../../../posts/>Posts</a></li><li><a href=../../../../whitepapers/>Whitepapers</a></li></ul></nav><span class=menu-trigger><svg viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
-</span><span class="theme-toggle not-selectable"><svg class="theme-toggler" width="24" height="24" viewBox="0 0 48 48" fill="none"><path d="M22 41c10.4934.0 19-8.5066 19-19C41 11.5066 32.4934 3 22 3 11.5066 3 3 11.5066 3 22s8.5066 19 19 19zM7 22C7 13.7157 13.7157 7 22 7V37C13.7157 37 7 30.2843 7 22z"/></svg></span>
-</span></span><script async src="https://www.googletagmanager.com/gtag/js?id=G-XNKLBC4D9D"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-XNKLBC4D9D")}</script></header><div class=content><main class=post><div class=post-info><p><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-8 minutes</p></div><article><h1 class=post-title><a href=https://Viuleeenz.github.io/posts/2023/12/applied-emulation-decrypting-ursnif-strings-with-unicorn/>Applied Emulation - Decrypting Ursnif strings with Unicorn</a></h1><div class=post-content><h3 id=introduction>Introduction</h3><p>Here we go with another chapter of the Applied Emulation series. In the previous blogpost we have talked about emulation and more specifically, the usage of <em>Dumpulator</em> to perform a quick triage. However, in this blogpost we are going to use a completely different approach, taking advantage of <strong>static analysis to</strong> <strong>understand and emulate a string decryption algorithm through <a href=https://www.unicorn-engine.org/>Unicorn</a></strong>. As always, I would like to give a practical example on a real case scenario. Because of that, I have chosen to analyze an <strong>Ursnif</strong> sample.</p><p>It’s worth mentioning that this sample is part of weekly challenges related to the <a href=https://courses.zero2auto.com/>Zero2Auto</a> course. However, instead of automating the full code extraction, as requested by the challenge, I found even more interesting going into unexplored paths applying emulation instead.</p><h3 id=unicorn-challenges>Unicorn challenges</h3><p>Using pure static analysis came with few limitations, in fact, Unicorn is a CPU emulator framework that does not have built in capabilities to invoke syscall directly. Because of that we need to overcome at least a couple of challenges before emulating our code:</p><ul><li><p>The first and probably the most challenging constraint is that we are going to emulate CPU instructions, instead of using direct calls to Windows API. Because of that, we need to choose our code carefully.</p></li><li><p>After that we have identified a candidate algorithm, we still need to set up the emulation environment variables (e.g., stack memory, registers, sections, start and end code, algorithm parameters, etc…).</p></li></ul><p>Speaking about “good candidate function”, we could look for a custom and self-contained algorithm. Even if those requirements seem to be strict constraints, an experienced reverser knows that most of the malware out there have these components as a part of their decryption routine. However, let’s take a step back. Someone may wonder why we don&rsquo;t use Dumpulator instead of Unicorn, considering all these limitations. The answer is straightforward:</p><p><strong>Dumpulator may not be usable if we are unable to run the code</strong> and set up the user mode space. Nevertheless, I strongly believe that it is more <strong>important to understand where and when a technique should be applied</strong>, even if it adds a few layers of complexity, rather than rushing for the easiest or the first solution that comes to our mind.</p><h3 id=ursnif-decryption-routine>Ursnif decryption routine</h3><p>Decryption routine is pretty straightforward to locate, it just follows the campaignDate variable that is going to be used as a decryption key for the .bss segment. Key generation algorithm has been already described <a href=https://www.0ffset.net/reverse-engineering/challenge-1-gozi-string-crypto/>here</a>, however, I would like to focus on the decryption routine itself, in order to understand all requirements to emulate this code.</p><p><img src=../../../../img/emulation_ursnif/decryption_routine_explained.png alt="Figure 1: Decryption routine explained">
-Figure 1: Decryption routine explained</p><p>At the first glance we could see that the function is self-contained and most of the operations are simple math (sub, add) that involves the key and the encrypted data. However, before proceeding it&rsquo;s important to have a look at the following instruction:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-nasm data-lang=nasm><span style=display:flex><span><span style=color:#a6e22e>mov</span> [ecx], eax
-</span></span></code></pre></div><p><strong>[ecx] is going to be the place to save the output of each decrypted byte</strong>. Nevertheless, ecx is also used as a counter to get the next byte from the <strong>.bss segment</strong>:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-nasm data-lang=nasm><span style=display:flex><span><span style=color:#a6e22e>mov</span> eax, [edx<span style=color:#f92672>+</span>ecx]
-</span></span></code></pre></div><p>Because of that we need to handle that situation very carefully. In fact, <strong>if we do not consider those instructions, we are going to have an access memory violation</strong> with ecx pointing to an unallocated memory region. In order to solve this issue, there are two ways:</p><ul><li>Allocating memory at <strong>0x000000</strong>. In this case, ecx will be used as a counter and as a pointer without any issue;</li><li>Otherwise, we could use a <strong>hook</strong> on our emulator that is going to analyze each instruction and when we are dealing with <strong>[ecx]</strong>, we could skip that instruction, redirecting the decrypted output towards another variable.</li></ul><p>For this blogpost we are going to use the first solution. Considering this post as an introduction of Unicorn, I don’t want to overwhelm readers with a lot of content (setting up the environment will be quite challenging to follow). It’s always good to master some basic concept before proceeding towards more advanced techniques</p><h3 id=setting-up-emulation-environment>Setting up emulation environment</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#f92672>from</span> unicorn <span style=color:#f92672>import</span> <span style=color:#f92672>*</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>from</span> unicorn.x86_const <span style=color:#f92672>import</span> <span style=color:#f92672>*</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>import</span> pefile
-</span></span><span style=display:flex><span><span style=color:#f92672>import</span> struct
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>file_data <span style=color:#f92672>=</span> open(<span style=color:#e6db74>&#39;unpacked_ursnif.bin&#39;</span>,<span style=color:#e6db74>&#39;rb&#39;</span>)<span style=color:#f92672>.</span>read()
-</span></span><span style=display:flex><span>pe <span style=color:#f92672>=</span> pefile<span style=color:#f92672>.</span>PE(data<span style=color:#f92672>=</span>file_data)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>for</span> s <span style=color:#f92672>in</span> pe<span style=color:#f92672>.</span>sections:
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#e6db74>b</span><span style=color:#e6db74>&#39;.bss&#39;</span> <span style=color:#f92672>in</span> s<span style=color:#f92672>.</span>Name[:<span style=color:#ae81ff>6</span>]: 
-</span></span><span style=display:flex><span>        bss_virtual_address <span style=color:#f92672>=</span> s<span style=color:#f92672>.</span>VirtualAddress
-</span></span><span style=display:flex><span>        bss_section_size <span style=color:#f92672>=</span> <span style=color:#ae81ff>0x1000</span>
-</span></span><span style=display:flex><span>        bss_section_data <span style=color:#f92672>=</span> s<span style=color:#f92672>.</span>get_data()
-</span></span></code></pre></div><p>First of all we need to import the Unicorn module and also unicorn constants that we are going to use to interact with registers. Then we could use the pefile module to load our bin file and take notes of <strong>.bss segment data.</strong>.</p><p>Then, we need to take the whole code that needs to be emulated. Before proceeding, it&rsquo;s important to keep in mind that emulation is quite slow and we need to use only the code needed for our purpose. For instance, prolog and epilogue instructions are not very useful for us, since we are emulating a single function without knowing any information about previous ESP and EBP values. Because of that we could skip them.</p><p>To get the proper bytes, with IDA, we could highlight the code that is going to be emulated and, using <strong>shift+e</strong>, spawn a popup with all selected bytes, ready to be pasted in our code.</p><p><img src=../../../../img/emulation_ursnif/select_code_to_emulate.png alt="Figure 2: Select code to emulate">
-Figure 2: Select code to emulate</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>
-</span></span><span style=display:flex><span>code <span style=color:#f92672>=</span> bytes<span style=color:#f92672>.</span>fromhex(<span style=color:#e6db74>&#39;8B040A8BF885C0750AC744241001000000EB0D2B74240C03C689018BF783C104FF4C241075DA&#39;</span>)
-</span></span></code></pre></div><p>Now things are starting to heat up, trying to settle our emulation. First of all, we need to instantiate Unicorn, then we need to set up stack memory, ESP, data memory (using .bss content) and then fill the code section with our bytes. To make it easier to read, I have split the whole script in multiple parts, as follow:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># Unicorn emulator setup.</span>
-</span></span><span style=display:flex><span>uc <span style=color:#f92672>=</span> Uc(UC_ARCH_X86, UC_MODE_32)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>stack_base <span style=color:#f92672>=</span> <span style=color:#ae81ff>0x00100000</span>
-</span></span><span style=display:flex><span>stack_size <span style=color:#f92672>=</span> <span style=color:#ae81ff>0x00100000</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># ESP is moved in the middle of the stack in order to handle.</span>
-</span></span><span style=display:flex><span><span style=color:#75715e># instruction that uses ESP as base address (e.g., [esp + 0xc]).</span>
-</span></span><span style=display:flex><span>ESP <span style=color:#f92672>=</span> stack_base <span style=color:#f92672>+</span> (stack_size <span style=color:#f92672>//</span> <span style=color:#ae81ff>2</span>)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># Map the stack memory into the emulator and feed it with null byte.</span>
-</span></span><span style=display:flex><span>uc<span style=color:#f92672>.</span>mem_map(stack_base, stack_size)
-</span></span><span style=display:flex><span>uc<span style=color:#f92672>.</span>mem_write(stack_base, <span style=color:#e6db74>b</span><span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\x00</span><span style=color:#e6db74>&#34;</span> <span style=color:#f92672>*</span> stack_size)
-</span></span><span style=display:flex><span><span style=color:#75715e># Write python variable ESP in emulator ESP register.</span>
-</span></span><span style=display:flex><span>uc<span style=color:#f92672>.</span>reg_write(UC_X86_REG_ESP, ESP) 
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>data_base <span style=color:#f92672>=</span> <span style=color:#ae81ff>0x00200000</span>
-</span></span><span style=display:flex><span>data_size <span style=color:#f92672>=</span> <span style=color:#ae81ff>0x00100000</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># Map the data memory with r/w/x permissions avoiding access violation.</span>
-</span></span><span style=display:flex><span>uc<span style=color:#f92672>.</span>mem_map(data_base, data_size, UC_PROT_ALL)
-</span></span><span style=display:flex><span>uc<span style=color:#f92672>.</span>mem_write(data_base, <span style=color:#e6db74>b</span><span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\x00</span><span style=color:#e6db74>&#34;</span> <span style=color:#f92672>*</span> data_size)
-</span></span><span style=display:flex><span><span style=color:#75715e># Data section needs to be filled with .bss data.</span>
-</span></span><span style=display:flex><span>uc<span style=color:#f92672>.</span>mem_write(data_base, bss_section_data)
-</span></span></code></pre></div><p>Through this snippet of code, we have prepared everything related to the stack and data section. More precisely, with <strong>uc.mem_map</strong> we have mapped a memory address with its size and protections ( rwx permissions have been chosen to avoid exceptions).</p><p>It’s worth mentioning that, what really makes those memories different is the ESP register that represents a pointer onto the stack. However, under the hood, there are no differences between the allocated memories.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#75715e># ----- Arguments Setup --------- #</span>
-</span></span><span style=display:flex><span><span style=color:#75715e># Setting up key parameter.</span>
-</span></span><span style=display:flex><span>key <span style=color:#f92672>=</span> gen_key(bss_virtual_address)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># Generate key bytes.</span>
-</span></span><span style=display:flex><span>key_bytes <span style=color:#f92672>=</span> struct<span style=color:#f92672>.</span>pack(<span style=color:#e6db74>&#39;&lt;I&#39;</span>, key)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># Write key byte on the stack.</span>
-</span></span><span style=display:flex><span>uc<span style=color:#f92672>.</span>mem_write(ESP, key_bytes)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># key bytes are located at ESP+0xC.</span>
-</span></span><span style=display:flex><span><span style=color:#75715e># To handle that istrution properly, we need to shift ESP of 0xC bytes.</span>
-</span></span><span style=display:flex><span>ESP <span style=color:#f92672>-=</span> <span style=color:#ae81ff>0xC</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># EDX is going to be used as a pointer to the encrypted data.</span>
-</span></span><span style=display:flex><span><span style=color:#75715e># It will be used as a base address: [edx + ecx].</span>
-</span></span><span style=display:flex><span><span style=color:#75715e># It needs to be initialized at base address of our data.</span>
-</span></span><span style=display:flex><span>uc<span style=color:#f92672>.</span>reg_write(UC_X86_REG_EDX, data_base)
-</span></span><span style=display:flex><span><span style=color:#75715e># ECX is a counter starting from 0.</span>
-</span></span><span style=display:flex><span>uc<span style=color:#f92672>.</span>reg_write(UC_X86_REG_ECX, <span style=color:#ae81ff>0</span>)
-</span></span><span style=display:flex><span><span style=color:#75715e># Write new stack position.</span>
-</span></span><span style=display:flex><span>uc<span style=color:#f92672>.</span>reg_write(UC_X86_REG_ESP, ESP)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># ----- Arguments Setup End ----- #</span>
-</span></span></code></pre></div><p>In order to get the key, we have called a gen_key routine (omitted here, to focus on emulation setup) that is going to return a string containing the decryption key. Then, once we get the key, we have to store it on the stack, respecting the <a href=https://docs.python.org/3/library/struct.html>little endian format</a>. Along with key parameters we have also settled all other arguments needed for the function, such as: encrypted data (edx), counter (ecx) as well as updated the esp according to the instruction [esp+0xC] that is going to take the key bytes.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#75715e># ---- Handling ECX access violation ---- #</span>
-</span></span><span style=display:flex><span><span style=color:#75715e># mov [ecx], eax.</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>decrypted_base <span style=color:#f92672>=</span> <span style=color:#ae81ff>0x00000000</span>
-</span></span><span style=display:flex><span>decrypted_size <span style=color:#f92672>=</span> <span style=color:#ae81ff>0x00100000</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>uc<span style=color:#f92672>.</span>mem_map(decrypted_base, decrypted_size, UC_PROT_ALL)
-</span></span><span style=display:flex><span>uc<span style=color:#f92672>.</span>mem_write(decrypted_base, <span style=color:#e6db74>b</span><span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\x00</span><span style=color:#e6db74>&#34;</span> <span style=color:#f92672>*</span> decrypted_size)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># -- Handling ECX access violation end -- #</span>
-</span></span></code></pre></div><p>As mentioned above, since that ecx will be either a pointer and a counter, we are going to create a memory space located to <strong>0x00000000</strong>. In this case, when we are going to deal with <strong>mov [ecx] ,eax</strong> instruction, we will avoid any exception.</p><p>To conclude we need to setup memory for our code. This is a pretty straightforward task if have followed the previous steps. Map the code address, fill it with null bytes and then write the bytes stored in the code variable.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>
-</span></span><span style=display:flex><span>code_base <span style=color:#f92672>=</span> <span style=color:#ae81ff>0x00400000</span>
-</span></span><span style=display:flex><span>code_size <span style=color:#f92672>=</span> <span style=color:#ae81ff>0x00100000</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># Map target memory with r/w/x permissions</span>
-</span></span><span style=display:flex><span>uc<span style=color:#f92672>.</span>mem_map(code_base, code_size, UC_PROT_ALL)
-</span></span><span style=display:flex><span>uc<span style=color:#f92672>.</span>mem_write(code_base, <span style=color:#e6db74>b</span><span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\x00</span><span style=color:#e6db74>&#34;</span> <span style=color:#f92672>*</span> code_size)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># Write our code into the target memory</span>
-</span></span><span style=display:flex><span>uc<span style=color:#f92672>.</span>mem_write(code_base, code)
-</span></span><span style=display:flex><span>code_end <span style=color:#f92672>=</span> code_base <span style=color:#f92672>+</span> len(code)
-</span></span><span style=display:flex><span>uc<span style=color:#f92672>.</span>emu_start(code_base, code_end, timeout<span style=color:#f92672>=</span><span style=color:#ae81ff>0</span>, count<span style=color:#f92672>=</span><span style=color:#ae81ff>0</span>)
-</span></span></code></pre></div><p>Now we have satisfied all setting requirements for our emulation and its time to test it out.</p><h3 id=testing>Testing</h3><p>Running our emulator against few Ursnif samples reveal that we have correctly settled all the environment variables. As you can see from the image below, it has been possible to retrieve all encrypted strings. Some of them could be very useful in order to do a step further in our analysis, since that we have references to infrastructure, powershell script as well as network requests template.</p><p><img src=../../../../img/emulation_ursnif/decrypted_strings.png alt="Figure 3: Decrypted strings">
-Figure 3: Decrypted strings</p><h3 id=conclusion--further-development>Conclusion & Further Development</h3><p>Emulation is a powerful tool, like a swiss knife, and it needs to be considered anytime we are dealing with malware automation. I hope that some of you had fun reading this post and learnt something new, to the point that you can&rsquo;t wait to apply this technique to your own sample.</p><p>I’m still planning to write some structured content about this topic. I don’t have a deadline for that but it is in my new year resolution list! In the meantime, keep reversing!</p><h3 id=references>References</h3><p>Sample analyzed:</p><ul><li><a href=https://www.unpac.me/results/3a3eb893-10fe-42c1-a2c4-5d86cc572fa4#/>Unpacme</a></li><li><a href=https://bazaar.abuse.ch/sample/413cf6a694eef7a4f1725a11938f1ab2df1957bfb3bf20cf6a47017bebbad2a9/>MalwareBazaar</a></li></ul><p>Unicorn:</p><ul><li><a href=https://www.unicorn-engine.org/>Unicorn engine</a></li></ul><p>Emulator:</p><ul><li><a href=https://github.com/Viuleeenz/Reversing_Notes/blob/main/MalwareAutomation/Ursnif/ursnif_emulate_decryption.py>ursnif_string_decryptor.py</a></li></ul></div></article><hr><div class=post-info><p><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6A2 2 0 004 4v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-1673 Words</p><p><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-2023-12-20 01:00</p></div></main></div><footer class=footer><div class=footer__inner><div class=footer__content><span>&copy; 2025</span>
-<span><a href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank rel=noopener>CC BY-NC 4.0</a></span></div></div></footer></div><script type=text/javascript src=../../../../bundle.min.e89fda0f29b95d33f6f4224dd9e5cf69d84aff3818be2b0d73e731689cc374261b016d17d46f8381962fb4a1577ba3017b1f23509d894f6e66431f988c00889e.js integrity="sha512-6J/aDym5XTP29CJN2eXPadhK/zgYvisNc+cxaJzDdCYbAW0X1G+DgZYvtKFXe6MBex8jUJ2JT25mQx+YjACIng=="></script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+        <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="author" content="map[name:Alessandro Strino]">
+<meta name="description" content="Introduction Here we go with another chapter of the Applied Emulation series. In the previous blogpost we have talked about emulation and more specifically, the usage of Dumpulator to perform a quick triage. However, in this blogpost we are going to use a completely different approach, taking advantage of static analysis to understand and emulate a string decryption algorithm through Unicorn. As always, I would like to give a practical example on a real case scenario. Because of that, I have chosen to analyze an Ursnif sample.
+" />
+<meta name="keywords" content="malware, binary, digital forensics, exploit development, reverse engineering" />
+<meta name="robots" content="noodp" />
+<meta name="theme-color" content="" />
+<link rel="canonical" href="http://localhost:1313/posts/2023/12/applied-emulation-decrypting-ursnif-strings-with-unicorn/" />
+
+
+    <title>
+        
+            Applied Emulation - Decrypting Ursnif strings with Unicorn :: Security Undisguised 
+        
+    </title>
+
+
+
+
+
+    
+        
+        
+        <link rel="stylesheet" href="../../../../scss/main.4c717a3dff5ec47ecfa7229b960ed715a5ad930b4079fbd0ed59f277863cf26c.css" integrity="sha256-THF6Pf9exH7PpyKblg7XFaWtkwtAefvQ7Vnyd4Y88mw=">
+    
+
+
+
+    
+        <link rel="stylesheet" type="text/css" href="../../../../style.css">
+    
+
+
+    <link rel="apple-touch-icon" sizes="180x180" href="../../../../apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../../../../favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../../../../favicon-16x16.png">
+    <link rel="manifest" href="../../../../site.webmanifest">
+    <link rel="mask-icon" href="../../../../safari-pinned-tab.svg" color="">
+    <link rel="shortcut icon" href="../../../../favicon.ico">
+    <meta name="msapplication-TileColor" content="">
+
+
+
+  <meta itemprop="name" content="Applied Emulation - Decrypting Ursnif strings with Unicorn">
+  <meta itemprop="description" content="Introduction Here we go with another chapter of the Applied Emulation series. In the previous blogpost we have talked about emulation and more specifically, the usage of Dumpulator to perform a quick triage. However, in this blogpost we are going to use a completely different approach, taking advantage of static analysis to understand and emulate a string decryption algorithm through Unicorn. As always, I would like to give a practical example on a real case scenario. Because of that, I have chosen to analyze an Ursnif sample.">
+  <meta itemprop="datePublished" content="2023-12-20T00:00:00+00:00">
+  <meta itemprop="dateModified" content="2023-12-20T00:00:00+00:00">
+  <meta itemprop="wordCount" content="1673">
+  <meta itemprop="image" content="http://localhost:1313/">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="http://localhost:1313/">
+  <meta name="twitter:title" content="Applied Emulation - Decrypting Ursnif strings with Unicorn">
+  <meta name="twitter:description" content="Introduction Here we go with another chapter of the Applied Emulation series. In the previous blogpost we have talked about emulation and more specifically, the usage of Dumpulator to perform a quick triage. However, in this blogpost we are going to use a completely different approach, taking advantage of static analysis to understand and emulate a string decryption algorithm through Unicorn. As always, I would like to give a practical example on a real case scenario. Because of that, I have chosen to analyze an Ursnif sample.">
+
+
+    <meta property="og:url" content="http://localhost:1313/posts/2023/12/applied-emulation-decrypting-ursnif-strings-with-unicorn/">
+  <meta property="og:site_name" content="Security Undisguised">
+  <meta property="og:title" content="Applied Emulation - Decrypting Ursnif strings with Unicorn">
+  <meta property="og:description" content="Introduction Here we go with another chapter of the Applied Emulation series. In the previous blogpost we have talked about emulation and more specifically, the usage of Dumpulator to perform a quick triage. However, in this blogpost we are going to use a completely different approach, taking advantage of static analysis to understand and emulate a string decryption algorithm through Unicorn. As always, I would like to give a practical example on a real case scenario. Because of that, I have chosen to analyze an Ursnif sample.">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2023-12-20T00:00:00+00:00">
+    <meta property="article:modified_time" content="2023-12-20T00:00:00+00:00">
+    <meta property="og:image" content="http://localhost:1313/">
+
+
+
+
+
+
+    <meta property="article:published_time" content="2023-12-20 00:00:00 &#43;0000 UTC" />
+
+
+
+
+
+
+
+
+
+    </head>
+
+    
+        <body>
+    
+    
+        <div class="container">
+            <header class="header">
+    <span class="header__inner">
+        <a href="../../../../" style="text-decoration: none;">
+    <div class="logo">
+        
+            <span class="logo__mark">&gt;</span>
+            <span class="logo__text ">
+                $ cd /home/Viuleeenz</span>
+            <span class="logo__cursor" style=
+                  "
+                   
+                   ">
+            </span>
+        
+    </div>
+</a>
+
+        <span class="header__right">
+            
+                <nav class="menu">
+    <ul class="menu__inner"><li><a href="../../../../about/">About</a></li><li><a href="../../../../posts/">Posts</a></li><li><a href="../../../../whitepapers/">Whitepapers</a></li>
+    </ul>
+</nav>
+
+                <span class="menu-trigger">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                    </svg>
+                </span>
+            
+                <span class="theme-toggle not-selectable"><svg class="theme-toggler" width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+   <path d="M22 41C32.4934 41 41 32.4934 41 22C41 11.5066 32.4934 3 22
+   3C11.5066 3 3 11.5066 3 22C3 32.4934 11.5066 41 22 41ZM7 22C7
+   13.7157 13.7157 7 22 7V37C13.7157 37 7 30.2843 7 22Z"/>
+ </svg></span>
+        </span>
+    </span>
+    
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-XNKLBC4D9D"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-XNKLBC4D9D');
+        }
+      </script>
+</header>
+
+
+            <div class="content">
+                
+  <main class="post">
+
+    <div class="post-info">
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        8 minutes
+
+        
+      </p>
+    </div>
+
+    <article>
+      <h1 class="post-title">
+        <a href="http://localhost:1313/posts/2023/12/applied-emulation-decrypting-ursnif-strings-with-unicorn/">Applied Emulation - Decrypting Ursnif strings with Unicorn</a>
+      </h1>
+
+      
+
+      
+
+      
+
+      <div class="post-content">
+        <h3 id="introduction">Introduction</h3>
+<p>Here we go with another chapter of the Applied Emulation series. In the previous blogpost we have talked about emulation and more specifically, the usage of <em>Dumpulator</em> to perform a quick triage. However, in this blogpost we are going to use a completely different approach, taking advantage of <strong>static analysis to</strong> <strong>understand and emulate a string decryption algorithm through <a href="https://www.unicorn-engine.org/">Unicorn</a></strong>. As always, I would like to give a practical example on a real case scenario. Because of that, I have chosen to analyze an <strong>Ursnif</strong> sample.</p>
+<p>It’s worth mentioning that this sample is part of weekly challenges related to the <a href="https://courses.zero2auto.com/">Zero2Auto</a> course. However, instead of automating the full code extraction, as requested by the challenge, I found even more interesting going into unexplored paths applying emulation instead.</p>
+<h3 id="unicorn-challenges">Unicorn challenges</h3>
+<p>Using pure static analysis came with few limitations, in fact, Unicorn is a CPU emulator framework that does not have built in capabilities to invoke syscall directly. Because of that we need to overcome at least a couple of challenges before emulating our code:</p>
+<ul>
+<li>
+<p>The first and probably the most challenging constraint is that we are going to emulate CPU instructions, instead of using direct calls to Windows API. Because of that, we need to choose our code carefully.</p>
+</li>
+<li>
+<p>After that we have identified a candidate algorithm, we still need to set up the emulation environment variables (e.g., stack memory, registers, sections, start and end code, algorithm parameters, etc…).</p>
+</li>
+</ul>
+<p>Speaking about “good candidate function”, we could look for a custom and self-contained algorithm. Even if those requirements seem to be strict constraints, an experienced reverser knows that most of the malware out there have these components as a part of their decryption routine. However, let’s take a step back. Someone may wonder why we don&rsquo;t use Dumpulator instead of Unicorn, considering all these limitations. The answer is straightforward:</p>
+<p><strong>Dumpulator may not be usable if we are unable to run the code</strong> and set up the user mode space. Nevertheless, I strongly believe that it is more <strong>important to understand where and when a technique should be applied</strong>, even if it adds a few layers of complexity, rather than rushing for the easiest or the first solution that comes to our mind.</p>
+<h3 id="ursnif-decryption-routine">Ursnif decryption routine</h3>
+<p>Decryption routine is pretty straightforward to locate, it just follows the campaignDate variable that is going to be used as a decryption key for the .bss segment. Key generation algorithm has been already described <a href="https://www.0ffset.net/reverse-engineering/challenge-1-gozi-string-crypto/">here</a>, however, I would like to focus on the decryption routine itself, in order to understand all requirements to emulate this code.</p>
+<p><img src="../../../../img/emulation_ursnif/decryption_routine_explained.png" alt="Figure 1: Decryption routine explained">
+Figure 1: Decryption routine explained</p>
+<p>At the first glance we could see that the function is self-contained and most of the operations are simple math (sub, add) that involves the key and the encrypted data. However, before proceeding it&rsquo;s important to have a look at the following instruction:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nasm" data-lang="nasm"><span style="display:flex;"><span><span style="color:#a6e22e">mov</span> [ecx], eax
+</span></span></code></pre></div><p><strong>[ecx] is going to be the place to save the output of each decrypted byte</strong>. Nevertheless, ecx is also used as a counter to get the next byte from the <strong>.bss segment</strong>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nasm" data-lang="nasm"><span style="display:flex;"><span><span style="color:#a6e22e">mov</span> eax, [edx<span style="color:#f92672">+</span>ecx]
+</span></span></code></pre></div><p>Because of that we need to handle that situation very carefully. In fact, <strong>if we do not consider those instructions, we are going to have an access memory violation</strong> with ecx pointing to an unallocated memory region. In order to solve this issue, there are two ways:</p>
+<ul>
+<li>Allocating memory at <strong>0x000000</strong>. In this case, ecx will be used as a counter and as a pointer without any issue;</li>
+<li>Otherwise, we could use a <strong>hook</strong> on our emulator that is going to analyze each instruction and when we are dealing with <strong>[ecx]</strong>, we could skip that instruction, redirecting the decrypted output towards another variable.</li>
+</ul>
+<p>For this blogpost we are going to use the first solution. Considering this post as an introduction of Unicorn, I don’t want to overwhelm readers with a lot of content (setting up the environment will be quite challenging to follow). It’s always good to master some basic concept before proceeding towards more advanced techniques</p>
+<h3 id="setting-up-emulation-environment">Setting up emulation environment</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> unicorn <span style="color:#f92672">import</span> <span style="color:#f92672">*</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> unicorn.x86_const <span style="color:#f92672">import</span> <span style="color:#f92672">*</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> pefile
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> struct
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>file_data <span style="color:#f92672">=</span> open(<span style="color:#e6db74">&#39;unpacked_ursnif.bin&#39;</span>,<span style="color:#e6db74">&#39;rb&#39;</span>)<span style="color:#f92672">.</span>read()
+</span></span><span style="display:flex;"><span>pe <span style="color:#f92672">=</span> pefile<span style="color:#f92672">.</span>PE(data<span style="color:#f92672">=</span>file_data)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> s <span style="color:#f92672">in</span> pe<span style="color:#f92672">.</span>sections:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;.bss&#39;</span> <span style="color:#f92672">in</span> s<span style="color:#f92672">.</span>Name[:<span style="color:#ae81ff">6</span>]: 
+</span></span><span style="display:flex;"><span>        bss_virtual_address <span style="color:#f92672">=</span> s<span style="color:#f92672">.</span>VirtualAddress
+</span></span><span style="display:flex;"><span>        bss_section_size <span style="color:#f92672">=</span> <span style="color:#ae81ff">0x1000</span>
+</span></span><span style="display:flex;"><span>        bss_section_data <span style="color:#f92672">=</span> s<span style="color:#f92672">.</span>get_data()
+</span></span></code></pre></div><p>First of all we need to import the Unicorn module and also unicorn constants that we are going to use to interact with registers. Then we could use the pefile module to load our bin file and take notes of <strong>.bss segment data.</strong>.</p>
+<p>Then, we need to take the whole code that needs to be emulated. Before proceeding, it&rsquo;s important to keep in mind that emulation is quite slow and we need to use only the code needed for our purpose. For instance, prolog and epilogue instructions are not very useful for us, since we are emulating a single function without knowing any information about previous ESP and EBP values. Because of that we could skip them.</p>
+<p>To get the proper bytes, with IDA, we could highlight the code that is going to be emulated and, using <strong>shift+e</strong>, spawn a popup with all selected bytes, ready to be pasted in our code.</p>
+<p><img src="../../../../img/emulation_ursnif/select_code_to_emulate.png" alt="Figure 2: Select code to emulate">
+Figure 2: Select code to emulate</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>code <span style="color:#f92672">=</span> bytes<span style="color:#f92672">.</span>fromhex(<span style="color:#e6db74">&#39;8B040A8BF885C0750AC744241001000000EB0D2B74240C03C689018BF783C104FF4C241075DA&#39;</span>)
+</span></span></code></pre></div><p>Now things are starting to heat up, trying to settle our emulation. First of all, we need to instantiate Unicorn, then we need to set up stack memory, ESP, data memory (using .bss content) and then fill the code section with our bytes. To make it easier to read, I have split the whole script in multiple parts, as follow:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Unicorn emulator setup.</span>
+</span></span><span style="display:flex;"><span>uc <span style="color:#f92672">=</span> Uc(UC_ARCH_X86, UC_MODE_32)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>stack_base <span style="color:#f92672">=</span> <span style="color:#ae81ff">0x00100000</span>
+</span></span><span style="display:flex;"><span>stack_size <span style="color:#f92672">=</span> <span style="color:#ae81ff">0x00100000</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># ESP is moved in the middle of the stack in order to handle.</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># instruction that uses ESP as base address (e.g., [esp + 0xc]).</span>
+</span></span><span style="display:flex;"><span>ESP <span style="color:#f92672">=</span> stack_base <span style="color:#f92672">+</span> (stack_size <span style="color:#f92672">//</span> <span style="color:#ae81ff">2</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Map the stack memory into the emulator and feed it with null byte.</span>
+</span></span><span style="display:flex;"><span>uc<span style="color:#f92672">.</span>mem_map(stack_base, stack_size)
+</span></span><span style="display:flex;"><span>uc<span style="color:#f92672">.</span>mem_write(stack_base, <span style="color:#e6db74">b</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\x00</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">*</span> stack_size)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Write python variable ESP in emulator ESP register.</span>
+</span></span><span style="display:flex;"><span>uc<span style="color:#f92672">.</span>reg_write(UC_X86_REG_ESP, ESP) 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>data_base <span style="color:#f92672">=</span> <span style="color:#ae81ff">0x00200000</span>
+</span></span><span style="display:flex;"><span>data_size <span style="color:#f92672">=</span> <span style="color:#ae81ff">0x00100000</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Map the data memory with r/w/x permissions avoiding access violation.</span>
+</span></span><span style="display:flex;"><span>uc<span style="color:#f92672">.</span>mem_map(data_base, data_size, UC_PROT_ALL)
+</span></span><span style="display:flex;"><span>uc<span style="color:#f92672">.</span>mem_write(data_base, <span style="color:#e6db74">b</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\x00</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">*</span> data_size)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Data section needs to be filled with .bss data.</span>
+</span></span><span style="display:flex;"><span>uc<span style="color:#f92672">.</span>mem_write(data_base, bss_section_data)
+</span></span></code></pre></div><p>Through this snippet of code, we have prepared everything related to the stack and data section. More precisely, with <strong>uc.mem_map</strong> we have mapped a memory address with its size and protections ( rwx permissions have been chosen to avoid exceptions).</p>
+<p>It’s worth mentioning that, what really makes those memories different is the ESP register that represents a pointer onto the stack. However, under the hood, there are no differences between the allocated memories.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># ----- Arguments Setup --------- #</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Setting up key parameter.</span>
+</span></span><span style="display:flex;"><span>key <span style="color:#f92672">=</span> gen_key(bss_virtual_address)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Generate key bytes.</span>
+</span></span><span style="display:flex;"><span>key_bytes <span style="color:#f92672">=</span> struct<span style="color:#f92672">.</span>pack(<span style="color:#e6db74">&#39;&lt;I&#39;</span>, key)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Write key byte on the stack.</span>
+</span></span><span style="display:flex;"><span>uc<span style="color:#f92672">.</span>mem_write(ESP, key_bytes)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># key bytes are located at ESP+0xC.</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># To handle that istrution properly, we need to shift ESP of 0xC bytes.</span>
+</span></span><span style="display:flex;"><span>ESP <span style="color:#f92672">-=</span> <span style="color:#ae81ff">0xC</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># EDX is going to be used as a pointer to the encrypted data.</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># It will be used as a base address: [edx + ecx].</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># It needs to be initialized at base address of our data.</span>
+</span></span><span style="display:flex;"><span>uc<span style="color:#f92672">.</span>reg_write(UC_X86_REG_EDX, data_base)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># ECX is a counter starting from 0.</span>
+</span></span><span style="display:flex;"><span>uc<span style="color:#f92672">.</span>reg_write(UC_X86_REG_ECX, <span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Write new stack position.</span>
+</span></span><span style="display:flex;"><span>uc<span style="color:#f92672">.</span>reg_write(UC_X86_REG_ESP, ESP)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># ----- Arguments Setup End ----- #</span>
+</span></span></code></pre></div><p>In order to get the key, we have called a gen_key routine (omitted here, to focus on emulation setup) that is going to return a string containing the decryption key. Then, once we get the key, we have to store it on the stack, respecting the <a href="https://docs.python.org/3/library/struct.html">little endian format</a>. Along with key parameters we have also settled all other arguments needed for the function, such as: encrypted data (edx), counter (ecx) as well as updated the esp according to the instruction [esp+0xC] that is going to take the key bytes.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># ---- Handling ECX access violation ---- #</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># mov [ecx], eax.</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>decrypted_base <span style="color:#f92672">=</span> <span style="color:#ae81ff">0x00000000</span>
+</span></span><span style="display:flex;"><span>decrypted_size <span style="color:#f92672">=</span> <span style="color:#ae81ff">0x00100000</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>uc<span style="color:#f92672">.</span>mem_map(decrypted_base, decrypted_size, UC_PROT_ALL)
+</span></span><span style="display:flex;"><span>uc<span style="color:#f92672">.</span>mem_write(decrypted_base, <span style="color:#e6db74">b</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\x00</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">*</span> decrypted_size)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># -- Handling ECX access violation end -- #</span>
+</span></span></code></pre></div><p>As mentioned above, since that ecx will be either a pointer and a counter, we are going to create a memory space located to <strong>0x00000000</strong>. In this case, when we are going to deal with   <strong>mov [ecx] ,eax</strong> instruction, we will avoid any exception.</p>
+<p>To conclude we need to setup memory for our code. This is a pretty straightforward task if have followed the previous steps. Map the code address, fill it with null bytes and then write the bytes stored in the code variable.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>code_base <span style="color:#f92672">=</span> <span style="color:#ae81ff">0x00400000</span>
+</span></span><span style="display:flex;"><span>code_size <span style="color:#f92672">=</span> <span style="color:#ae81ff">0x00100000</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Map target memory with r/w/x permissions</span>
+</span></span><span style="display:flex;"><span>uc<span style="color:#f92672">.</span>mem_map(code_base, code_size, UC_PROT_ALL)
+</span></span><span style="display:flex;"><span>uc<span style="color:#f92672">.</span>mem_write(code_base, <span style="color:#e6db74">b</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\x00</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">*</span> code_size)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Write our code into the target memory</span>
+</span></span><span style="display:flex;"><span>uc<span style="color:#f92672">.</span>mem_write(code_base, code)
+</span></span><span style="display:flex;"><span>code_end <span style="color:#f92672">=</span> code_base <span style="color:#f92672">+</span> len(code)
+</span></span><span style="display:flex;"><span>uc<span style="color:#f92672">.</span>emu_start(code_base, code_end, timeout<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>, count<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>)
+</span></span></code></pre></div><p>Now we have satisfied all setting requirements for our emulation and its time to test it out.</p>
+<h3 id="testing">Testing</h3>
+<p>Running our emulator against few Ursnif samples reveal that we have correctly settled all the environment variables. As you can see from the image below, it has been possible to retrieve all encrypted strings. Some of them could be very useful in order to do a step further in our analysis, since that we have references to infrastructure, powershell script as well as network requests template.</p>
+<p><img src="../../../../img/emulation_ursnif/decrypted_strings.png" alt="Figure 3: Decrypted strings">
+Figure 3: Decrypted strings</p>
+<h3 id="conclusion--further-development">Conclusion &amp; Further Development</h3>
+<p>Emulation is a powerful tool, like a swiss knife, and it needs to be considered anytime we are dealing with malware automation. I hope that some of you had fun reading this post and learnt something new, to the point that you can&rsquo;t wait to apply this technique to your own sample.</p>
+<p>I’m still planning to write some structured content about this topic. I don’t have a deadline for that but it is in my new year resolution list! In the meantime, keep reversing!</p>
+<h3 id="references">References</h3>
+<p>Sample analyzed:</p>
+<ul>
+<li><a href="https://www.unpac.me/results/3a3eb893-10fe-42c1-a2c4-5d86cc572fa4#/">Unpacme</a></li>
+<li><a href="https://bazaar.abuse.ch/sample/413cf6a694eef7a4f1725a11938f1ab2df1957bfb3bf20cf6a47017bebbad2a9/">MalwareBazaar</a></li>
+</ul>
+<p>Unicorn:</p>
+<ul>
+<li><a href="https://www.unicorn-engine.org/">Unicorn engine</a></li>
+</ul>
+<p>Emulator:</p>
+<ul>
+<li><a href="https://github.com/Viuleeenz/Reversing_Notes/blob/main/MalwareAutomation/Ursnif/ursnif_emulate_decryption.py">ursnif_string_decryptor.py</a></li>
+</ul>
+
+      </div>
+    </article>
+
+    <hr />
+
+    <div class="post-info">
+      
+      
+
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        1673 Words
+      </p>
+
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        
+          2023-12-20 01:00
+        
+
+         
+          
+        
+      </p>
+    </div>
+
+    
+
+
+    
+
+  </main>
+
+            </div>
+
+            
+                <footer class="footer">
+    
+    <div class="footer__inner">
+        <div class="footer__content">
+            <span>&copy; 2025</span>
+            
+            <span><a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></span>
+            
+            
+        </div>
+    </div>
+    
+    
+</footer>
+
+            
+        </div>
+
+        
+
+
+
+<script type="text/javascript" src="../../../../bundle.min.e89fda0f29b95d33f6f4224dd9e5cf69d84aff3818be2b0d73e731689cc374261b016d17d46f8381962fb4a1577ba3017b1f23509d894f6e66431f988c00889e.js" integrity="sha512-6J/aDym5XTP29CJN2eXPadhK/zgYvisNc&#43;cxaJzDdCYbAW0X1G&#43;DgZYvtKFXe6MBex8jUJ2JT25mQx&#43;YjACIng=="></script>
+
+
+
+    </body>
+</html>
