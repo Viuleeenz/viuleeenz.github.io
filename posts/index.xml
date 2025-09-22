@@ -23,7 +23,7 @@
 <li>
 <p><strong>Misleading Copyright Information</strong></p>
 <ul>
-<li>“LLC &lsquo;Windows&rsquo; &amp; Copyright © 2024” ( Attempts to mimic legitimate Microsoft software, the naming convention is incorrect.)</li>
+<li>“LLC &lsquo;Windows&rsquo; &amp; Copyright © 2024” ( Attempts to mimic legitimate Microsoft software )</li>
 </ul>
 </li>
 <li>
@@ -45,7 +45,7 @@
 <p>Gremlin Stealer’s <strong>behavior tab</strong> reveals distinct networking fingerprints:</p>
 <ul>
 <li>
-<p><strong>IP Discovery Services</strong> → The malware reaches out to:</p>
+<p><strong>IP Discovery Services</strong>: The malware reaches out to:</p>
 <ul>
 <li><code>api.ipify.org</code></li>
 <li><code>ip-api.com</code></li>
@@ -53,13 +53,13 @@
 <p>These requests are used to <strong>determine the victim’s external IP address</strong>, a common tactic among info-stealers for <strong>geolocation</strong> and <strong>target profiling</strong>.</p>
 </li>
 <li>
-<p><strong>Telegram API Endpoints</strong> → Connections to <code>api.telegram.org/bot</code> strongly suggest that <strong>Telegram is used for data exfiltration</strong>.</p>
+<p><strong>Telegram API Endpoints</strong>: Connections to <code>api.telegram.org/bot</code> could suggest that <strong>Telegram is used for data exfiltration</strong>.</p>
 <ul>
-<li>This technique has become increasingly <strong>popular among cybercriminals</strong> due to <strong>encryption</strong>, <strong>ease of automation</strong>, and <strong>resilience against takedowns</strong>.</li>
+<li>It&rsquo;s worth mentioning that this technique has become increasingly <strong>popular among cybercriminals</strong> due to <strong>encryption</strong>, <strong>ease of automation</strong>, and <strong>resilience against takedowns</strong>.</li>
 </ul>
 </li>
 <li>
-<p><strong>Hardcoded C2 Server</strong> → <code>207.244.199[.]46</code> is embedded as a <strong>command-and-control endpoint</strong>.</p>
+<p><strong>Hardcoded C2 Server</strong>: <code>207.244.199[.]46</code> is embedded as a <strong>command-and-control endpoint</strong>.</p>
 <ul>
 <li>This serves as both an <strong>immediate IOC</strong> and a <strong>pivot point</strong> for uncovering related infrastructure used by the same threat actor.</li>
 </ul>
@@ -82,7 +82,7 @@
 </span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">signature:</span><span style="color:#e6db74">&#34;LLC &#39;Windows&#39; &amp; Copyright ©  2024&#34;</span>
 </span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">netguid:</span><span style="color:#ae81ff">8</span><span style="color:#960050;background-color:#1e0010">f</span><span style="color:#ae81ff">855</span><span style="color:#960050;background-color:#1e0010">bb</span><span style="color:#ae81ff">2-4718-4</span><span style="color:#960050;background-color:#1e0010">fa</span><span style="color:#ae81ff">4</span><span style="color:#960050;background-color:#1e0010">-be</span><span style="color:#ae81ff">9</span><span style="color:#960050;background-color:#1e0010">c</span><span style="color:#ae81ff">-87</span><span style="color:#960050;background-color:#1e0010">ed</span><span style="color:#ae81ff">0</span><span style="color:#960050;background-color:#1e0010">b</span><span style="color:#ae81ff">588</span><span style="color:#960050;background-color:#1e0010">b</span><span style="color:#ae81ff">5</span><span style="color:#960050;background-color:#1e0010">c</span>
 </span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">behavior:</span><span style="color:#e6db74">&#34;\&#34;%ProgramFiles(x86)%\\Google\\Chrome\\Application\\chrome.exe\&#34; --restore-last-session --remote-debugging-port=9222 --user-data-dir=\&#34;%LOCALAPPDATA%\\Google\\Chrome\\User Data\&#34;&#34;</span>
-</span></span></code></pre></div><p>Starting with the first one (<em>generated:&ldquo;2041-06-29T19:48:00&rdquo;</em>) ****we are able to collect a couple of samples.</p>
+</span></span></code></pre></div><p>Starting with the first one (<em>generated:&ldquo;2041-06-29T19:48:00&rdquo;</em>) we are able to collect a couple of samples.</p>
 <p><img src="/img/threat_hunt/vt_simple.png" alt="Figure 4: Potentially correlated sample with original Gremlin Stealer"></p>
 <p>Figure 4: Potentially correlated sample with original Gremlin Stealer</p>
 <p>As expected, the first match is <strong>our original sample</strong>. However, the second one appears to be <strong>a new potential candidate</strong> worth investigating based on its <strong>filename</strong> and metadata, which suggest it may be linked to the same campaign.</p>
@@ -187,7 +187,7 @@
 </li>
 <li><strong>.NET Compilation Identifiers</strong>
 <ul>
-<li>Uses <code>TypeLib ID</code> and <code>Module Version ID</code> for clustering ( very strong, but can be <strong>overly restrictive</strong> if the malware author recompiles )</li>
+<li>Uses <code>TypeLib ID</code> and <code>Module Version ID</code> for clustering ( It&rsquo;s important to keep in mind that this is a very restrictive condition and could lead to miss some samples if the malware author make some changes in the compilation environment - e.g., modify compiler settings, use different Visual Studio or .NET framework as well as alter compilation metadata to evade detection )</li>
 </ul>
 </li>
 <li><strong>Functional Capabilities</strong>
@@ -239,10 +239,10 @@
 <p>Through our Gremlin Stealer investigation, we&rsquo;ve demonstrated that the answer isn&rsquo;t as daunting as it might initially seem. <strong>You don&rsquo;t need to be a reverse engineering expert to extract meaningful intelligence from a single malware sample.</strong></p>
 <p>Starting with just one hash from Unit42&rsquo;s report, we systematically built a comprehensive threat profile. The key insight? <strong>Effective threat hunting is more about methodology than advanced technical skills.</strong> It&rsquo;s about asking the right questions, knowing where to look for answers, and systematically connecting the dots between seemingly unrelated pieces of information.</p>
 <p>Every indicator we discovered became a stepping stone to the next discovery. This iterative approach transformed a single IoC into a robust detection strategy capable of identifying an entire malware family and its supporting infrastructure.</p>
-<p>So the next time you encounter a novel threat with limited public intelligence, don&rsquo;t be intimidated. <strong>Start with what you have, apply systematic thinking, and let curiosity guide your investigation.</strong> The tools and techniques demonstrated here are accessible to any security professional willing to invest the time to learn them. After all, threat hunting isn&rsquo;t just about finding malware, it&rsquo;s about understanding the adversary. And that understanding begins with a single question and the determination to find the answer.</p>
+<p>So the next time you encounter a novel threat with limited public intelligence, don&rsquo;t be intimidated. <strong>Start with what you have, apply systematic thinking, and let curiosity guide your investigation.</strong> After all, threat hunting isn&rsquo;t just about finding malware, it&rsquo;s about understanding the adversary. And that understanding begins with a single question and the determination to find the answer.</p>
 <p>Happy hunting! 🔍</p>
 <h3 id="hunting-insight">Hunting Insight</h3>
-<p><em>It&rsquo;s worth mentioning that sometimes, this strategy could be very helpful when you identify a quite interesting malware. However, some samples can be quite hard to analyze because of protection and obfuscation mechanisms in place. Nevertheless, this technique also gives us a chance to collect and obtain similar samples without such hardening—perhaps representing early development versions of the malware that, even if they exhibit lower complexity, still show similarities (thanks to YARA matches) with the sample we are analyzing. These less protected variants can still provide valuable insights about the latest threat, allowing us to understand the underlying functionality and TTPs even when the primary sample is heavily obfuscated.</em></p>
+<p><em>This strategy can be particularly valuable when you encounter interesting malware that&rsquo;s difficult to analyze due to heavy protection and obfuscation mechanisms. Through this clustering technique, it&rsquo;s not uncommon to discover similar samples that lack such hardening—often representing earlier development versions or variants from the same author. These less protected samples frequently show similarities to your target (detectable through YARA matches) and can provide valuable insights into the underlying functionality and TTPs, even when the primary sample is heavily obfuscated.</em></p>
 <h3 id="iocs">IOCs</h3>
 <ul>
 <li>
