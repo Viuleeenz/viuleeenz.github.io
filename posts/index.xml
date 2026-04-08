@@ -4,7 +4,7 @@
 <blockquote>
 <p>💡 <em>Through this blogpost, I try to make it as more understandable as possible, making reverse native libraries a little bit less disorienting. Because of that, I would like to make a soft introduction to native libraries, going against a real world example, covering something that goes over the mere basics, without losing the actual focus on learning new things along the way.</em></p>
 </blockquote>
-<p>Reference: <code>1e38419cea3379d8992d165f842f3fd78e9da32aa7f04bcb19e3bdf71d109e2f</code></p>
+<p>Reference: <code>ced80229a4f46990c854c7c81dbaa7fec3dd06dd537992e5d6d3bd316add45d2</code></p>
 <h2 id="from-java-to-native-code-connection">From Java to Native Code Connection</h2>
 <p>To execute a function from a native library, the Java code must first declare a corresponding native method. When this Java-declared native method is invoked, the <em>paired</em> native function within the compiled library (ELF/.so) is executed.</p>
 <p>In Java, a native method looks like a regular method declaration, with two key differences: it is marked with the <code>native</code> keyword, and it contains no implementation. This is because the method’s logic resides entirely in the compiled native library rather than in Java code.</p>
@@ -158,7 +158,7 @@
 </ul>
 <p>Sample:</p>
 <ul>
-<li><a href="https://www.virustotal.com/gui/file/1e38419cea3379d8992d165f842f3fd78e9da32aa7f04bcb19e3bdf71d109e2f">Coper Loader</a></li>
+<li><a href="https://www.virustotal.com/gui/file/ced80229a4f46990c854c7c81dbaa7fec3dd06dd537992e5d6d3bd316add45d2">Coper Loader</a></li>
 </ul>
 <p>Coper Unpacker/Decryption script:</p>
 <ul>
