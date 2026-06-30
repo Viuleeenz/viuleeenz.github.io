@@ -214,6 +214,10 @@
 <p>It&rsquo;s also one less thing to worry about when Flare-On season rolls around again 🤫</p>
 <p>Hope this saves someone else the same laptop-migration headache that started this whole thing. Thanks for reading!</p>
 <h2 id="references">References</h2>
+<p>Minimal Terraform Setup:</p>
+<ul>
+<li><a href="https://github.com/Viuleeenz/Reversing_Notes/tree/main/CloudMalwareLab/flarevm-minimal">flarevm-terraform-setup</a> - Reversing Notes repo.</li>
+</ul>
 <p>Original Project:</p>
 <ul>
 <li><a href="https://github.com/adanalvarez/AWS-malware-lab">adanalvarez/AWS-malware-lab</a> - original Terraform lab repository (supports Guacamole and INetSim configurations)</li>
