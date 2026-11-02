@@ -1,4 +1,137 @@
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on Security Undisguised</title><link>https://Viuleeenz.github.io/posts/</link><description>Recent content in Posts on Security Undisguised</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>&lt;a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener"&gt;CC BY-NC 4.0&lt;/a&gt;</copyright><lastBuildDate>Tue, 30 Jun 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://Viuleeenz.github.io/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>Rapid-Deployable Cloud Malware Analysis Lab on AWS</title><link>https://Viuleeenz.github.io/posts/2026/06/rapid-deployable-cloud-malware-analysis-lab-on-aws/</link><pubDate>Tue, 30 Jun 2026 00:00:00 +0000</pubDate><guid>https://Viuleeenz.github.io/posts/2026/06/rapid-deployable-cloud-malware-analysis-lab-on-aws/</guid><description>&lt;p&gt;Every time I changed laptops I found myself rebuilding the same malware analysis environment from scratch. Local VMs worked well enough until they didn&amp;rsquo;t: snapshots became stale, the host machine slowed down, and after a few months I was no longer entirely sure whether the environment was still clean. Moving to an Apple Silicon Mac finally forced me to rethink the entire workflow. Rather than fighting emulation layers or maintaining increasingly heavy local VMs, I decided to move the analysis environment into AWS.&lt;/p&gt;</description><content type="html"><![CDATA[<p>Every time I changed laptops I found myself rebuilding the same malware analysis environment from scratch. Local VMs worked well enough until they didn&rsquo;t: snapshots became stale, the host machine slowed down, and after a few months I was no longer entirely sure whether the environment was still clean. Moving to an Apple Silicon Mac finally forced me to rethink the entire workflow. Rather than fighting emulation layers or maintaining increasingly heavy local VMs, I decided to move the analysis environment into AWS.</p>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on Security Undisguised</title><link>https://Viuleeenz.github.io/posts/</link><description>Recent content in Posts on Security Undisguised</description><generator>Hugo -- gohugo.io</generator><language>en-US</language><copyright>&lt;a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener"&gt;CC BY-NC 4.0&lt;/a&gt;</copyright><lastBuildDate>Mon, 02 Nov 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://Viuleeenz.github.io/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>Hunting Without a Budget - Chasing Banking Phishing Kits with Free Tools</title><link>https://Viuleeenz.github.io/posts/2026/11/hunting-without-a-budget-chasing-banking-phishing-kits-with-free-tools/</link><pubDate>Mon, 02 Nov 2026 00:00:00 +0000</pubDate><guid>https://Viuleeenz.github.io/posts/2026/11/hunting-without-a-budget-chasing-banking-phishing-kits-with-free-tools/</guid><description>&lt;h2 id="introduction"&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;This research started from a Group-IB blogpost that unveils a spreading campaign. It looks like plain information stealing, but through a series of cumulative, apparently &amp;ldquo;legitimate&amp;rdquo; requests, the attackers harvest all the data needed to fully compromise the victim&amp;rsquo;s card and identity. That data can then potentially be sold to other groups, in order to overcome KYC and the other countermeasures already deployed on the defense side.&lt;/p&gt;
+&lt;p&gt;After reading that blogpost, as always happens, I started questioning myself: &lt;em&gt;&amp;ldquo;As a single researcher, is it possible to keep up with those guys, or are expensive intelligence platforms the only way to go if you want to make an impact?&amp;rdquo;&lt;/em&gt; A very similar question came up last year in a previous blogpost. This time, however, the question is more about the attacker&amp;rsquo;s infrastructure, and about discovering threats ahead of time, or &lt;em&gt;where no one&amp;rsquo;s lookin&amp;rsquo;&lt;/em&gt;.&lt;/p&gt;</description><content type="html"><![CDATA[<h2 id="introduction">Introduction</h2>
+<p>This research started from a Group-IB blogpost that unveils a spreading campaign. It looks like plain information stealing, but through a series of cumulative, apparently &ldquo;legitimate&rdquo; requests, the attackers harvest all the data needed to fully compromise the victim&rsquo;s card and identity. That data can then potentially be sold to other groups, in order to overcome KYC and the other countermeasures already deployed on the defense side.</p>
+<p>After reading that blogpost, as always happens, I started questioning myself: <em>&ldquo;As a single researcher, is it possible to keep up with those guys, or are expensive intelligence platforms the only way to go if you want to make an impact?&rdquo;</em> A very similar question came up last year in a previous blogpost. This time, however, the question is more about the attacker&rsquo;s infrastructure, and about discovering threats ahead of time, or <em>where no one&rsquo;s lookin&rsquo;</em>.</p>
+<blockquote>
+<p>💡<em>”Where no one&rsquo;s lookin&rsquo;&quot; is provocative: once a piece of information is listed somewhere, it means that someone has already tracked it. However, most of the time scans are part of broader operations that run automatically, and some infrastructure may not reach the threshold for triggering an alert. In this blogpost I will focus on tracking the attacker&rsquo;s infrastructure. I would like to show a technique, among others, to keep up (or at least try to) with attackers. More specifically, my goal is to &ldquo;narrow&rdquo; the gap for people who do not have full access to expensive intelligence platforms.</em></p>
+</blockquote>
+<h2 id="information-gathering">Information Gathering</h2>
+<p>Every investigation needs an entry point. In this case we can start from our reference article and keep the information that could be useful to expand our hunting query. A good place to start are the IOCs (<em>ça va sans dire</em>): they show how the attackers build their infrastructure, especially their favorite naming conventions and TLDs, and exploring those lists gives us a good insight into where to begin.</p>
+<p>Here it’s possible to split every domain into its keywords and counted how many registered domains contain each term:</p>
+<p><img src="/img/hunting_phishing_kit/keyword_frequency.png" alt="Figure 1: Keyword Frequency">
+Figure 1: Keyword Frequency</p>
+<p>TLDs are much easier, since we can sum most of them up in three categories: <code>.in</code>, <code>.online</code> and <code>github.io</code>.</p>
+<p>However, that was just a starting point. From here we can explore the IOCs a bit more, to understand what the websites look like and to extract additional words and custom elements created to lure people into submitting their credentials.</p>
+<p>Let&rsquo;s take <code>cancelcardprotection[.]online</code> as a starting point. It contains two keywords that appear at the top of our counter: <code>protection</code> and <code>card</code>. Let&rsquo;s explore this site on urlscan.io.</p>
+<p><img src="/img/hunting_phishing_kit/icici_phishing.png" alt="Figure 2: URLScan - ICICIBank phishing page"></p>
+<p>Figure 2: URLScan - ICICIBank phishing page</p>
+<p>This page contains a lot of great information: the IP associated with the site, the resources collected, the certificates (from time to time, searching for the associated CommonName can reveal a lot) and the page title.</p>
+<p>Even if the site is not available anymore, we can switch to the HTTP tab and see the resources urlscan.io collected at scan time. From here we can figure out whether there is something interesting to catch.</p>
+<p><img src="/img/hunting_phishing_kit/urlscan_icici_http_detail.png" alt="Figure 3: URLScan - ICICIBank phishing page detial">
+Figure 3: URLScan - ICICIBank phishing page detial</p>
+<p>One of the most interesting catches is the <code>.png</code> called <code>icici-bank-vector-logo_logoshape.png</code>. Expanding the tab for that resource, we get the hash value associated with it (to get more details about the actual image, we can go directly on <em>Show image</em>). Another arrow for our bow.</p>
+<p><img src="/img/hunting_phishing_kit/icici_phishing_resourse_hash.png" alt="Figure 4: URLScan - ICICIBank phishing page resources">
+Figure 4: URLScan - ICICIBank phishing page resources</p>
+<blockquote>
+<p>💡<em>The idea behind this information gathering is to &ldquo;understand&rdquo; the attacker&rsquo;s mind a little bit better. This is a very useful skill that can be re-used in different cybersecurity areas: understanding the attacker a little better pays off with dividends whether you are reversing binaries, responding to an incident or pentesting the attacker&rsquo;s infrastructure.</em></p>
+</blockquote>
+<h3 id="starting-the-hunt">Starting the Hunt</h3>
+<p>From here we can follow different strategies. Let&rsquo;s start from the easy one before moving forward to complex queries.</p>
+<p>The very first query is quite easy. It just takes the hash of the <code>.png</code> file discovered in the previous section and uses it as a first pivot:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>hash<span style="color:#960050;background-color:#1e0010">:</span>4fbea12ef269ee2f7a981991acbd3f975b4e80727047d4e306b908de9207b3b6
+</span></span></code></pre></div><p><img src="/img/hunting_phishing_kit/hash_query_result.png" alt="Figure 5: URLScan - Hash query result">
+Figure 5: URLScan - Hash query result</p>
+<p>At the time of writing, this query collected 24 distinct results. Of those, 15 domains were already part of the original Group-IB list, while 9 were not tracked there.</p>
+<blockquote>
+<p>💡<em>This information might seem irrelevant, since our purpose was to find additional targets instead of duplicating existing ones. However, when we are trying to discover new things, especially from a known starting point (as in this case), re-collecting known information is a strong signal that our query is properly aligned with our focus.</em></p>
+</blockquote>
+<p>Another query that comes to mind is to use the <strong>page.title</strong> indicator directly:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>page.title<span style="color:#960050;background-color:#1e0010">:</span><span style="color:#e6db74">&#34;ICICI Credit Card Portal&#34;</span>
+</span></span></code></pre></div><p><img src="/img/hunting_phishing_kit/title_query_result.png" alt="Figure 6: URLScan - Page Title query result">
+Figure 6: URLScan - Page Title query result</p>
+<p>This time we get back 31 results, and a couple of URLs did not appear anywhere else (see the IOCs section). Both queries returned interesting results, but we have still not used our initial word-frequency score.</p>
+<h3 id="taking-a-step-further-and-exploring-the-unknown">Taking a Step Further and Exploring the Unknown</h3>
+<p>From here, it&rsquo;s worth noting that we are dealing with information related to the previous campaign, or that could be caught by a collateral query derived from what we learned during the Group-IB investigation. Either way, a query built on what we have observed so far is a great way to start tracking phishing infrastructure that aims to steal card or banking information.</p>
+<p>Let&rsquo;s create a query that combines our previous words in a way that catches as much of the observed information as possible. For instance, it is possible to exploit domain keywords as well as keywords we found in the URLs. A reasonable query could be the following:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>page.domain<span style="color:#960050;background-color:#1e0010">:</span>/.*(manage|cpplan|mobile|service|secure|help).*\.(online|<span style="color:#66d9ef">in</span>)/ AND
+</span></span><span style="display:flex;"><span>page.url.keyword<span style="color:#960050;background-color:#1e0010">:</span>/.*(card|payment).*/ AND 
+</span></span><span style="display:flex;"><span>stats.encodedDataLength<span style="color:#960050;background-color:#1e0010">:</span>[<span style="color:#ae81ff">100000</span> TO <span style="color:#ae81ff">500000</span>]
+</span></span></code></pre></div><p><img src="/img/hunting_phishing_kit/keyword_query_result.png" alt="Figure 7: URLScan - Keyword query result">
+Figure 7: URLScan - Keyword query result</p>
+<p>Now we have a bunch of results to investigate. To understand whether our query worked, let&rsquo;s explore a few of them. The first one worth highlighting is <code>icicibankcreditcard-selfserviceportal[.]websapp[.]co[.]in</code>. Given the naming convention, it seems related to the <em>icicibank</em> theme we have observed so far. Moreover, it contains quite a lot of data (320KB), and the most interesting thing is that it was discovered a day ago, so it&rsquo;s possible that the site is still up and running.</p>
+<p>Exploring the associated card, we can see the IP address and a preview of the actual domain. In this case the page title is &ldquo;Render - Application loading&rdquo;. If we search for the <strong>Render</strong> service, we find this:</p>
+<p><em><strong>“<strong>On the Render cloud platform, free tier web services automatically spin down after 15 minutes of inactivity to save resources. When a user next visits the site, the service takes about 1 minute to wake back up, and Render shows an automatic loading/spin-up page to the browser during this time</strong>”</strong></em></p>
+<p>So URLScan probably started analyzing this domain while it was still in its bootstrap phase.</p>
+<p><img src="/img/hunting_phishing_kit/icici_new_fake_portal.png" alt="Figure 8: URLScan - ICICI new fake portal detail">
+Figure 8: URLScan - ICICI new fake portal detail</p>
+<p>Let&rsquo;s explore the site and see what is actually behind it.</p>
+<p>The main page is promising, especially the claims about mobile device recommendations. Navigating through the <em>&ldquo;Mobile Simulator&rdquo;</em>, we can spot other pages related to <em><strong>Card Activation</strong></em>, <em><strong>Rewards Redemptions</strong></em>, <em><strong>Pin Generation</strong></em>, etc. Regardless of the desired function, the user is redirected to the <strong>Application Detail</strong> view, which asks for KYC information, as well as card info and an OTP.</p>
+<p><img src="/img/hunting_phishing_kit/icici_fake_portal_live.png" alt="Figure 9: Live ICICI new fake portal">
+Figure 9: Live ICICI new fake portal</p>
+<p>As an additional recon step, to understand whether this domain has already been used somewhere, we can go directly on VirusTotal and search for traces. At the time of writing the domain is not flagged as malicious, but we also get some additional CNAMEs that could be used to reach the site.</p>
+<p><img src="/img/hunting_phishing_kit/vt_verification.png" alt="Figure 10: VirustTotal domain verification">
+Figure 10: VirustTotal domain verification</p>
+<p>From here we have additional options to follow, especially if we want to investigate more of the results produced by urlscan.io. Let&rsquo;s quickly explore the very first result (<code>icicibankcreditcard-selfserviceportal[.]websapp[.]co[.]in</code>). Opening that card we spot something interesting too: in the <em>Screenshot</em> section there is a very familiar image, the one we saw in the previous case. This time, though, the welcome page refers to <strong>Axis Bank</strong>.</p>
+<p><img src="/img/hunting_phishing_kit/axis_new_fake_portal.png" alt="Figure 11: URLScan - Axis new fake portal detail">
+Figure 11: URLScan - Axis new fake portal detail</p>
+<p>Since we are dancing, let&rsquo;s explore the third result (<code>helpcard[.]online/indus/</code>) before concluding this investigation. The page here seems totally different from what we have found so far: it refers to IndusInd Bank, with a reference to Debit Cards.</p>
+<p><img src="/img/hunting_phishing_kit/helpcard_detail.png" alt="Figure 12: IndusInd discovred fake portal">
+Figure 12: IndusInd discovred fake portal</p>
+<p>Exploring the site, we don&rsquo;t only see the usual welcome page with scammer-like offers: there is also a button that lures users into downloading an Android application. Following that link, through the browser&rsquo;s developer tab, we can see that it points to a GitHub account.</p>
+<p><img src="/img/hunting_phishing_kit/github_account.png" alt="Figure 13: Malicious Github Account">
+Figure 13: Malicious Github Account</p>
+<p>At the time of writing it contains 5 repositories, each of them holding a few different APKs related to different targets.</p>
+<p><img src="/img/hunting_phishing_kit/github_repositories.png" alt="Figure 14: Malicious Git Repositories">
+Figure 14: Malicious Git Repositories</p>
+<p>Given this pattern, the real next step was to &ldquo;fuzz&rdquo; the domain a little, to discover other paths (if any) where those applications could be hosted. Interestingly enough, going to the root of <code>helpcard[.]online</code>, the domain redirects to another HTML page that contains a reference to the <code>New-axi</code> repository.</p>
+<p><img src="/img/hunting_phishing_kit/apk_download.png" alt="Figure 15: APK Download Button">
+Figure 15: APK download Button</p>
+<blockquote>
+<p>💡<em>This is exactly what approaching the hunt with the attacker&rsquo;s mind looks like. The names we discovered originally led to a GitHub account that points to a dedicated repository, so the very next question that came to my mind was: &ldquo;Is there any other pattern on this host that could serve other APKs?&rdquo; Thanks to that I managed to go the extra mile and discover something new. Even if I already had all the APKs, it was still worth exploring a bit more: you never know what you are going to bump into.</em></p>
+</blockquote>
+<h2 id="how-do-i-know-when-its-time-to-stop">How Do I Know When It’s Time to Stop?</h2>
+<p>This is exactly the point where things start getting messy. From a single report, without any paid tools, we collected related domains and built a hunting query that not only discovered additional phishing kits, but also unveiled a GitHub account that is actively distributing APKs.</p>
+<p>At this point we have collected a lot of information, and the latest discovery lets us keep pivoting, extending our queries with the newest findings. That is a good strategy, but at some point it is worth pausing to make sense of what has been found and documented, because additional material can become overwhelming and tear everything apart.</p>
+<p>There is no single right answer. A good compromise is to keep the pivot strategies running, in case something new comes up, and in the meantime start analyzing the APKs to classify them: those are evidence too, and they can feed another round on the merry-go-round.</p>
+<p><img src="/img/hunting_phishing_kit/ghostbat_detection_payload.png" alt="Figure 16: Ghostbat Detected">
+Figure 16: Ghostbat Detected</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>We started this journey from a single public report and a simple question: <em>can a single researcher keep up with these guys without an expensive intelligence platform?</em></p>
+<p>Here is what we did along the way. We extracted the naming conventions and TLDs from the Group-IB IOCs and scored them by frequency. A series of pivoting led us to fresh phishing kits impersonating ICICI, Axis and IndusInd, hosted on free-tier services and only a day old. Finally, one button on a fake bank page took us to a GitHub account distributing APKs from the GhostBat family. <strong>All of it with a free URLScan account, a VirusTotal lookup and a browser.</strong></p>
+<p>Of course, paid platforms offer more history, more telemetry and more automation (as you may have noticed, the free tier only lets us search the last 365 days of scans). But that is not what made the difference here. What made the difference was the approach: start from what you have, think like the attacker, and keep asking <em>&ldquo;what else would they have reused?&rdquo;</em> Attackers recycle logos, page titles, naming conventions and hosting providers, and every one of those habits is a pivot waiting to be used.</p>
+<blockquote>
+<p>💡<em>Budget limits what you can see, but it does not limit how you can think. A curious researcher with free tools can still find infrastructure before the alerts do, and every domain reported or taken down is one less trap for a real victim. So if you have ever felt that this game is only for those with deep pockets, my advice is: pick an IOC, open a free tool and start pulling the thread. You may be surprised by where it leads.</em></p>
+</blockquote>
+<p>Happy hunting! 🔍</p>
+<h2 id="iocs">IOCs</h2>
+<h2 id="discovered-domains">Discovered domains</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>icicicardplan[.]online
+</span></span><span style="display:flex;"><span>icicicardplans[.]online
+</span></span><span style="display:flex;"><span>icicicardpolicy[.]online
+</span></span><span style="display:flex;"><span>icicicards[.]online
+</span></span><span style="display:flex;"><span>icicicpp[.]online
+</span></span><span style="display:flex;"><span>icicicreditcard[.]online
+</span></span><span style="display:flex;"><span>iciciinsurance[.]online
+</span></span><span style="display:flex;"><span>icicimanagecards[.]online
+</span></span><span style="display:flex;"><span>icicipolicy[.]online
+</span></span><span style="display:flex;"><span>cancelcppservice[.]online
+</span></span><span style="display:flex;"><span>icicideactivatepolicy[.]online
+</span></span><span style="display:flex;"><span>helpcard[.]online
+</span></span></code></pre></div><h2 id="malicious-github-account">Malicious Github account</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>shiv4576k-coder
+</span></span></code></pre></div><h2 id="apks">APKs</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>//All APKs belong to GhostBat family.
+</span></span><span style="display:flex;"><span>1c863864ad556de1a70e69f78edce3a106af7c8ec29d01331493cadc20a6fcd9
+</span></span><span style="display:flex;"><span>2192fbd1385b0804b07e339039fa6aecb684405c59c0eb83c01406835a5a43bd
+</span></span><span style="display:flex;"><span>2daaff68aa9abf87496db1aaf1f888d7a5daf036a3497cda90122c9a3b521045
+</span></span><span style="display:flex;"><span>5da2ebd0915f5ce692dd6dabfbce0a1952ef6085f3d2c9233a189176acf6d71a
+</span></span><span style="display:flex;"><span>8bdf4067550e28c0148a34f0cc29a2cc47140aec89d4e6437205e318e023c720
+</span></span><span style="display:flex;"><span>8d21b3309296b0d5b2fe05ad6390a2ad2b14f932ed4dbaa7cd456b6377b3529f
+</span></span><span style="display:flex;"><span>bbb6c46b1f1a8d45f3edfd9f5caca712109b4adf5c01ae8baad9e9cdeca01d34
+</span></span><span style="display:flex;"><span>df94e0196c2d15148fa9b80a84672401393abda12a433ad0e4372f00f27476cc
+</span></span><span style="display:flex;"><span>f714d65bb847fc58514d34a4a00974cd7cb996112fc1277b408607c9d8835a94
+</span></span><span style="display:flex;"><span>f7c25dfe6e2fb5b55e7985f294955c3201184f26bb10f77d0672ecefcf0791ea
+</span></span></code></pre></div><h3 id="references">References</h3>
+<p>Recommended reading:</p>
+<ul>
+<li><a href="https://github.com/adulau/the-art-of-pivoting/blob/main/README.md">The Art of Pivoting</a></li>
+</ul>
+<p>Group-IB Blog:</p>
+<ul>
+<li><a href="https://www.group-ib.com/blog/cyberdakait-seven-android-trojans-indian-banking/">Reference Article</a></li>
+</ul>
+]]></content></item><item><title>Rapid-Deployable Cloud Malware Analysis Lab on AWS</title><link>https://Viuleeenz.github.io/posts/2026/06/rapid-deployable-cloud-malware-analysis-lab-on-aws/</link><pubDate>Tue, 30 Jun 2026 00:00:00 +0000</pubDate><guid>https://Viuleeenz.github.io/posts/2026/06/rapid-deployable-cloud-malware-analysis-lab-on-aws/</guid><description>&lt;p&gt;Every time I changed laptops I found myself rebuilding the same malware analysis environment from scratch. Local VMs worked well enough until they didn&amp;rsquo;t: snapshots became stale, the host machine slowed down, and after a few months I was no longer entirely sure whether the environment was still clean. Moving to an Apple Silicon Mac finally forced me to rethink the entire workflow. Rather than fighting emulation layers or maintaining increasingly heavy local VMs, I decided to move the analysis environment into AWS.&lt;/p&gt;</description><content type="html"><![CDATA[<p>Every time I changed laptops I found myself rebuilding the same malware analysis environment from scratch. Local VMs worked well enough until they didn&rsquo;t: snapshots became stale, the host machine slowed down, and after a few months I was no longer entirely sure whether the environment was still clean. Moving to an Apple Silicon Mac finally forced me to rethink the entire workflow. Rather than fighting emulation layers or maintaining increasingly heavy local VMs, I decided to move the analysis environment into AWS.</p>
 <p>This guide walks through building a repeatable, disposable malware analysis lab using Terraform and FlareVM. By the end, a fresh analysis machine is only a <code>terraform apply</code> away, and cleaning it up takes a single <code>terraform destroy</code>.</p>
 <p>The setup described here builds upon the original <a href="https://github.com/adanalvarez/AWS-malware-lab">adanalvarez/AWS-malware-lab</a> repository, with several practical adjustments, simplifications, and lessons learned during real-world usage.</p>
 <blockquote>
@@ -399,7 +532,7 @@
 ]]></content></item><item><title>From one to many - one IOC to hunt them ALL</title><link>https://Viuleeenz.github.io/posts/2025/08/from-one-to-many-one-ioc-to-hunt-them-all/</link><pubDate>Thu, 28 Aug 2025 00:00:00 +0000</pubDate><guid>https://Viuleeenz.github.io/posts/2025/08/from-one-to-many-one-ioc-to-hunt-them-all/</guid><description>&lt;p&gt;&lt;em&gt;If you are a threat researcher reading a blog post about a novel threat that could potentially impact your organization, or if you need to investigate this threat to enrich your internal telemetry for better tracking and detection, how would you proceed?&lt;/em&gt;&lt;/p&gt;
 &lt;p&gt;This was the question that come up in my mind, out of the blue, reading an article from Unit42 where they start to talk about a novel malware sold in the underground named &lt;a href="https://unit42.paloaltonetworks.com/new-malware-gremlin-stealer-for-sale-on-telegram/"&gt;Gremlin stealer&lt;/a&gt;. As always the article is very well detailed, carefully explaining the malware&amp;rsquo;s characteristics and objectives while also providing the SHA-256 hash of the analyzed sample.&lt;/p&gt;</description><content type="html"><![CDATA[<p><em>If you are a threat researcher reading a blog post about a novel threat that could potentially impact your organization, or if you need to investigate this threat to enrich your internal telemetry for better tracking and detection, how would you proceed?</em></p>
 <p>This was the question that come up in my mind, out of the blue, reading an article from Unit42 where they start to talk about a novel malware sold in the underground named <a href="https://unit42.paloaltonetworks.com/new-malware-gremlin-stealer-for-sale-on-telegram/">Gremlin stealer</a>. As always the article is very well detailed, carefully explaining the malware&rsquo;s characteristics and objectives while also providing the SHA-256 hash of the analyzed sample.</p>
-<p>Generally speaking, shared IOCs are invaluable resources for the security community, as detection capabilities often depend on the breadth of threat intelligence available in your platform. However, IOC collections can vary dramatically in quality and scope. Sometimes you&rsquo;ll find comprehensive lists containing everything from phishing email hashes and malware stages to domains and JavaScript files. Other times, you&rsquo;re left with minimal intelligence—perhaps just a single hash and a brief description—making threat hunting significantly more challenging.</p>
+<p>Generally speaking, shared IOCs are invaluable resources for the security community, as detection capabilities often depend on the breadth of threat intelligence available in your platform. However, IOC collections can vary dramatically in quality and scope. Sometimes you&rsquo;ll find comprehensive lists containing everything from phishing email hashes and malware stages to domains and JavaScript files. Other times, you&rsquo;re left with minimal intelligence, perhaps just a single hash and a brief description, making threat hunting significantly more challenging.</p>
 <blockquote>
 <p>💡 <em>When you encounter a new threat and there aren&rsquo;t many resources to rely on, you must leverage your own internal data to collect additional intelligence. This allows you to extract valuable IOCs, pivot across related malware infrastructures, and discover additional hidden samples.</em></p>
 </blockquote>
@@ -407,7 +540,7 @@
 <h2 id="understanding-sample-relationships">Understanding Sample Relationships</h2>
 <p>Effective threat hunting begins with understanding how malware samples relate to each other. <strong>Static characteristics</strong> form the foundation of this analysis. File hash relationships are particularly valuable—searching for samples with the same <strong>imphash</strong> (import hash) can reveal binaries that use similar API patterns, while <strong>ssdeep</strong> and other fuzzy hashing techniques (based on <strong>Context-Triggered Piecewise Hashing (CTPH)</strong>) help identify files with near-identical content across variable-length chunks, even when their exact hashes differ due to minor modifications or repacking.</p>
 <p>In addition to hashes, <strong>file metadata</strong> can provide another valuable layer of similarity indicators, helping connect samples that may belong to the same malware family or campaign. However, similarity analysis shouldn&rsquo;t stop at static attributes. From a <strong>behavioral standpoint</strong>, distinctive indicators often emerge, such as: <strong>File creation paths, Command-line arguments, Registry modifications, Network communication patterns,</strong> etc..</p>
-<p>When multiple samples shows overlapping behavioral traits — for instance, reaching out to the same C2 infrastructure or using identical file paths — it becomes much easier to <strong>cluster them under the same threat actor&rsquo;s activity</strong>. In fact, for hunting purposes, <strong>behavioral indicators are often more reliable than static characteristics</strong>, since they reflect what the malware <strong>must</strong> do to achieve its objectives.</p>
+<p>When multiple samples shows overlapping behavioral traits: for instance, reaching out to the same C2 infrastructure or using identical file paths — it becomes much easier to <strong>cluster them under the same threat actor&rsquo;s activity</strong>. In fact, for hunting purposes, <strong>behavioral indicators are often more reliable than static characteristics</strong>, since they reflect what the malware <strong>must</strong> do to achieve its objectives.</p>
 <blockquote>
 <p>💡 <em>Static characteristics are <strong>easily modified</strong> by threat actors, but behavioral requirements are <strong>functionally constrained</strong>. A threat actor can change how malware looks, but it&rsquo;s much harder to change what it needs to do to succeed.</em></p>
 </blockquote>
@@ -416,7 +549,7 @@
 <ul>
 <li>
 <p><strong>Anomalous Timestamp</strong></p>
-<p>The file&rsquo;s reported creation date — <strong>2041-06-29 19:48:00 UTC</strong> — is set in the future. This technique is primarily used to <strong>confuse forensic timeline analysis</strong> and can trip detection rules or triage systems that filter samples based on PE timestamp ranges. (It&rsquo;s worth mentioning that effectiveness against modern sandboxes is limited, since that most do not rely on the PE timestamp for analysis decisions but it remains a low-effort trick against timeline-centric tooling and analysts who use timestamp-based correlation).</p>
+<p>The file&rsquo;s reported creation date ( <strong>2041-06-29 19:48:00 UTC</strong> ) is set in the future. It is tempting to read this as an anti-forensic trick to <strong>confuse forensic timeline analysis</strong> and can trip detection rules or triage systems that filter samples based on PE timestamp ranges. (It&rsquo;s worth mentioning that effectiveness against modern sandboxes is limited, since that most do not rely on the PE timestamp for analysis decisions but it remains a low-effort trick against timeline-centric tooling and analysts who use timestamp-based correlation).</p>
 </li>
 <li>
 <p><strong>Misleading Copyright Information</strong></p>
@@ -486,7 +619,7 @@
 </span></span><span style="display:flex;"><span>netguid:8f855bb2-4718-4fa4-be9c-87ed0b588b5c
 </span></span><span style="display:flex;"><span>behavior:<span style="color:#e6db74">&#34;\&#34;%%ProgramFiles(x86)%%\\Google\\Chrome\\Application\\chrome.exe\&#34; --restore-last-session --remote-debugging-port=9222 --user-data-dir=\&#34;%%LOCALAPPDATA%%\\Google\\Chrome\\User Data\&#34;&#34;</span>
 </span></span></code></pre></div><blockquote>
-<p>💡 <em>VirusTotal&rsquo;s netguid modifier queries the Assembly GUID — which corresponds to the TypeLib ID set in source code ([assembly: Guid(…)]), not the MVID. The MVID is a compiler-generated random value stored as binary in the metadata stream and is not indexed by netguid. Always use the TypeLib ID value (7c11697d-caad-4bae-8b2a-0e331680a53b) for this query.</em></p>
+<p>💡 <em>VirusTotal&rsquo;s netguid modifier queries the TypeLib ID. The MVID is a compiler-generated random value stored as binary in the metadata stream and is not indexed by netguid. Always use the TypeLib ID value (7c11697d-caad-4bae-8b2a-0e331680a53b) for this query.</em></p>
 </blockquote>
 <p>Starting with the first one (<em>generated:&ldquo;2041-06-29T19:48:00&rdquo;</em>) we are able to collect a couple of samples.</p>
 <p><img src="/img/threat_hunt/vt_simple.png" alt="Figure 4: Potentially correlated sample with original Gremlin Stealer"></p>
@@ -674,9 +807,6 @@
 			</tr>
 	</thead>
 	<tbody>
-			<tr>
-					<td>d1ea7576611623c6a4ad1990ffed562e8981a3aa209717065eddc5be37a76132</td>
-			</tr>
 			<tr>
 					<td>32d081039285eed1fb97dc814da1a97dac9d6efcf5827326067ca0ba2130de05</td>
 			</tr>
